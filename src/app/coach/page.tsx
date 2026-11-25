@@ -76,11 +76,7 @@ export default function AiDietitianPage() {
             <h2 className="font-display font-bold text-sm text-[#1B1B1E]">
               Personal AI Dietitian (Pure Veg • No Eggs)
             </h2>
-            <p className="text-[11px] text-[#554337]">
-              {aiConfigured
-                ? 'Live Gemini AI connected to your real diary & EVOLT 360 profile'
-                : 'Local Smart Dietitian Engine connected to your real diary (Add GEMINI_API_KEY for LLM)'}
-            </p>
+
           </div>
         </div>
         <button
@@ -112,11 +108,10 @@ export default function AiDietitianPage() {
           return (
             <div key={m.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[85%] rounded-3xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
-                  isUser
-                    ? 'bg-[#1B1B1E] text-white rounded-br-md'
-                    : 'bg-white border border-[#E4E0D8] text-[#1B1B1E] rounded-bl-md shadow-xs'
-                }`}
+                className={`max-w-[85%] rounded-3xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${isUser
+                  ? 'bg-[#1B1B1E] text-white rounded-br-md'
+                  : 'bg-white border border-[#E4E0D8] text-[#1B1B1E] rounded-bl-md shadow-xs'
+                  }`}
               >
                 {m.content}
               </div>
