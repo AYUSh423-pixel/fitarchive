@@ -177,9 +177,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!auth.checked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F7F4EF]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="tactile-card px-8 py-6 text-center">
-          <div className="w-10 h-10 rounded-full bg-[#FB923C]/20 text-[#944A00] flex items-center justify-center mx-auto mb-3 animate-pulse">
+          <div className="w-10 h-10 rounded-full bg-[#006C4B]/20 text-[#006C4B] flex items-center justify-center mx-auto mb-3 animate-pulse">
             <Sparkles className="w-5 h-5" />
           </div>
           <p className="font-display font-semibold text-[#1B1B1E]">Loading NutriFit AI...</p>
@@ -190,14 +190,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!auth.authenticated) {
     return (
-      <div className="min-h-screen bg-[#F7F4EF] flex items-center justify-center p-5">
+      <div className="min-h-screen bg-white flex items-center justify-center p-5">
         <div className="tactile-card-white w-full max-w-md p-7 space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#FB923C] text-white flex items-center justify-center shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-[#006C4B] text-white flex items-center justify-center shadow-md">
               <Leaf className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#944A00]">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#006C4B]">
                 Pure Vegetarian • Private Space
               </span>
               <h1 className="font-display text-2xl font-bold text-[#1B1B1E]">NutriFit AI</h1>
@@ -213,13 +213,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             onClick={handleQuickEnter}
             disabled={authLoading}
-            className="w-full py-3.5 px-5 rounded-full bg-[#FB923C] hover:bg-[#f97316] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all cursor-pointer"
+            className="w-full py-3.5 px-5 rounded-full bg-[#006C4B] hover:bg-[#005a3d] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all cursor-pointer"
           >
             <span>Continue as {auth.name || 'Ayush'} (Personal Profile)</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          <div className="flex p-1 bg-[#F5F2EB] rounded-2xl gap-1">
+          <div className="flex p-1 bg-[#ECFDF5] rounded-2xl gap-1">
             <button
               type="button"
               onClick={() => {
@@ -306,11 +306,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     ROUTE_TITLES[pathname] || (pathname.startsWith('/recipes/') ? 'Recipe Details' : 'NutriFit AI');
 
   return (
-    <div className="min-h-screen flex bg-[#F7F4EF] text-[#1B1B1E]">
+    <div className="min-h-screen flex bg-white text-[#1B1B1E]">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-[#FAF8F5] border-r border-[#E4E0D8]/80 px-4 py-5 z-40 overflow-y-auto no-scrollbar">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-[#D1FAE5]/80 px-4 py-5 z-40 overflow-y-auto no-scrollbar">
         <Link href="/" className="flex items-center gap-3 px-2 mb-6">
-          <div className="w-10 h-10 rounded-2xl bg-[#FB923C] text-white flex items-center justify-center shadow-sm">
+          <div className="w-10 h-10 rounded-2xl bg-[#006C4B] text-white flex items-center justify-center shadow-sm">
             <Leaf className="w-5 h-5" />
           </div>
           <div>
@@ -322,7 +322,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="space-y-5 flex-1">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
-              <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-[#887365] mb-1.5">
+              <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-[#6B5F4E] mb-1.5">
                 {group.label}
               </p>
               <div className="space-y-1">
@@ -335,8 +335,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       href={item.href}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold transition-all ${
                         active
-                          ? 'bg-[#FFEDD5] text-[#944A00] shadow-xs'
-                          : 'text-[#554337] hover:bg-[#F2EFE9] hover:text-[#1B1B1E]'
+                          ? 'bg-[#ECFDF5] text-[#006C4B] shadow-xs'
+                          : 'text-[#554337] hover:bg-[#D1FAE5] hover:text-[#1B1B1E]'
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -354,7 +354,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className={`flex-1 lg:pl-64 flex flex-col min-h-screen w-full ${isScannerPage ? 'bg-[#0D1F18]' : ''}`}>
         {/* Top Header — new clean design, hidden on scanner */}
         {!isScannerPage && (
-          <header className="sticky top-0 z-30 h-16 bg-[#E8E4DC]/90 backdrop-blur-xl border-b border-[#D6D0C4]/40 px-4 sm:px-6 flex items-center justify-between">
+          <header className="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-xl border-b border-[#D1FAE5]/40 px-4 sm:px-6 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setDrawerOpen(true)}
@@ -379,7 +379,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 href="/profile"
                 aria-label="Body profile"
-                className="w-9 h-9 rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-sm font-bold text-sm"
+                className="w-9 h-9 rounded-full bg-[#006C4B] text-white flex items-center justify-center shadow-sm font-bold text-sm"
               >
                 {auth.name ? auth.name.charAt(0).toUpperCase() : <User className="w-[17px] h-[17px]" />}
               </Link>
@@ -397,17 +397,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {drawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div className="fixed inset-0 bg-black/30 backdrop-blur-xs" onClick={() => setDrawerOpen(false)} />
-          <div className="relative w-72 max-w-[82vw] bg-[#FAF8F5] h-full p-5 overflow-y-auto shadow-2xl z-10">
+          <div className="relative w-72 max-w-[82vw] bg-white h-full p-5 overflow-y-auto shadow-2xl z-10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-[#FB923C] text-white flex items-center justify-center">
+                <div className="w-9 h-9 rounded-2xl bg-[#006C4B] text-white flex items-center justify-center">
                   <Leaf className="w-4 h-4" />
                 </div>
                 <span className="font-display font-bold text-lg">NutriFit AI</span>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-9 h-9 rounded-full bg-[#F2EFE9] flex items-center justify-center"
+                className="w-9 h-9 rounded-full bg-[#D1FAE5] flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -415,7 +415,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="space-y-5">
               {NAV_GROUPS.map((group) => (
                 <div key={group.label}>
-                  <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-[#887365] mb-1.5">
+                  <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-[#6B5F4E] mb-1.5">
                     {group.label}
                   </p>
                   <div className="space-y-1">
@@ -428,7 +428,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                           href={item.href}
                           onClick={() => setDrawerOpen(false)}
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold ${
-                            active ? 'bg-[#FFEDD5] text-[#944A00]' : 'text-[#554337]'
+                            active ? 'bg-[#ECFDF5] text-[#006C4B]' : 'text-[#554337]'
                           }`}
                         >
                           <Icon className="w-4 h-4" />
@@ -454,7 +454,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/"
               className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+                pathname === '/' ? 'text-[#006C4B]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
               }`}
             >
               <Home className="w-5 h-5 mb-0.5" />
@@ -463,7 +463,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/diary"
               className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/diary' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+                pathname === '/diary' ? 'text-[#006C4B]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
               }`}
             >
               <BookOpen className="w-5 h-5 mb-0.5" />
@@ -475,7 +475,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 href="/scanner"
                 aria-label="Scan Meal"
-                className="w-[66px] h-[66px] rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(180,83,9,0.45)] border-[5px] border-[#E8E4DC] active:scale-95 transition-all"
+                className="w-[66px] h-[66px] rounded-full bg-[#006C4B] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(0,108,75,0.45)] border-[5px] border-white active:scale-95 transition-all"
               >
                 <Camera className="w-7 h-7 text-white stroke-[2.2]" />
               </Link>
@@ -484,7 +484,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/explore"
               className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/explore' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+                pathname === '/explore' ? 'text-[#006C4B]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
               }`}
             >
               <Compass className="w-5 h-5 mb-0.5" />
@@ -493,7 +493,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/coach"
               className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/coach' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+                pathname === '/coach' ? 'text-[#006C4B]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
               }`}
             >
               <Sparkles className="w-5 h-5 mb-0.5" />

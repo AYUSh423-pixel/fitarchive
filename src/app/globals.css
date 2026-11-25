@@ -1,41 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --surface: #fbf8fc;
-  --surface-canvas: #f7f4ef;
-  --surface-raised: #faf8f5;
-  --surface-subdued: #f2efe9;
-  --surface-container: #f0edf1;
-  --surface-container-low: #f5f3f6;
-  --surface-container-high: #eae7eb;
+  --surface: #f0fdf4;
+  --surface-canvas: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-subdued: #dcfce7;
+  --surface-container: #dcfce7;
+  --surface-container-low: #f0fdf4;
+  --surface-container-high: #bbf7d0;
   --surface-container-lowest: #ffffff;
   --on-surface: #1b1b1e;
   --on-surface-variant: #554337;
-  --primary: #944a00;
-  --primary-container: #fb923c;
-  --primary-fixed: #ffdcc5;
-  --on-primary-fixed: #301400;
-  --secondary: #006c4b;
-  --secondary-container: #64f9bc;
+  --primary: #006c4b;
+  --primary-container: #dcfce7;
+  --primary-fixed: #bbf7d0;
+  --on-primary-fixed: #052e16;
+  --secondary: #fb923c;
+  --secondary-container: #ffdcc5;
   --tertiary: #674bb5;
   --tertiary-fixed: #e8ddff;
-  --outline-variant: #dbc1b2;
+  --outline-variant: #a7f3d0;
 
-  /* Sakuga VFX anime components — customized for NutriFit Warm Earth & Citrus Punch */
+  /* Sakuga VFX anime components — customized for NutriFit Green & Citrus Punch */
   --sk-card: #ffffff;
   --sk-ink: #1b1b1e;
   --sk-dim: #71717a;
-  --sk-soft: #ffdcc5;
-  --sk-pri: #fb923c;
-  --sk-pri-ink: #1b1b1e;
-  --sk-acc: #006c4b;
-  --sk-track: #e4e0d8;
+  --sk-soft: #bbf7d0;
+  --sk-pri: #006c4b;
+  --sk-pri-ink: #ffffff;
+  --sk-acc: #fb923c;
+  --sk-track: #d1fae5;
   --sk-r: 16px;
   --sk-bw: 2.8px;
-  --sk-sh: 4px 5px 0 #ffdcc5;
-  --sk-btn-sh: 4px 5px 0 #ffdcc5;
+  --sk-sh: 4px 5px 0 #bbf7d0;
+  --sk-btn-sh: 4px 5px 0 #bbf7d0;
   --sk-btn-line: #1b1b1e;
-  --sk-alt-sh: 3px 4px 0 #e4e0d8;
+  --sk-alt-sh: 3px 4px 0 #a7f3d0;
   --sk-alt-line: #554337;
   --sk-tick: #1b1b1e;
   --sk-fill: #006c4b;
@@ -60,7 +60,7 @@
 
 html,
 body {
-  background-color: #E8E4DC;
+  background-color: #ffffff;
   color: #1a1a1a;
   font-family: var(--font-manrope), "Manrope", sans-serif;
   overscroll-behavior-y: none;
@@ -92,15 +92,15 @@ h1, h2, h3, .font-display {
 
 .tactile-input {
   background-color: #ffffff;
-  border: 1.5px solid #E5E0D8;
+  border: 1.5px solid #D1FAE5;
   border-radius: 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tactile-input:focus {
   outline: none;
-  border-color: #B45309;
-  box-shadow: 0 0 0 3px rgba(180,83,9,0.12);
+  border-color: #006C4B;
+  box-shadow: 0 0 0 3px rgba(0,108,75,0.12);
 }
 
 .no-scrollbar::-webkit-scrollbar {
