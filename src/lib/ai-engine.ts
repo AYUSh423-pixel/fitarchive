@@ -49,7 +49,9 @@ export async function callVidhyantraChat(
   messages: Array<{ role: string; content: string }>,
   apiKey: string,
   baseUrl: string,
-  model: string
+  model: string,
+  imageBase64?: string,
+  mimeType?: string
 ): Promise<string | null> {
   const chatUrl = (baseUrl || DEFAULT_VIDHYANTRA_BASE_URL).replace(/\/+$/, '') + '/chat/';
 
@@ -75,6 +77,16 @@ export async function callVidhyantraChat(
     ? `${systemMsg.content}\n\n=== CONVERSATION ===\n${formattedDialog}`
     : formattedDialog;
 
+  // Build request body with optional image
+  const requestBody: Record<string, any> = {
+    model: vidhyantraModel,
+    message: combined,
+  };
+
+  if (imageBase64) {
+    requestBody.image = `data:${mimeType || 'image/jpeg'};base64,${imageBase64}`;
+  }
+
   try {
     const res = await fetch(chatUrl, {
       method: 'POST',
@@ -82,17 +94,19 @@ export async function callVidhyantraChat(
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey || DEFAULT_VIDHYANTRA_KEY}`,
       },
-      body: JSON.stringify({
-        model: vidhyantraModel,
-        message: combined,
-      }),
+      body: JSON.stringify(requestBody),
       signal: AbortSignal.timeout(28000),
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Vidhyantra API error:', res.status, errorText);
+      return null;
+    }
     const data = await res.json();
     return data?.reply || null;
-  } catch {
+  } catch (err) {
+    console.error('Vidhyantra API fetch error:', err);
     return null;
   }
 }
@@ -151,7 +165,10 @@ export async function analyzeFoodPhoto(
 ): Promise<PhotoScanResult> {
   const { provider, apiKey, model, baseUrl } = resolveAiCredentials(config);
 
-  if (apiKey) {
+  // Check if we have a vision-capable provider
+  const hasVisionSupport = provider === 'gemini' || provider === 'openai' || provider === 'openrouter' || (!isVidhyantraUrl(baseUrl) && provider !== 'custom');
+
+  if (apiKey && hasVisionSupport) {
     try {
       const prompt = `You are an expert pure-vegetarian Indian nutritionist AI specializing in homemade Indian cuisine. Analyze this food photo${hintText ? ` (user hint: "${hintText}")` : ''}.
 
@@ -223,18 +240,24 @@ Respond ONLY in this exact JSON shape:
           jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         }
       } else if (isVidhyantraUrl(baseUrl)) {
-        // Vidhyantra sol (GPT-6 flagship) — text-only since photo not supported
-        // Build an accurate text-based analysis prompt using the hint or a generic Indian meal
+        // Vidhyantra sol (GPT-6 flagship) — supports image analysis via image field
         const analysisPrompt = hintText
           ? `${prompt}\n\nThe user described their meal as: "${hintText}".\nUsing your expert knowledge of Indian home cooking, identify all the food items likely present in this description, estimate their weights and portions for a typical Indian household serving size, and calculate macros including realistic oil/ghee for home-cooking methods (e.g. tadka for dal, ghee on roti, oil in sabzi). Return ONLY the JSON described above.`
-          : `${prompt}\n\nThe user took a photo of an Indian vegetarian meal but the photo analysis could not be performed in text mode. As a pure-vegetarian Indian nutritionist, estimate a balanced homemade vegetarian meal that includes protein (like dal/paneer/soya), carbs (roti/rice), and vegetables. Assume typical Gujarati or North Indian home-cooking portions with realistic oil/ghee amounts. Return ONLY the JSON described above.`;
+          : prompt;
 
-        jsonText = await callVidhyantraChat(
-          [{ role: 'user', content: analysisPrompt }],
-          apiKey,
-          baseUrl,
-          model
-        );
+        try {
+          jsonText = await callVidhyantraChat(
+            [{ role: 'user', content: analysisPrompt }],
+            apiKey,
+            baseUrl,
+            model,
+            base64Image,
+            mimeType
+          );
+        } catch (err) {
+          console.error('Vidhyantra analysis error:', err);
+          jsonText = null;
+        }
       } else {
         // OpenAI / Groq / OpenRouter / Custom vision endpoint
         const targetUrl = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
