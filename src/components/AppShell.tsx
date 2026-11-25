@@ -85,7 +85,7 @@ const NAV_GROUPS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isScannerPage = pathname === '/scanner';
+  const isScannerPage = Boolean(pathname?.startsWith('/scanner'));
   const [auth, setAuth] = useState<AuthState>({ checked: false, authenticated: false });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');

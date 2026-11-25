@@ -138,16 +138,21 @@ export default function MealScannerPage() {
         body: JSON.stringify({ imageBase64: b64, mimeType: mime, hintText: hint }),
       });
       const text = await res.text();
-      let data: { error?: string; result?: PhotoScanResult };
+      let data: any;
       try {
         data = JSON.parse(text);
       } catch {
         throw new Error('Server returned an invalid response. Please add a description to assist the AI.');
       }
       if (!res.ok || data.error) throw new Error(data.error || 'Analysis failed');
-      if (data.result) {
-        setScanResult(data.result);
-        setItems(data.result.items.map((it, i) => ({ ...it, tempId: `t${i}` })));
+
+      // The API returns PhotoScanResult directly or wrapped in data.result
+      const scanResultData: PhotoScanResult = (data.result || data) as PhotoScanResult;
+      if (scanResultData && Array.isArray(scanResultData.items) && scanResultData.items.length > 0) {
+        setScanResult(scanResultData);
+        setItems(scanResultData.items.map((it, i) => ({ ...it, tempId: `t${i}` })));
+      } else {
+        throw new Error('Could not identify food items. Please add a brief description below and try again.');
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Analysis failed. Try again.');
@@ -467,7 +472,7 @@ export default function MealScannerPage() {
       </div>
 
       {/* Bottom controls */}
-      <div className="flex items-center justify-between px-8 pb-6 pt-4 relative z-30">
+      <div className="flex items-center justify-between px-6 pb-6 pt-3 relative z-30 w-full max-w-sm mx-auto">
         {/* Gallery picker */}
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -479,16 +484,16 @@ export default function MealScannerPage() {
 
         {/* Center action button */}
         {imagePreview ? (
-          <div className="flex-1 flex flex-col items-center px-4">
+          <div className="flex-1 flex flex-col items-center px-3">
             <button
               onClick={() => analyzePhoto(imageBase64, mimeType, hintText)}
               disabled={analyzing}
-              className="w-full max-w-[220px] py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               {analyzing ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Analyzing…</span>
+                  <span>Analyzing Meal…</span>
                 </>
               ) : (
                 <>
@@ -499,7 +504,7 @@ export default function MealScannerPage() {
             </button>
             <button
               onClick={handleRetake}
-              className="text-white/60 hover:text-white text-xs mt-2 underline cursor-pointer"
+              className="text-white/60 hover:text-white text-xs mt-1.5 underline cursor-pointer"
             >
               Retake photo
             </button>
@@ -515,7 +520,7 @@ export default function MealScannerPage() {
               <div className="w-7 h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <div className="w-14 h-14 rounded-full bg-[#B45309] flex items-center justify-center">
-                <Camera className="w-6 h-6 text-white" />
+                <Camera className="w-7 h-7 text-white stroke-[2.2]" />
               </div>
             )}
           </button>
@@ -535,9 +540,9 @@ export default function MealScannerPage() {
             <button
               onClick={startCamera}
               aria-label="Restart camera"
-              className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white"
+              className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors"
             >
-              <Camera className="w-5 h-5" />
+              <RotateCcw className="w-5 h-5" />
             </button>
           )}
         </div>
