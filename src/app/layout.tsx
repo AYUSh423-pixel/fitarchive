@@ -42,6 +42,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script src="/button.js" />
         <script src="/tabs.js" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js').catch(() => {});
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body className="min-h-full bg-[#F7F4EF] text-[#1B1B1E]">
         <Suspense fallback={<div className="min-h-screen bg-[#F7F4EF]" />}>

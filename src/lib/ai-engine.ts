@@ -56,12 +56,22 @@ export async function callVidhyantraChat(
   const vidhyantraModel = VALID_MODELS.includes(model) ? model : 'sol';
 
   // Vidhyantra API uses a single "message" string field (not OpenAI messages array)
-  // Combine system context + user message into one prompt string
-  const systemMsg = messages.find(m => m.role === 'system');
-  const userMsg = messages.filter(m => m.role === 'user').pop();
+  // Combine system context + multi-turn dialog into one cohesive prompt string
+  const systemMsg = messages.find((m) => m.role === 'system');
+  const dialogTurns = messages.filter((m) => m.role !== 'system');
+
+  let formattedDialog = '';
+  if (dialogTurns.length > 1) {
+    formattedDialog = dialogTurns
+      .map((t) => `${t.role === 'user' ? 'User' : 'Dietitian'}: ${t.content}`)
+      .join('\n\n');
+  } else if (dialogTurns.length === 1) {
+    formattedDialog = dialogTurns[0]?.content || '';
+  }
+
   const combined = systemMsg
-    ? `${systemMsg.content}\n\nUser: ${userMsg?.content || ''}`
-    : (userMsg?.content || '');
+    ? `${systemMsg.content}\n\n${formattedDialog ? `=== CONVERSATION ===\n${formattedDialog}` : ''}`
+    : formattedDialog;
 
   const res = await fetch(chatUrl, {
     method: 'POST',
@@ -121,28 +131,47 @@ export async function analyzeFoodPhoto(
 
   if (apiKey) {
     try {
-      const prompt = `You are a pure-vegetarian Indian nutritionist AI. Analyze this food photo${hintText ? ` (user hint: "${hintText}")` : ''}.
-Identify each visible Indian food item, estimate serving size, weight in grams, calories, proteinG, carbsG, fatG, and likely oil/ghee in grams.
-Respond ONLY in valid JSON with this exact shape:
+      const prompt = `You are an expert pure-vegetarian Indian nutritionist AI specializing in homemade Indian cuisine. Analyze this food photo${hintText ? ` (user hint: "${hintText}")` : ''}.
+
+RULES:
+- PURE VEGETARIAN ONLY — no eggs, no meat, no fish, no seafood. User is strictly vegetarian.
+- Identify every visible food item separately (roti, dal, sabzi, rice, chutney, raita, etc.).
+- Use Indian cooking method awareness:
+  • Roti/phulka on tawa: assume 2–3g ghee each unless clearly dry
+  • Dal/curry: assume 10–15g oil/ghee per bowl for tempering (tadka)
+  • Sabzi (dry): 8–12g oil for 1 bowl serving
+  • Sabzi (gravy): 12–18g oil for 1 bowl
+  • Poha/upma: 5–8g oil per plate
+  • Fried items (puri, pakoda, vada): 15–25g oil absorbed
+  • Biryani/pulao: 10g ghee per bowl estimate
+  • Salad/raita/kachumber: 0–2g oil only
+- For each item, estimate a realistic Indian home-cooked portion (not restaurant size, not too small).
+- If the user hint specifies an item, treat it as definitely present and accurately portioned.
+- Output STRICT valid JSON only — no markdown, no preamble, no commentary.
+
+Respond ONLY in this exact JSON shape:
 {
-  "dishTitle": "short title",
-  "cuisineLabel": "e.g. Homemade North-Indian / Gujarati Thali",
+  "dishTitle": "short descriptive title",
+  "cuisineLabel": "e.g. Homemade Gujarati Thali / North Indian Dinner / South Indian Breakfast",
+  "cookingMethod": "tawa-cooked|pressure-cooked|deep-fried|air-fried|raw|grilled|steamed|stir-fried",
   "items": [
     {
-      "name": "Food Name",
+      "name": "Indian Food Name in English",
       "quantity": 1,
-      "unit": "bowl|piece|g|cup|tbsp|tsp|serving",
+      "unit": "bowl|piece|g|cup|tbsp|tsp|serving|plate",
       "weightGrams": 150,
       "calories": 200,
       "proteinG": 10,
       "carbsG": 25,
       "fatG": 6,
-      "oilGheeGrams": 4,
+      "oilGheeGrams": 8,
       "confidence": "high|medium|low",
-      "sharePct": 35
+      "sharePct": 35,
+      "cookingNotes": "e.g. tawa-fried with 2g ghee, home-style tadka"
     }
   ],
-  "clarifyingQuestions": ["question about ghee/oil or portion size"]
+  "clarifyingQuestions": ["Ask about portion size or ghee amount if uncertain"],
+  "disclaimer": "Estimates for home-cooked Indian portions. Confirm ghee/oil amounts."
 }`;
 
       let jsonText: string | null = null;
@@ -172,14 +201,18 @@ Respond ONLY in valid JSON with this exact shape:
           jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         }
       } else if (isVidhyantraUrl(baseUrl)) {
-        // Vidhyantra doesn't support image input — fall through to text-based hint
-        // but still try text analysis with the hint
-        if (hintText) {
-          jsonText = await callVidhyantraChat(
-            [{ role: 'user', content: `${prompt}\nFood description: ${hintText}` }],
-            apiKey, baseUrl, model
-          );
-        }
+        // Vidhyantra sol (GPT-6 flagship) — text-only since photo not supported
+        // Build an accurate text-based analysis prompt using the hint or a generic Indian meal
+        const analysisPrompt = hintText
+          ? `${prompt}\n\nThe user described their meal as: "${hintText}".\nUsing your expert knowledge of Indian home cooking, identify all the food items likely present in this description, estimate their weights and portions for a typical Indian household serving size, and calculate macros including realistic oil/ghee for home-cooking methods (e.g. tadka for dal, ghee on roti, oil in sabzi). Return ONLY the JSON described above.`
+          : `${prompt}\n\nThe user took a photo of an Indian vegetarian meal but the photo analysis could not be performed in text mode. As a pure-vegetarian Indian nutritionist, estimate a balanced homemade vegetarian meal that includes protein (like dal/paneer/soya), carbs (roti/rice), and vegetables. Assume typical Gujarati or North Indian home-cooking portions with realistic oil/ghee amounts. Return ONLY the JSON described above.`;
+
+        jsonText = await callVidhyantraChat(
+          [{ role: 'user', content: analysisPrompt }],
+          apiKey,
+          baseUrl,
+          model
+        );
       } else {
         // OpenAI / Groq / OpenRouter / Custom vision endpoint
         const targetUrl = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
@@ -522,16 +555,67 @@ export async function runDietitianChat(
 
   if (apiKey) {
     try {
-      const systemContext = `You are NutriFit AI, a warm, encouraging, practical personal Indian vegetarian dietitian.
-STRICT RULES:
-1. User is PURE VEGETARIAN, ABSOLUTELY NO EGGS, NO MEAT, NO FISH. Never suggest eggs or non-veg.
-2. User prefers affordable homemade Indian food (especially Gujarati & North Indian staples).
-3. Never shame, guilt, or suggest starvation/extreme deficits.
-4. Distinguish clearly between verified logged data and estimates. Never fabricate logged meals.
-5. User Profile: Age ${db.profile.age}, ${db.profile.heightCm}cm, ${db.profile.weightKg}kg, Body Fat ${db.profile.bodyFatPct}%, Muscle ${db.profile.skeletalMuscleMassKg}kg, Waist ${db.profile.waistCm}cm, Gym 4-5x/wk, Goal: Lean Athletic Physique.
-6. Daily Targets: ${target.caloriesKcal} kcal, ${target.proteinG}g protein, ${target.carbsG}g carbs, ${target.fatG}g fat.
-7. Today's Actual Logged Totals (${today}): ${Math.round(consumed.calories)} kcal, ${Math.round(consumed.proteinG)}g protein, ${Math.round(consumed.carbsG)}g carbs, ${Math.round(consumed.fatG)}g fat. Water: ${todayWater} ml.
-8. Today's Logged Foods: ${todayLogs.length ? todayLogs.map((l) => `${l.mealSlot}: ${l.foodName} (${l.calories} kcal, ${l.proteinG}g P)`).join('; ') : 'Nothing logged yet today.'}`;
+      // Build rich context strings
+      const remCarbsG = Math.round(target.carbsG - consumed.carbsG);
+      const remFatG = Math.round(target.fatG - consumed.fatG);
+      const waterPct = Math.round((todayWater / Math.max(1, target.waterMl)) * 100);
+
+      // Recent 7-day weight trend from body scans
+      const recentScans = (db.bodyScans || [])
+        .sort((a, b) => b.scanDate.localeCompare(a.scanDate))
+        .slice(0, 7);
+      const weightTrend = recentScans.length >= 2
+        ? (() => {
+            const newest = recentScans[0].weightKg;
+            const oldest = recentScans[recentScans.length - 1].weightKg;
+            const diff = Number((newest - oldest).toFixed(1));
+            return `Weight trend (last ${recentScans.length} scans): ${diff > 0 ? '+' : ''}${diff} kg (latest: ${newest} kg)`;
+          })()
+        : recentScans.length === 1
+          ? `Latest weight: ${recentScans[0].weightKg} kg`
+          : 'No weight scans logged yet';
+
+      // Workout context today
+      const todayWorkouts = (db.workoutLogs || []).filter((w) => w.workoutDate === today);
+      const workoutContext = todayWorkouts.length
+        ? `Workouts today: ${todayWorkouts.map((w) => {
+            const exs = (w.exercises || []).slice(0, 3).map((e) => `${e.exerciseName} ${e.sets}×${e.reps}${e.weightKg ? ` @ ${e.weightKg}kg` : ''}`).join(', ');
+            return `${w.title}${w.durationMin ? ` (${w.durationMin} min)` : ''}${exs ? ` — ${exs}` : ''}`;
+          }).join('; ')}`
+        : 'No workout logged today yet';
+
+      const systemContext = `You are NutriFit AI, a warm, encouraging, expert personal Indian vegetarian dietitian and fitness coach. Reply in clear markdown with bullet points and **bold key numbers**.
+
+=== STRICT RULES ===
+1. User is PURE VEGETARIAN — ABSOLUTELY NO EGGS, NO MEAT, NO FISH, NO SEAFOOD. Never suggest them.
+2. User prefers affordable homemade Indian food (especially Gujarati & North Indian staples like roti, dal, paneer, soya chunks, curd, poha, thepla, rajma, sprouts).
+3. Never shame, never guilt-trip, never suggest extreme deficits or starvation.
+4. Always distinguish verified logged data from estimates. Never fabricate or guess logged meals.
+5. When you give a recommendation, include specific amounts in grams or ml, not just "some" or "a bowl".
+6. Acknowledge the user's actual logged data before making suggestions. Don't pretend they haven't eaten if they have.
+
+=== USER PROFILE ===
+- Age: ${db.profile.age} | Height: ${db.profile.heightCm} cm | Current Weight: ${db.profile.weightKg} kg
+- Body Fat: ${db.profile.bodyFatPct}% | Skeletal Muscle: ${db.profile.skeletalMuscleMassKg} kg | Waist: ${db.profile.waistCm} cm
+- Activity: Gym 4–5×/week | Goal: Lean Athletic Physique (fat loss + muscle preservation)
+- ${weightTrend}
+
+=== TODAY'S NUTRITION (${today}) ===
+- Calories: **${Math.round(consumed.calories)} / ${target.caloriesKcal} kcal** (remaining: **${remCal} kcal**)
+- Protein: **${Math.round(consumed.proteinG)}g / ${target.proteinG}g** (remaining: **${remPro}g**)
+- Carbs: **${Math.round(consumed.carbsG)}g / ${target.carbsG}g** (remaining: **${remCarbsG}g**)
+- Fat: **${Math.round(consumed.fatG)}g / ${target.fatG}g** (remaining: **${remFatG}g**)
+- Water: **${todayWater} ml / ${target.waterMl} ml** (${waterPct}%)
+
+=== TODAY'S LOGGED MEALS ===
+${todayLogs.length
+  ? todayLogs.map((l) => `• ${l.mealSlot.toUpperCase()}: ${l.foodName} — ${l.calories} kcal, ${l.proteinG}g P, ${l.carbsG}g C, ${l.fatG}g F`).join('\n')
+  : 'Nothing logged yet today.'
+}
+
+=== FITNESS CONTEXT ===
+- ${workoutContext}
+- Weekly goal: hit protein target every day; keep calories at or below target; drink ${target.waterMl} ml water`;
 
       let replyText: string | null = null;
 

@@ -51,6 +51,8 @@ export default function FoodDiaryPage() {
   const [statusMsg, setStatusMsg] = useState('');
   const [lastDeleted, setLastDeleted] = useState<FoodLog | null>(null);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [activeMealSlot, setActiveMealSlot] = useState<MealSlot | 'all'>('all');
+  const diaryTabsRef = React.useRef<HTMLElement | null>(null);
 
   const loadDiary = useCallback(async () => {
     setLoading(true);
@@ -342,7 +344,38 @@ export default function FoodDiaryPage() {
         <div className="h-48 rounded-3xl bg-white animate-pulse" />
       ) : (
         <div className="space-y-4">
-          {mealSlots.map((slot) => {
+          {/* Sakuga Tabs — filter by meal slot */}
+          <div className="overflow-x-auto no-scrollbar">
+            {/* @ts-ignore */}
+            <sakuga-tabs
+              ref={(el: HTMLElement | null) => {
+                diaryTabsRef.current = el;
+                if (el && !(el as unknown as { _diaryListened?: boolean })._diaryListened) {
+                  (el as unknown as { _diaryListened: boolean })._diaryListened = true;
+                  el.addEventListener('change', (ev: Event) => {
+                    const detail = (ev as CustomEvent<{ value: string }>).detail;
+                    setActiveMealSlot(detail.value as MealSlot | 'all');
+                    // Snap open the first matching slot if filtering to a single slot
+                    if (detail.value !== 'all') {
+                      setModalSlot(detail.value as MealSlot);
+                    }
+                  });
+                }
+              }}
+              style={{ '--sk-pri': '#FB923C', '--sk-acc': '#006c4b' } as React.CSSProperties}
+            >
+              <option value="all">All Meals</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="snacks">Snacks</option>
+              <option value="dinner">Dinner</option>
+            {/* @ts-ignore */}
+            </sakuga-tabs>
+          </div>
+
+          {mealSlots
+            .filter((slot) => activeMealSlot === 'all' || slot.key === activeMealSlot)
+            .map((slot) => {
             const slotLogs = logs.filter((l) => l.mealSlot === slot.key);
             const slotCals = slotLogs.reduce((s, l) => s + l.calories, 0);
             return (

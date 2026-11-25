@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.nutrifit_smoky.twa",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7F:0E:52:D7:11:86:EC:F9:6B:9E:87:66:43:06:51:09:E0:4E:52:97:92:41:CE:39:B3:73:E6:CD:D8"
+      ]
+    }
+  }
+]
