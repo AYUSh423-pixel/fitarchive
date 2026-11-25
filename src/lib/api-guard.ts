@@ -27,6 +27,8 @@ export async function requireAuth(): Promise<
         habitLogsRes,
         mealsRes,
         workoutsRes,
+        bodyScansRes,
+        bodyMeasurementsRes,
       ] = await Promise.all([
         supabaseAdmin.from('user_profiles').select('*').eq('id', session.userId).single(),
         supabaseAdmin.from('nutrition_targets').select('*').eq('user_id', session.userId).maybeSingle(),
@@ -37,6 +39,8 @@ export async function requireAuth(): Promise<
         supabaseAdmin.from('habit_logs').select('*').eq('user_id', session.userId),
         supabaseAdmin.from('meals').select('*').eq('user_id', session.userId),
         supabaseAdmin.from('workouts').select('*').eq('user_id', session.userId),
+        supabaseAdmin.from('body_scans').select('*').eq('user_id', session.userId).order('scan_date', { ascending: false }),
+        supabaseAdmin.from('body_measurements').select('*').eq('user_id', session.userId).order('measured_date', { ascending: false }),
       ]);
 
       const baseDb = readDatabase();
@@ -129,6 +133,43 @@ export async function requireAuth(): Promise<
           notes: h.notes || undefined,
         }));
 
+        const userBodyScans: DatabaseState['bodyScans'] = (bodyScansRes.data || []).map((s: any) => ({
+          id: s.id,
+          userId: s.user_id,
+          scanDate: s.scan_date,
+          deviceName: s.device_name || 'EVOLT 360',
+          weightKg: Number(s.weight_kg),
+          bmi: Number(s.bmi),
+          bodyFatPct: Number(s.body_fat_pct || 0),
+          skeletalMuscleMassKg: Number(s.skeletal_muscle_mass_kg || 0),
+          waistCm: Number(s.waist_cm || 0),
+          visceralFatLevel: Number(s.visceral_fat_level || 0),
+          bmrKcal: Number(s.bmr_kcal || 0),
+          teeKcal: Number(s.tee_kcal || 0),
+          reportUrl: s.report_url || undefined,
+          notes: s.notes || undefined,
+          createdAt: s.created_at || new Date().toISOString(),
+          heightCm: s.height_cm ? Number(s.height_cm) : undefined,
+          reportedBmi: s.reported_bmi ? Number(s.reported_bmi) : undefined,
+          calculatedBmi: s.calculated_bmi ? Number(s.calculated_bmi) : undefined,
+          fileType: s.file_type || undefined,
+          rawExtractedJson: s.raw_extracted_json || undefined,
+          validationStatus: s.validation_status || undefined,
+        }));
+
+        const userBodyMeasurements: DatabaseState['bodyMeasurements'] = (bodyMeasurementsRes.data || []).map((m: any) => ({
+          id: m.id,
+          userId: m.user_id,
+          measuredDate: m.measured_date,
+          weightKg: Number(m.weight_kg),
+          waistCm: m.waist_cm ? Number(m.waist_cm) : undefined,
+          bodyFatPct: m.body_fat_pct ? Number(m.body_fat_pct) : undefined,
+          skeletalMuscleMassKg: m.skeletal_muscle_mass_kg ? Number(m.skeletal_muscle_mass_kg) : undefined,
+          visceralFatLevel: m.visceral_fat_level ? Number(m.visceral_fat_level) : undefined,
+          notes: m.notes || undefined,
+          createdAt: m.created_at || new Date().toISOString(),
+        }));
+
         const scopedDb: DatabaseState = {
           ...baseDb,
           auth: {
@@ -141,6 +182,8 @@ export async function requireAuth(): Promise<
           foodLogs: userFoodLogs,
           waterLogs: userWaterLogs,
           habitLogs: userHabitLogs,
+          bodyScans: userBodyScans,
+          bodyMeasurements: userBodyMeasurements,
         };
 
         return { session, db: scopedDb };

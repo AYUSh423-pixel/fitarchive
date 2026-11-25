@@ -54,6 +54,12 @@ export interface BodyScan {
   reportUrl?: string;
   notes?: string;
   createdAt: string;
+  heightCm?: number;
+  reportedBmi?: number;
+  calculatedBmi?: number;
+  fileType?: string;
+  rawExtractedJson?: any;
+  validationStatus?: string;
 }
 
 export interface BodyMeasurement {

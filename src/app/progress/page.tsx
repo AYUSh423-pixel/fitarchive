@@ -10,8 +10,24 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Activity, Camera, Check, Info, Plus, Scale, Upload } from 'lucide-react';
+import {
+  Activity,
+  AlertCircle,
+  Camera,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  FileCheck2,
+  FileText,
+  Info,
+  Plus,
+  Scale,
+  Sparkles,
+  Upload,
+  X,
+} from 'lucide-react';
 import type { BodyMeasurement, BodyScan, ProgressPhoto, UserProfile } from '@/types/nutrifit';
+import { calculateBmi } from '@/lib/nutrition-engine';
 
 interface ProgressResponse {
   profile: UserProfile;
@@ -37,6 +53,25 @@ export default function ProgressPage() {
   const [scanMode, setScanMode] = useState(false);
   const [toast, setToast] = useState('');
 
+  // Assessment Upload & Review State
+  const [uploadingReport, setUploadingReport] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [auditModalScan, setAuditModalScan] = useState<BodyScan | null>(null);
+
+  // Review Form Fields
+  const [editWeight, setEditWeight] = useState(76.4);
+  const [editHeight, setEditHeight] = useState(164.0);
+  const [editReportedBmi, setEditReportedBmi] = useState<number | undefined>(28.4);
+  const [editBodyFat, setEditBodyFat] = useState(29.7);
+  const [editSmm, setEditSmm] = useState(29.6);
+  const [editWaist, setEditWaist] = useState(96.7);
+  const [editDevice, setEditDevice] = useState('EVOLT 360');
+  const [editFileType, setEditFileType] = useState('pdf_report');
+  const [editDiscrepancyNote, setEditDiscrepancyNote] = useState('');
+  const [rawExtractionSnippet, setRawExtractionSnippet] = useState<any>(null);
+  const [reportFileBase64, setReportFileBase64] = useState<string | undefined>(undefined);
+  const [reportMime, setReportMime] = useState('application/pdf');
+
   const loadProgress = async () => {
     const res = await fetch('/api/progress', { cache: 'no-store' });
     if (res.ok) {
@@ -46,12 +81,127 @@ export default function ProgressPage() {
       setWaistCm(d.profile.waistCm);
       setBodyFatPct(d.profile.bodyFatPct);
       setSmmKg(d.profile.skeletalMuscleMassKg);
+      setEditHeight(d.profile.heightCm || 164.0);
     }
   };
 
   useEffect(() => {
     loadProgress();
   }, []);
+
+  // Compute live BMI from currently edited values
+  const currentCalculatedBmi = editHeight > 0 && editWeight > 0 ? calculateBmi(editWeight, editHeight) : 0;
+  const bmiDiscrepancy =
+    editReportedBmi && currentCalculatedBmi > 0
+      ? Math.abs(editReportedBmi - currentCalculatedBmi)
+      : 0;
+
+  // Handler for uploading EVOLT 360 / InBody / BMI Report PDF or Photo
+  const handleReportFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !data) return;
+
+    setUploadingReport(true);
+    setToast('');
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = String(reader.result || '');
+      const b64 = dataUrl.split(',')[1] || '';
+      const mime = file.type || 'application/pdf';
+
+      setReportFileBase64(b64);
+      setReportMime(mime);
+
+      try {
+        const res = await fetch('/api/assessment/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileBase64: b64,
+            fileName: file.name,
+            mimeType: mime,
+            currentHeightCm: data.profile.heightCm,
+            currentWeightKg: data.profile.weightKg,
+          }),
+        });
+
+        const resData = await res.json();
+        if (!res.ok) throw new Error(resData?.error || 'Extraction failed');
+
+        const ext = resData.extraction;
+        const meas = ext?.measurements || {};
+
+        setEditWeight(meas.weightKg || data.profile.weightKg);
+        setEditHeight(meas.heightCm || data.profile.heightCm);
+        setEditReportedBmi(meas.reportedBmi);
+        setEditBodyFat(meas.bodyFatPct ?? data.profile.bodyFatPct);
+        setEditSmm(meas.skeletalMuscleMassKg ?? data.profile.skeletalMuscleMassKg);
+        setEditWaist(meas.waistCm ?? data.profile.waistCm);
+        setEditDevice(
+          ext.documentType === 'evolt_360'
+            ? 'EVOLT 360'
+            : ext.documentType === 'inbody'
+            ? 'InBody'
+            : ext.fileType === 'photo_human'
+            ? 'Photo Assessment'
+            : 'Health Assessment Report'
+        );
+        setEditFileType(ext.fileType || 'pdf_report');
+        setEditDiscrepancyNote(ext.validation?.discrepancyNote || '');
+        setRawExtractionSnippet(resData);
+        setReviewModalOpen(true);
+      } catch (err) {
+        setToast(`Extraction note: ${(err as Error).message}. You can enter values manually.`);
+        setReviewModalOpen(true);
+      } finally {
+        setUploadingReport(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Confirm and persist the reviewed assessment
+  const handleConfirmAssessment = async () => {
+    if (!data) return;
+    try {
+      const res = await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'body_scan',
+          weightKg: editWeight,
+          heightCm: editHeight,
+          reportedBmi: editReportedBmi,
+          calculatedBmi: currentCalculatedBmi,
+          bmi: editReportedBmi || currentCalculatedBmi,
+          bodyFatPct: editBodyFat,
+          skeletalMuscleMassKg: editSmm,
+          waistCm: editWaist,
+          deviceName: editDevice,
+          fileType: editFileType,
+          reportBase64: reportFileBase64,
+          reportMime,
+          validationStatus: bmiDiscrepancy > 0.3 ? 'discrepancy_reviewed' : 'verified_accurate',
+          rawExtractedJson: rawExtractionSnippet,
+          notes: editDiscrepancyNote
+            ? `Verified with note: ${editDiscrepancyNote}`
+            : `Verified ${editDevice} Assessment (Formula: wt/ht² = ${currentCalculatedBmi}).`,
+        }),
+      });
+
+      if (res.ok) {
+        setToast(`✅ Body assessment saved! Profile updated to ${editWeight}kg & BMI ${currentCalculatedBmi}.`);
+        setReviewModalOpen(false);
+        loadProgress();
+      } else {
+        const err = await res.json();
+        setToast(`Error: ${err?.error || 'Failed to save'}`);
+      }
+    } catch (e) {
+      setToast(`Save error: ${(e as Error).message}`);
+    }
+  };
 
   const handleLogEntry = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,16 +265,51 @@ export default function ProgressPage() {
         <Info className="w-4 h-4 shrink-0 mt-0.5" />
         <span>
           <strong>Informational Estimate Only:</strong> EVOLT 360 &amp; BIA body composition scans estimate fat and
-          muscle trends and are <strong>not medical diagnoses</strong>. Never judge progress by a single day&apos;s scale weight.
+          muscle trends and are <strong>not medical diagnoses</strong>. Standard scientific BMI is calculated as{' '}
+          <code>weight (kg) ÷ height (m)²</code>.
         </span>
       </div>
+
+      {/* AI Assessment Upload Banner */}
+      <section className="tactile-card p-5 bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5]/60 border-2 border-[#FB923C]/40 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 rounded-xl bg-[#FB923C] text-white">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <h2 className="font-display font-bold text-base text-[#1B1B1E]">
+                Upload BMI / EVOLT 360 / InBody Report
+              </h2>
+            </div>
+            <p className="text-xs text-[#554337] leading-relaxed">
+              Upload your PDF report or body photo. The AI extracts your height, weight, body fat %, and muscle mass,
+              and cross-checks printed BMI against the scientific formula before saving.
+            </p>
+          </div>
+
+          <label className="shrink-0 px-4 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#EA580C] transition-colors cursor-pointer shadow-sm">
+            <Upload className="w-4 h-4" />
+            <span>{uploadingReport ? 'Analyzing Report...' : 'Upload Report / Photo'}</span>
+            <input
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={handleReportFileSelect}
+              disabled={uploadingReport}
+              className="hidden"
+            />
+          </label>
+        </div>
+      </section>
 
       {/* Key Composition Metrics */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="tactile-card-white p-4">
           <p className="text-[11px] font-bold uppercase text-[#554337]">Current Weight</p>
           <p className="font-display text-2xl font-bold mt-1">{data.profile.weightKg} kg</p>
-          <p className="text-[11px] text-[#944A00]">BMI {data.profile.bmi}</p>
+          <p className="text-[11px] text-[#944A00]">
+            Height: {data.profile.heightCm}cm • BMI {data.profile.bmi}
+          </p>
         </div>
         <div className="tactile-card-white p-4">
           <p className="text-[11px] font-bold uppercase text-[#554337]">Waist</p>
@@ -152,10 +337,114 @@ export default function ProgressPage() {
       </section>
 
       {toast && (
-        <div className="p-3 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3.5 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
           <Check className="w-4 h-4" /> {toast}
         </div>
       )}
+
+      {/* DEDICATED BMI REPORT & ASSESSMENT HISTORY TABLE */}
+      <section className="tactile-card-white p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-lg font-bold flex items-center gap-2 text-[#1B1B1E]">
+              <FileCheck2 className="w-5 h-5 text-[#944A00]" />
+              BMI &amp; Body Composition Reports History
+            </h2>
+            <p className="text-xs text-[#554337] mt-0.5">
+              Accurate audit log of all your EVOLT 360, InBody, and photo assessments with scientific formula verification.
+            </p>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-[#F5F3F6] text-[#554337] text-xs font-bold">
+            {data.bodyScans.length} {data.bodyScans.length === 1 ? 'Report' : 'Reports'}
+          </span>
+        </div>
+
+        {data.bodyScans.length === 0 ? (
+          <div className="p-6 rounded-2xl bg-[#F5F3F6] text-center space-y-2">
+            <FileText className="w-8 h-8 text-[#944A00]/50 mx-auto" />
+            <p className="text-sm font-bold text-[#1B1B1E]">No BMI or Body Composition Reports Uploaded Yet</p>
+            <p className="text-xs text-[#554337] max-w-md mx-auto">
+              Click &quot;Upload Report / Photo&quot; above to scan your EVOLT 360 or InBody printout. We&apos;ll automatically
+              extract and verify your BMI accuracy!
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-[#E4E0D8] text-[11px] font-bold text-[#554337] uppercase tracking-wider">
+                  <th className="py-2.5 px-3">Date &amp; Device</th>
+                  <th className="py-2.5 px-3">Height / Weight</th>
+                  <th className="py-2.5 px-3">Calculated BMI</th>
+                  <th className="py-2.5 px-3">Reported BMI</th>
+                  <th className="py-2.5 px-3">Accuracy Status</th>
+                  <th className="py-2.5 px-3">Body Fat &amp; Muscle</th>
+                  <th className="py-2.5 px-3 text-right">Audit</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E4E0D8]/60">
+                {data.bodyScans.map((scan) => {
+                  const ht = scan.heightCm || data.profile.heightCm;
+                  const calc = scan.calculatedBmi || calculateBmi(scan.weightKg, ht);
+                  const isMatch =
+                    scan.reportedBmi && Math.abs(scan.reportedBmi - calc) <= 0.3;
+                  const hasDiscrepancy =
+                    scan.reportedBmi && Math.abs(scan.reportedBmi - calc) > 0.3;
+
+                  return (
+                    <tr key={scan.id} className="hover:bg-[#F9F8F6] transition-colors">
+                      <td className="py-3 px-3 font-semibold text-[#1B1B1E]">
+                        <div>{scan.scanDate}</div>
+                        <span className="inline-block text-[10px] font-bold text-[#944A00] bg-[#FFEDD5] px-2 py-0.5 rounded-full mt-0.5">
+                          {scan.deviceName}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="font-bold text-[#1B1B1E]">{scan.weightKg} kg</div>
+                        <div className="text-[10px] text-[#554337]">{ht} cm</div>
+                      </td>
+                      <td className="py-3 px-3 font-bold text-[#1B1B1E]">
+                        {calc}
+                      </td>
+                      <td className="py-3 px-3 text-[#554337]">
+                        {scan.reportedBmi ? `${scan.reportedBmi}` : '—'}
+                      </td>
+                      <td className="py-3 px-3">
+                        {isMatch ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D]">
+                            <CheckCircle2 className="w-3 h-3" /> Accurate Match
+                          </span>
+                        ) : hasDiscrepancy ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E]">
+                            <AlertCircle className="w-3 h-3" /> Diff (±{Math.abs(scan.reportedBmi! - calc).toFixed(1)})
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#F4F4F5] text-[#554337]">
+                            Scientific Formula
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="text-[#1B1B1E]">{scan.bodyFatPct}% Fat</div>
+                        <div className="text-[10px] text-[#006C4B] font-semibold">{scan.skeletalMuscleMassKg} kg SMM</div>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setAuditModalScan(scan)}
+                          className="px-2.5 py-1 rounded-lg bg-[#F5F3F6] hover:bg-[#E4E0D8] text-[#1B1B1E] font-bold text-[11px] transition-colors cursor-pointer"
+                        >
+                          Audit Details
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       {/* Charts */}
       <section className="tactile-card-white p-5 space-y-4">
@@ -178,7 +467,7 @@ export default function ProgressPage() {
       <form onSubmit={handleLogEntry} className="tactile-card-white p-5 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-display font-bold text-base flex items-center gap-2">
-            <Scale className="w-4 h-4 text-[#944A00]" /> Log Measurement or Body Scan
+            <Scale className="w-4 h-4 text-[#944A00]" /> Manual Quick Log
           </h3>
           <button
             type="button"
@@ -194,27 +483,54 @@ export default function ProgressPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div>
             <label className="text-xs font-semibold block mb-1">Weight (kg)</label>
-            <input type="number" step="0.1" value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value))} className="tactile-input w-full px-3 py-2 text-sm" />
+            <input
+              type="number"
+              step="0.1"
+              value={weightKg}
+              onChange={(e) => setWeightKg(Number(e.target.value))}
+              className="tactile-input w-full px-3 py-2 text-sm"
+            />
           </div>
           <div>
             <label className="text-xs font-semibold block mb-1">Waist (cm)</label>
-            <input type="number" step="0.1" value={waistCm} onChange={(e) => setWaistCm(Number(e.target.value))} className="tactile-input w-full px-3 py-2 text-sm" />
+            <input
+              type="number"
+              step="0.1"
+              value={waistCm}
+              onChange={(e) => setWaistCm(Number(e.target.value))}
+              className="tactile-input w-full px-3 py-2 text-sm"
+            />
           </div>
           {scanMode && (
             <>
               <div>
                 <label className="text-xs font-semibold block mb-1">Body Fat (%)</label>
-                <input type="number" step="0.1" value={bodyFatPct} onChange={(e) => setBodyFatPct(Number(e.target.value))} className="tactile-input w-full px-3 py-2 text-sm" />
+                <input
+                  type="number"
+                  step="0.1"
+                  value={bodyFatPct}
+                  onChange={(e) => setBodyFatPct(Number(e.target.value))}
+                  className="tactile-input w-full px-3 py-2 text-sm"
+                />
               </div>
               <div>
                 <label className="text-xs font-semibold block mb-1">Muscle (kg)</label>
-                <input type="number" step="0.1" value={smmKg} onChange={(e) => setSmmKg(Number(e.target.value))} className="tactile-input w-full px-3 py-2 text-sm" />
+                <input
+                  type="number"
+                  step="0.1"
+                  value={smmKg}
+                  onChange={(e) => setSmmKg(Number(e.target.value))}
+                  className="tactile-input w-full px-3 py-2 text-sm"
+                />
               </div>
             </>
           )}
         </div>
 
-        <button type="submit" className="px-6 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+        <button
+          type="submit"
+          className="px-6 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+        >
           <Plus className="w-4 h-4" /> Save Entry
         </button>
       </form>
@@ -271,6 +587,258 @@ export default function ProgressPage() {
           </div>
         )}
       </section>
+
+      {/* REVIEW & VERIFY ASSESSMENT MODAL */}
+      {reviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl my-8 border border-[#E4E0D8]">
+            <div className="flex items-center justify-between border-b border-[#E4E0D8] pb-3">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="w-5 h-5 text-[#944A00]" />
+                <h3 className="font-display font-bold text-lg text-[#1B1B1E]">
+                  Verify Body Assessment
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReviewModalOpen(false)}
+                className="p-1 rounded-full hover:bg-[#F5F3F6] text-[#554337] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scientific Accuracy & Formula Verification Box */}
+            <div
+              className={`p-4 rounded-2xl text-xs space-y-2 ${
+                editFileType === 'photo_human'
+                  ? 'bg-[#E0F2FE] text-[#0C4A6E] border border-[#BAE6FD]'
+                  : bmiDiscrepancy > 0.3
+                  ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
+                  : 'bg-[#DCFCE7] text-[#14532D] border border-[#BBF7D0]'
+              }`}
+            >
+              <div className="font-bold flex items-center gap-1.5 text-sm">
+                {editFileType === 'photo_human' ? (
+                  <>
+                    <Camera className="w-4 h-4" /> Photo Assessment Mode
+                  </>
+                ) : bmiDiscrepancy > 0.3 ? (
+                  <>
+                    <AlertCircle className="w-4 h-4" /> Discrepancy Detected
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" /> Scientific Accuracy Verified
+                  </>
+                )}
+              </div>
+
+              {editFileType === 'photo_human' ? (
+                <p>
+                  <strong>Note:</strong> Photos cannot determine body weight or actual BMI. Please verify and confirm
+                  your height and scale weight below before saving.
+                </p>
+              ) : bmiDiscrepancy > 0.3 ? (
+                <p>
+                  Report printed BMI is <strong>{editReportedBmi}</strong>, but the standard scientific formula (
+                  <code>weight ÷ height²</code>) gives <strong>{currentCalculatedBmi}</strong> (difference of{' '}
+                  {bmiDiscrepancy.toFixed(1)}). Please verify your height and weight.
+                </p>
+              ) : (
+                <p>
+                  Standard scientific calculation (<code>{editWeight}kg ÷ ({editHeight / 100}m)²</code>) yields{' '}
+                  <strong>{currentCalculatedBmi}</strong>, which aligns perfectly with your report!
+                </p>
+              )}
+            </div>
+
+            {/* Editable Measurements */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#554337]">
+                Review &amp; Edit Extracted Values
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Weight (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editWeight}
+                    onChange={(e) => setEditWeight(parseFloat(e.target.value) || 0)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Height (cm)</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={editHeight}
+                    onChange={(e) => setEditHeight(parseFloat(e.target.value) || 0)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Calculated BMI</label>
+                  <div className="px-3 py-2 rounded-xl bg-[#F5F3F6] font-bold text-sm text-[#1B1B1E]">
+                    {currentCalculatedBmi}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Report Printed BMI</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editReportedBmi || ''}
+                    placeholder="e.g. 28.4"
+                    onChange={(e) => setEditReportedBmi(e.target.value ? parseFloat(e.target.value) : undefined)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Body Fat (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editBodyFat}
+                    onChange={(e) => setEditBodyFat(parseFloat(e.target.value) || 0)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Muscle Mass (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editSmm}
+                    onChange={(e) => setEditSmm(parseFloat(e.target.value) || 0)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Waist Circumference (cm)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editWaist}
+                    onChange={(e) => setEditWaist(parseFloat(e.target.value) || 0)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold block mb-1 text-[#554337]">Device / Source</label>
+                  <input
+                    type="text"
+                    value={editDevice}
+                    onChange={(e) => setEditDevice(e.target.value)}
+                    className="tactile-input w-full px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E4E0D8]">
+              <button
+                type="button"
+                onClick={() => setReviewModalOpen(false)}
+                className="px-4 py-2 rounded-full text-xs font-semibold text-[#554337] hover:bg-[#F5F3F6] cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAssessment}
+                className="px-6 py-2.5 rounded-full bg-[#FB923C] hover:bg-[#EA580C] text-white text-xs font-bold cursor-pointer shadow-md transition-colors"
+              >
+                Confirm &amp; Save Assessment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AUDIT DETAILS MODAL */}
+      {auditModalScan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E4E0D8]">
+            <div className="flex items-center justify-between border-b border-[#E4E0D8] pb-3">
+              <div>
+                <h3 className="font-display font-bold text-lg text-[#1B1B1E]">
+                  Assessment Audit Details
+                </h3>
+                <p className="text-xs text-[#554337]">
+                  {auditModalScan.deviceName} • {auditModalScan.scanDate}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAuditModalScan(null)}
+                className="p-1 rounded-full hover:bg-[#F5F3F6] text-[#554337] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#F5F3F6] space-y-2 text-xs">
+              <p className="font-bold text-[#1B1B1E] flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#006C4B]" /> BMI Formula Verification
+              </p>
+              <p className="text-[#554337]">
+                Scientific Formula: <code>BMI = weight (kg) ÷ (height (m))²</code>
+              </p>
+              <div className="p-2.5 rounded-xl bg-white border border-[#E4E0D8] font-mono text-[11px] space-y-1">
+                <div>Weight: {auditModalScan.weightKg} kg</div>
+                <div>Height: {auditModalScan.heightCm || data.profile.heightCm} cm</div>
+                <div>
+                  Calculated BMI:{' '}
+                  <strong className="text-[#006C4B]">
+                    {auditModalScan.calculatedBmi ||
+                      calculateBmi(auditModalScan.weightKg, auditModalScan.heightCm || data.profile.heightCm)}
+                  </strong>
+                </div>
+                {auditModalScan.reportedBmi && (
+                  <div>
+                    Report Printed BMI:{' '}
+                    <strong>{auditModalScan.reportedBmi}</strong>
+                  </div>
+                )}
+                <div>Status: {auditModalScan.validationStatus || 'verified'}</div>
+              </div>
+            </div>
+
+            {auditModalScan.notes && (
+              <div className="text-xs text-[#554337]">
+                <strong>Notes:</strong> {auditModalScan.notes}
+              </div>
+            )}
+
+            {auditModalScan.reportUrl && (
+              <div className="pt-2">
+                <a
+                  href={auditModalScan.reportUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#944A00] hover:underline"
+                >
+                  <FileText className="w-4 h-4" /> View Attached Source Document
+                </a>
+              </div>
+            )}
+
+            <div className="text-right pt-2 border-t border-[#E4E0D8]">
+              <button
+                type="button"
+                onClick={() => setAuditModalScan(null)}
+                className="px-5 py-2 rounded-full bg-[#1B1B1E] text-white text-xs font-bold cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

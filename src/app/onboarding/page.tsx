@@ -28,8 +28,8 @@ export default function OnboardingPage() {
       .then((d) => setProfile(d.profile));
   }, []);
 
-  // Handler for uploading EVOLT 360 / InBody / BMI Report
-  const handleReportUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handler for uploading EVOLT 360 / InBody / BMI Report (PDF or Photo)
+  const handleReportUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
 
@@ -37,66 +37,84 @@ export default function OnboardingPage() {
     setScanSuccess('');
     setScanFileName(file.name);
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const text = String(reader.result || '');
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = String(reader.result || '');
+        const fileBase64 = dataUrl.split(',')[1] || '';
 
-      // Regex patterns for EVOLT 360 & InBody standard text outputs
-      const weightMatch = text.match(/weight[:\s]+(\d+(?:\.\d+)?)\s*kg/i) || text.match(/(\d{2,3}(?:\.\d+)?)\s*kg/i);
-      const heightMatch = text.match(/height[:\s]+(\d+(?:\.\d+)?)\s*cm/i) || text.match(/(\d{3}(?:\.\d+)?)\s*cm/i);
-      const fatMatch = text.match(/(?:body\s*fat|bfp|fat\s*%|fat\s*percent)[:\s]+(\d+(?:\.\d+)?)\s*%/i) || text.match(/(\d{1,2}(?:\.\d+)?)\s*%\s*(?:fat)/i);
-      const muscleMatch = text.match(/(?:skeletal\s*muscle|smm|muscle\s*mass)[:\s]+(\d+(?:\.\d+)?)\s*kg/i);
-      const waistMatch = text.match(/waist[:\s]+(\d+(?:\.\d+)?)\s*cm/i);
-      const ageMatch = text.match(/age[:\s]+(\d{1,2})/i);
+        try {
+          const res = await fetch('/api/assessment/extract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileBase64,
+              fileName: file.name,
+              mimeType: file.type || 'application/pdf',
+              currentHeightCm: profile.heightCm,
+              currentWeightKg: profile.weightKg,
+            }),
+          });
 
-      const updated = { ...profile };
-      let foundCount = 0;
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.error || 'Extraction failed');
 
-      if (weightMatch) {
-        updated.weightKg = parseFloat(weightMatch[1]);
-        foundCount++;
-      }
-      if (heightMatch) {
-        updated.heightCm = parseFloat(heightMatch[1]);
-        foundCount++;
-      }
-      if (fatMatch) {
-        updated.bodyFatPct = parseFloat(fatMatch[1]);
-        foundCount++;
-      }
-      if (muscleMatch) {
-        updated.skeletalMuscleMassKg = parseFloat(muscleMatch[1]);
-        foundCount++;
-      }
-      if (waistMatch) {
-        updated.waistCm = parseFloat(waistMatch[1]);
-        foundCount++;
-      }
-      if (ageMatch) {
-        updated.age = parseInt(ageMatch[1], 10);
-        foundCount++;
-      }
+          const ext = data.extraction;
+          const meas = ext?.measurements || {};
+          const updated = { ...profile };
+          let foundCount = 0;
 
-      // Automatically recalculate BMI, BMR, TEE
-      updated.bmi = calculateBmi(updated.weightKg, updated.heightCm);
-      updated.bmrKcal = calculateBmr(updated.weightKg, updated.heightCm, updated.age, updated.gender);
-      updated.teeKcal = calculateTee(updated.bmrKcal, updated.activityLevel);
+          if (meas.weightKg && meas.weightKg > 0) {
+            updated.weightKg = meas.weightKg;
+            foundCount++;
+          }
+          if (meas.heightCm && meas.heightCm > 0) {
+            updated.heightCm = meas.heightCm;
+            foundCount++;
+          }
+          if (meas.bodyFatPct && meas.bodyFatPct > 0) {
+            updated.bodyFatPct = meas.bodyFatPct;
+            foundCount++;
+          }
+          if (meas.skeletalMuscleMassKg && meas.skeletalMuscleMassKg > 0) {
+            updated.skeletalMuscleMassKg = meas.skeletalMuscleMassKg;
+            foundCount++;
+          }
+          if (meas.waistCm && meas.waistCm > 0) {
+            updated.waistCm = meas.waistCm;
+            foundCount++;
+          }
 
-      setProfile(updated);
+          // Recalculate BMI, BMR, TEE
+          updated.bmi = calculateBmi(updated.weightKg, updated.heightCm);
+          updated.bmrKcal = calculateBmr(updated.weightKg, updated.heightCm, updated.age, updated.gender);
+          updated.teeKcal = calculateTee(updated.bmrKcal, updated.activityLevel);
+
+          setProfile(updated);
+          setScanParsing(false);
+
+          const docName = ext.documentType === 'evolt_360' ? 'EVOLT 360' : ext.documentType === 'inbody' ? 'InBody' : 'Health Report';
+          const matchMsg = ext.validation?.bmiMatchesReport
+            ? `(Calculated BMI: ${updated.bmi} ✅ Verified Match)`
+            : ext.validation?.discrepancyNote
+            ? `(${ext.validation.discrepancyNote})`
+            : '';
+
+          setScanSuccess(
+            foundCount > 0
+              ? `Auto-filled ${foundCount} stats from ${docName}: ${updated.weightKg}kg, ${updated.heightCm}cm, BMI ${updated.bmi} ${matchMsg}`
+              : `Report attached (${file.name}). Please verify or adjust your measurements in Step 2.`
+          );
+        } catch (fetchErr) {
+          setScanParsing(false);
+          setScanSuccess(`Uploaded ${file.name}. Please confirm your stats in Step 2.`);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch {
       setScanParsing(false);
-      setScanSuccess(
-        foundCount > 0
-          ? `Auto-filled ${foundCount} stats from report: ${updated.weightKg}kg, ${updated.heightCm}cm, BMI ${updated.bmi}!`
-          : `Report attached (${file.name}). Please verify or adjust your measurements in Step 2.`
-      );
-    };
-
-    reader.onerror = () => {
-      setScanParsing(false);
-      setScanSuccess(`Report attached (${file.name}). Enter your stats in Step 2.`);
-    };
-
-    reader.readAsText(file);
+      setScanSuccess(`Uploaded ${file.name}. Please enter your stats in Step 2.`);
+    }
   };
 
   const handleFinish = async () => {

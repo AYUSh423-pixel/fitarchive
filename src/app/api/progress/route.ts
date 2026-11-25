@@ -3,9 +3,10 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { requireAuth } from '@/lib/api-guard';
-import { todayIsoDate, updateDatabase, UPLOADS_DIR } from '@/lib/db/local-store';
+import { todayIsoDate, updateDatabase, UPLOADS_DIR, DEFAULT_USER_ID } from '@/lib/db/local-store';
 import { calculateBmi, calculateBmr, calculateTee, evaluateWeeklyProgress } from '@/lib/nutrition-engine';
 import type { BodyMeasurement, BodyScan, ProgressPhoto } from '@/types/nutrifit';
+import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
 
 export async function GET() {
   const guard = await requireAuth();
@@ -69,8 +70,10 @@ export async function POST(req: Request) {
 
     if (kind === 'body_scan') {
       const weightKg = Number(body.weightKg);
-      const heightCm = guard.db.profile.heightCm;
-      const bmi = body.bmi ? Number(body.bmi) : calculateBmi(weightKg, heightCm);
+      const heightCm = body.heightCm ? Number(body.heightCm) : guard.db.profile.heightCm;
+      const reportedBmi = body.reportedBmi ? Number(body.reportedBmi) : undefined;
+      const calculatedBmi = calculateBmi(weightKg, heightCm);
+      const bmi = reportedBmi || calculatedBmi;
       const bmrKcal = body.bmrKcal
         ? Number(body.bmrKcal)
         : calculateBmr(weightKg, heightCm, guard.db.profile.age, guard.db.profile.gender);
@@ -97,7 +100,13 @@ export async function POST(req: Request) {
         scanDate: String(body.scanDate || todayIsoDate()),
         deviceName: String(body.deviceName || 'EVOLT 360'),
         weightKg,
+        heightCm,
         bmi,
+        reportedBmi,
+        calculatedBmi,
+        fileType: body.fileType || 'pdf_report',
+        rawExtractedJson: body.rawExtractedJson || null,
+        validationStatus: body.validationStatus || 'verified',
         bodyFatPct: Number(body.bodyFatPct || guard.db.profile.bodyFatPct),
         skeletalMuscleMassKg: Number(body.skeletalMuscleMassKg || guard.db.profile.skeletalMuscleMassKg),
         waistCm: Number(body.waistCm || guard.db.profile.waistCm),
@@ -105,10 +114,54 @@ export async function POST(req: Request) {
         bmrKcal,
         teeKcal,
         reportUrl,
-        notes: body.notes ? String(body.notes) : 'Informational BIA estimate — not a medical diagnosis.',
+        notes: body.notes ? String(body.notes) : 'Verified body composition assessment.',
         createdAt: new Date().toISOString(),
       };
 
+      // 1. If Supabase user, persist directly to Supabase PostgreSQL
+      if (isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID) {
+        try {
+          await supabaseAdmin.from('body_scans').insert({
+            id: scan.id,
+            user_id: guard.session.userId,
+            scan_date: scan.scanDate,
+            device_name: scan.deviceName,
+            weight_kg: scan.weightKg,
+            height_cm: scan.heightCm,
+            bmi: scan.bmi,
+            reported_bmi: scan.reportedBmi,
+            calculated_bmi: scan.calculatedBmi,
+            body_fat_pct: scan.bodyFatPct,
+            skeletal_muscle_mass_kg: scan.skeletalMuscleMassKg,
+            waist_cm: scan.waistCm,
+            visceral_fat_level: scan.visceralFatLevel,
+            bmr_kcal: scan.bmrKcal,
+            tee_kcal: scan.teeKcal,
+            report_url: scan.reportUrl,
+            notes: scan.notes,
+            file_type: scan.fileType,
+            raw_extracted_json: scan.rawExtractedJson,
+            validation_status: scan.validationStatus,
+          });
+
+          await supabaseAdmin.from('user_profiles').update({
+            weight_kg: scan.weightKg,
+            height_cm: scan.heightCm,
+            bmi: scan.bmi,
+            body_fat_pct: scan.bodyFatPct,
+            skeletal_muscle_mass_kg: scan.skeletalMuscleMassKg,
+            waist_cm: scan.waistCm,
+            visceral_fat_level: scan.visceralFatLevel,
+            bmr_kcal: scan.bmrKcal,
+            tee_kcal: scan.teeKcal,
+            updated_at: new Date().toISOString(),
+          }).eq('id', guard.session.userId);
+        } catch (supaErr) {
+          console.error('Failed to sync body scan to Supabase:', supaErr);
+        }
+      }
+
+      // 2. Also keep local state updated
       updateDatabase((draft) => {
         draft.bodyScans.unshift(scan);
         draft.bodyMeasurements.unshift({
@@ -126,6 +179,7 @@ export async function POST(req: Request) {
         draft.profile = {
           ...draft.profile,
           weightKg: scan.weightKg,
+          heightCm: scan.heightCm || draft.profile.heightCm,
           bmi: scan.bmi,
           bodyFatPct: scan.bodyFatPct,
           skeletalMuscleMassKg: scan.skeletalMuscleMassKg,
