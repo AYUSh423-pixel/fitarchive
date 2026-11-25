@@ -111,7 +111,7 @@ export function CalmLoaderCompact({
 
   if (!mounted) {
     return (
-      <div className={`calm-loader-compact ${className}`} style={{ width: size, height: size }} aria-hidden="true">
+      <div className={`calm-loader-compact ${className}`} style={{ width: size, height: size, '--loader-size': `${size}px` }} aria-hidden="true">
         <div className="calm-loader-compact__glow calm-loader-compact__glow--1" />
         <div className="calm-loader-compact__glow calm-loader-compact__glow--2" />
       </div>
@@ -119,7 +119,7 @@ export function CalmLoaderCompact({
   }
 
   return (
-    <div className={`calm-loader-compact ${className}`} style={{ width: size, height: size }} aria-hidden="true">
+    <div className={`calm-loader-compact ${className}`} style={{ width: size, height: size, '--loader-size': `${size}px` }} aria-hidden="true">
       {/* Ambient glow */}
       <div className="calm-loader-compact__glow calm-loader-compact__glow--1" />
       <div className="calm-loader-compact__glow calm-loader-compact__glow--2" />
