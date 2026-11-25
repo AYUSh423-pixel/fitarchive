@@ -7,6 +7,7 @@ import type {
   MealPlanDay,
   MealSlot,
 } from '@/types/nutrifit';
+import { extractJsonFromAiResponse } from '@/lib/json-helper';
 import { todayIsoDate } from '@/lib/db/local-store';
 
 export interface ScannedCandidateItem {
@@ -215,23 +216,24 @@ Respond ONLY in valid JSON with this exact shape:
       }
 
       if (jsonText) {
-        const cleaned = jsonText.replace(/^```json/m, '').replace(/```$/m, '').trim();
-        const parsed = JSON.parse(cleaned);
-        const items: ScannedCandidateItem[] = (parsed.items || []).map((it: ScannedCandidateItem, idx: number) => ({
-          ...it,
-          tempId: `scan-${Date.now()}-${idx}`,
-        }));
-        return {
-          mode: provider,
-          dishTitle: parsed.dishTitle || 'Scanned Indian Meal',
-          cuisineLabel: parsed.cuisineLabel || 'Homemade Indian • Estimated',
-          items,
-          clarifyingQuestions: parsed.clarifyingQuestions || [
-            'Was extra ghee or butter added on top of the roti/dal?',
-          ],
-          disclaimer:
-            'Photo-based nutrition values are AI estimates, not exact lab measurements. Please review and adjust before saving.',
-        };
+        const parsed = extractJsonFromAiResponse(jsonText);
+        if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
+          const items: ScannedCandidateItem[] = (parsed.items || []).map((it: ScannedCandidateItem, idx: number) => ({
+            ...it,
+            tempId: `scan-${Date.now()}-${idx}`,
+          }));
+          return {
+            mode: provider,
+            dishTitle: parsed.dishTitle || 'Scanned Indian Meal',
+            cuisineLabel: parsed.cuisineLabel || 'Homemade Indian • Estimated',
+            items,
+            clarifyingQuestions: parsed.clarifyingQuestions || [
+              'Was extra ghee or butter added on top of the roti/dal?',
+            ],
+            disclaimer:
+              'Photo-based nutrition values are AI estimates, not exact lab measurements. Please review and adjust before saving.',
+          };
+        }
       }
     } catch {
       // Fall through cleanly to labelled local fallback

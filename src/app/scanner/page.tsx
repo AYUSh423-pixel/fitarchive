@@ -38,12 +38,45 @@ export default function MealScannerPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setMimeType(file.type || 'image/jpeg');
+
+    // Use Image + Canvas to compress large phone camera photos (prevent 413 Payload Too Large / HTML response errors)
     const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result || '');
-      setImagePreview(result);
-      const b64 = result.split(',')[1] || '';
-      setImageBase64(b64);
+    reader.onload = (event) => {
+      const rawDataUrl = String(event.target?.result || '');
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1024;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          setImagePreview(compressedDataUrl);
+          setImageBase64(compressedDataUrl.split(',')[1] || '');
+          setMimeType('image/jpeg');
+        } else {
+          setImagePreview(rawDataUrl);
+          setImageBase64(rawDataUrl.split(',')[1] || '');
+        }
+      };
+      img.onerror = () => {
+        setImagePreview(rawDataUrl);
+        setImageBase64(rawDataUrl.split(',')[1] || '');
+      };
+      img.src = rawDataUrl;
     };
     reader.readAsDataURL(file);
   };
@@ -57,8 +90,19 @@ export default function MealScannerPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64, mimeType, hintText }),
       });
-      const data: PhotoScanResult = await res.json();
-      if (!res.ok) throw new Error('Scan failed');
+
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Server returned an invalid response. If using photo, please add a short description below to assist the AI.');
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Scan analysis failed. Please try again.');
+      }
+
       setScanResult(data);
       setItems(data.items || []);
       setServingMultiplier(1.0);
