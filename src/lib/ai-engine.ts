@@ -114,6 +114,7 @@ export async function callVidhyantraChat(
     }
     const data = await res.json();
     console.log('[Vidhyantra] Response data keys:', Object.keys(data));
+    console.log('[Vidhyantra] Raw reply:', data?.reply?.substring(0, 500));
     return data?.reply || null;
   } catch (err) {
     console.error('[Vidhyantra] API fetch error:', err);
@@ -329,7 +330,9 @@ Respond ONLY in this exact JSON shape:
       }
 
       if (jsonText) {
+        console.log('[analyzeFoodPhoto] Raw jsonText (first 500 chars):', jsonText?.substring(0, 500));
         const parsed = extractJsonFromAiResponse(jsonText);
+        console.log('[analyzeFoodPhoto] Parsed result:', parsed ? 'Success' : 'Failed', parsed ? { dishTitle: parsed.dishTitle, itemsCount: parsed.items?.length } : null);
         if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
           const items: ScannedCandidateItem[] = (parsed.items || []).map((it: ScannedCandidateItem, idx: number) => ({
             ...it,
