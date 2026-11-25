@@ -110,3 +110,213 @@ h1, h2, h3, .font-display {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ============================================================
+   Calm Loader - Meditative Loading Animations
+   Soft blue blurred orbs orbiting in gentle circles
+   ============================================================ */
+
+/* Main CalmLoader */
+.calm-loader {
+  --orbit-radius: calc(var(--loader-size) * 0.35);
+  --orb-size: calc(var(--loader-size) * 0.18);
+  --blur-radius: calc(var(--loader-size) * 0.15);
+}
+
+.calm-loader__orbits {
+  position: relative;
+}
+
+.calm-loader__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.calm-loader__glow--1 {
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  filter: blur(calc(var(--loader-size) * 0.5));
+}
+
+.calm-loader__glow--2 {
+  background: radial-gradient(circle at 70% 70%, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
+  filter: blur(calc(var(--loader-size) * 0.4));
+}
+
+.calm-loader__center-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 33%;
+  height: 33%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+  filter: blur(calc(var(--loader-size) * 0.25));
+  animation: calm-pulse 4s ease-in-out infinite;
+}
+
+.calm-loader__orbit {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  animation: calm-orbit 8s linear infinite;
+}
+
+.calm-loader__orbit--2 {
+  animation: calm-orbit-reverse 12s linear infinite;
+}
+
+.calm-loader__orbit--3 {
+  animation: calm-orbit 20s linear infinite reverse;
+}
+
+.calm-loader__orbit--static,
+.calm-loader__orbit--static .calm-loader__orb {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calm-loader__center-pulse,
+  .calm-loader__orbit {
+    animation: none !important;
+  }
+}
+
+.calm-loader__orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--orb-size);
+  height: var(--orb-size);
+  transform: translate(-50%, -50%) rotate(calc(var(--orb-index) * 120deg)) translateX(var(--orbit-radius));
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.7) 0%, rgba(34, 211, 238, 0.5) 100%);
+  filter: blur(var(--blur-radius));
+  opacity: 0.7;
+  mix-blend-mode: plus-lighter;
+  will-change: transform;
+}
+
+.calm-loader__orb--small {
+  width: calc(var(--orb-size) * 0.6) !important;
+  height: calc(var(--orb-size) * 0.6) !important;
+  transform: translate(-50%, -50%) rotate(calc(var(--orb-index) * 180deg + 60deg)) translateX(calc(var(--orbit-radius) * 0.7));
+  background: linear-gradient(45deg, rgba(34, 211, 238, 0.5) 0%, rgba(59, 130, 246, 0.3) 100%);
+  filter: blur(calc(var(--blur-radius) * 0.7));
+  opacity: 0.5;
+  mix-blend-mode: plus-lighter;
+}
+
+.calm-loader__orb--micro {
+  width: calc(var(--orb-size) * 0.35) !important;
+  height: calc(var(--orb-size) * 0.35) !important;
+  transform: translate(-50%, -50%) rotate(calc(var(--orb-index) * 90deg)) translateX(calc(var(--orbit-radius) * 1.15));
+  background: rgba(255, 255, 255, 0.4);
+  filter: blur(calc(var(--blur-radius) * 0.5));
+  opacity: 0.4;
+  mix-blend-mode: plus-lighter;
+}
+
+.calm-loader__text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.05em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Compact CalmLoader */
+.calm-loader-compact {
+  position: relative;
+  --orbit-radius: calc(var(--loader-size) * 0.3);
+  --orb-size: calc(var(--loader-size) * 0.16);
+  --blur-radius: calc(var(--loader-size) * 0.1);
+}
+
+.calm-loader-compact__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.calm-loader-compact__glow--1 {
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+  filter: blur(calc(var(--loader-size) * 0.45));
+}
+
+.calm-loader-compact__glow--2 {
+  background: radial-gradient(circle at 70% 70%, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
+  filter: blur(calc(var(--loader-size) * 0.35));
+}
+
+.calm-loader-compact__center-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  height: 40%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  filter: blur(calc(var(--loader-size) * 0.2));
+  animation: calm-pulse 3s ease-in-out infinite;
+}
+
+.calm-loader-compact__orbit {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  animation: calm-orbit 6s linear infinite;
+}
+
+.calm-loader-compact__orbit--static {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calm-loader-compact__center-pulse,
+  .calm-loader-compact__orbit {
+    animation: none !important;
+  }
+}
+
+.calm-loader-compact__orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--orb-size);
+  height: var(--orb-size);
+  transform: translate(-50%, -50%) rotate(calc(var(--orb-index) * 120deg)) translateX(var(--orbit-radius));
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(34, 211, 238, 0.6) 100%);
+  filter: blur(var(--blur-radius));
+  opacity: 0.8;
+  mix-blend-mode: plus-lighter;
+  will-change: transform;
+}
+
+/* Keyframes */
+@keyframes calm-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes calm-orbit-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes calm-pulse {
+  0%, 100% { 
+    opacity: 0.4; 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: translate(-50%, -50%) scale(1.3); 
+  }
+}
