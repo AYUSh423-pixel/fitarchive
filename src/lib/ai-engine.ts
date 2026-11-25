@@ -34,8 +34,54 @@ export interface PhotoScanResult {
   disclaimer: string;
 }
 
+// Vidhyantra custom API: POST /api/v1/chat/ → { model, reply }
+// Response field is "reply" not choices[0].message.content
+const VIDHYANTRA_HOST = 'vidhyantra.online';
+
+function isVidhyantraUrl(baseUrl: string) {
+  try { return new URL(baseUrl).hostname.includes(VIDHYANTRA_HOST); } catch { return false; }
+}
+
+export async function callVidhyantraChat(
+  messages: Array<{ role: string; content: string }>,
+  apiKey: string,
+  baseUrl: string,
+  model: string
+): Promise<string | null> {
+  // Vidhyantra format: last user message goes as prompt, uses POST /chat/
+  const chatUrl = baseUrl.replace(/\/+$/, '') + '/chat/';
+  // Supported models: chatgpt56, code, quick, sol, terra, ultra
+  // Default to 'ultra' (most capable)
+  const vidhyantraModel = model && ['chatgpt56','code','quick','sol','terra','ultra'].includes(model)
+    ? model : 'ultra';
+
+  // Build a single prompt by combining system + user messages
+  const systemMsg = messages.find(m => m.role === 'system');
+  const userMsg = messages.filter(m => m.role === 'user').pop();
+  const combined = systemMsg
+    ? `${systemMsg.content}\n\nUser: ${userMsg?.content || ''}`
+    : (userMsg?.content || '');
+
+  const res = await fetch(chatUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: vidhyantraModel,
+      messages: [{ role: 'user', content: combined }],
+    }),
+  });
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  // Vidhyantra returns { model, reply, created_at }
+  return data?.reply || data?.choices?.[0]?.message?.content || null;
+}
+
 export function resolveAiCredentials(config?: AiConfig) {
-  const provider = config?.provider || (process.env.AI_PROVIDER as any) || (process.env.OPENAI_API_KEY ? 'openai' : 'gemini');
+  const provider = config?.provider || (process.env.AI_PROVIDER as any) || (process.env.AI_API_KEY ? 'custom' : process.env.OPENAI_API_KEY ? 'openai' : 'gemini');
   let apiKey = config?.apiKey || process.env.AI_API_KEY || '';
 
   if (!apiKey) {
@@ -49,6 +95,7 @@ export function resolveAiCredentials(config?: AiConfig) {
     if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
     else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';
+    else if (provider === 'custom') model = 'ultra'; // default for Vidhyantra
     else model = 'gpt-4o-mini';
   }
 
@@ -122,6 +169,15 @@ Respond ONLY in valid JSON with this exact shape:
         if (res.ok) {
           const data = await res.json();
           jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        }
+      } else if (isVidhyantraUrl(baseUrl)) {
+        // Vidhyantra doesn't support image input — fall through to text-based hint
+        // but still try text analysis with the hint
+        if (hintText) {
+          jsonText = await callVidhyantraChat(
+            [{ role: 'user', content: `${prompt}\nFood description: ${hintText}` }],
+            apiKey, baseUrl, model
+          );
         }
       } else {
         // OpenAI / Groq / OpenRouter / Custom vision endpoint
@@ -494,6 +550,15 @@ STRICT RULES:
           const data = await res.json();
           replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         }
+      } else if (isVidhyantraUrl(baseUrl)) {
+        // Vidhyantra custom API — does NOT use OpenAI format
+        replyText = await callVidhyantraChat(
+          [
+            { role: 'system', content: systemContext },
+            { role: 'user', content: userMessage },
+          ],
+          apiKey, baseUrl, model
+        );
       } else {
         // OpenAI / Groq / OpenRouter / Custom compatible completion endpoint
         const targetUrl = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
