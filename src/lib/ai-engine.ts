@@ -85,7 +85,14 @@ export async function callVidhyantraChat(
 
   if (imageBase64) {
     requestBody.image = `data:${mimeType || 'image/jpeg'};base64,${imageBase64}`;
+    console.log('[Vidhyantra] Image attached to request, data URI length:', requestBody.image.length);
+  } else {
+    console.log('[Vidhyantra] WARNING: No image provided in request!');
   }
+
+  console.log('[Vidhyantra] Sending request to:', chatUrl);
+  console.log('[Vidhyantra] Request body keys:', Object.keys(requestBody));
+  console.log('[Vidhyantra] Model:', vidhyantraModel);
 
   try {
     const res = await fetch(chatUrl, {
@@ -98,15 +105,18 @@ export async function callVidhyantraChat(
       signal: AbortSignal.timeout(28000),
     });
 
+    console.log('[Vidhyantra] Response status:', res.status);
+
     if (!res.ok) {
       const errorText = await res.text();
-      console.error('Vidhyantra API error:', res.status, errorText);
+      console.error('[Vidhyantra] API error:', res.status, errorText);
       return null;
     }
     const data = await res.json();
+    console.log('[Vidhyantra] Response data keys:', Object.keys(data));
     return data?.reply || null;
   } catch (err) {
-    console.error('Vidhyantra API fetch error:', err);
+    console.error('[Vidhyantra] API fetch error:', err);
     return null;
   }
 }
@@ -114,6 +124,17 @@ export async function callVidhyantraChat(
 export function resolveAiCredentials(config?: AiConfig) {
   let apiKey = config?.apiKey || process.env.AI_API_KEY || '';
   let provider = config?.provider || (process.env.AI_PROVIDER as any);
+
+  console.log('[resolveAiCredentials] Input config:', { 
+    configApiKey: config?.apiKey ? '***' : 'none',
+    configProvider: config?.provider,
+    configBaseUrl: config?.baseUrl,
+    configModel: config?.model,
+    envAI_API_KEY: process.env.AI_API_KEY ? '***' : 'none',
+    envAI_PROVIDER: process.env.AI_PROVIDER,
+    envAI_BASE_URL: process.env.AI_BASE_URL,
+    envAI_MODEL: process.env.AI_MODEL,
+  });
 
   // If no API key set in env or config, fallback to available keys or default Vidhyantra key
   if (!apiKey) {
@@ -165,8 +186,12 @@ export async function analyzeFoodPhoto(
 ): Promise<PhotoScanResult> {
   const { provider, apiKey, model, baseUrl } = resolveAiCredentials(config);
 
+  console.log('[analyzeFoodPhoto] Resolved credentials:', { provider, model, baseUrl, hasApiKey: !!apiKey, apiKeyPrefix: apiKey?.substring(0, 10) });
+
   // Check if we have a vision-capable provider
-  const hasVisionSupport = provider === 'gemini' || provider === 'openai' || provider === 'openrouter' || (!isVidhyantraUrl(baseUrl) && provider !== 'custom');
+  const hasVisionSupport = provider === 'gemini' || provider === 'openai' || provider === 'openrouter' || isVidhyantraUrl(baseUrl);
+
+  console.log('[analyzeFoodPhoto] Vision support check:', { hasVisionSupport, isVidhyantra: isVidhyantraUrl(baseUrl) });
 
   if (apiKey && hasVisionSupport) {
     try {
@@ -241,6 +266,15 @@ Respond ONLY in this exact JSON shape:
         }
       } else if (isVidhyantraUrl(baseUrl)) {
         // Vidhyantra sol (GPT-6 flagship) — supports image analysis via image field
+        console.log('[Vidhyantra] Provider detected, preparing request...', {
+          hasImage: !!base64Image,
+          imageLength: base64Image?.length || 0,
+          mimeType,
+          hasHint: !!hintText,
+          model,
+          baseUrl
+        });
+
         const analysisPrompt = hintText
           ? `${prompt}\n\nThe user described their meal as: "${hintText}".\nUsing your expert knowledge of Indian home cooking, identify all the food items likely present in this description, estimate their weights and portions for a typical Indian household serving size, and calculate macros including realistic oil/ghee for home-cooking methods (e.g. tadka for dal, ghee on roti, oil in sabzi). Return ONLY the JSON described above.`
           : prompt;
@@ -254,8 +288,9 @@ Respond ONLY in this exact JSON shape:
             base64Image,
             mimeType
           );
+          console.log('[Vidhyantra] Response received:', jsonText ? 'Success' : 'Empty/Null response');
         } catch (err) {
-          console.error('Vidhyantra analysis error:', err);
+          console.error('[Vidhyantra] Analysis error:', err);
           jsonText = null;
         }
       } else {
