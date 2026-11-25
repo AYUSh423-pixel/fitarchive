@@ -1,0 +1,3000 @@
+{
+  "auth": {
+    "userId": "11111111-1111-4111-8111-111111111111",
+    "email": "personal@nutrifit.local",
+    "passwordHash": "957615018b106f1701ad0f2170898b65:acfca5429c9383f0b1b2514ae1ec982efd4cb726a3c6938d218a70c103f5fdc56c56de0ba833c04840c2006312265a3ca4d1108cb41191ef688a0b588421d902",
+    "pinEnabled": false
+  },
+  "profile": {
+    "id": "11111111-1111-4111-8111-111111111111",
+    "name": "Ayush",
+    "email": "personal@nutrifit.local",
+    "age": 20,
+    "gender": "male",
+    "heightCm": 164,
+    "weightKg": 76.4,
+    "bmi": 28.4,
+    "bodyFatPct": 29.7,
+    "skeletalMuscleMassKg": 29.6,
+    "waistCm": 96.7,
+    "visceralFatLevel": 11,
+    "bmrKcal": 1529,
+    "teeKcal": 2354,
+    "dietType": "pure_veg_no_egg",
+    "activityLevel": "gym_4_5_days",
+    "foodPreference": "Homemade Indian food",
+    "goal": "lean_athletic",
+    "allergies": [],
+    "dislikedFoods": [],
+    "onboardingCompleted": false,
+    "createdAt": "2026-11-25T12:34:04.724Z",
+    "updatedAt": "2026-11-25T12:34:04.724Z"
+  },
+  "bodyScans": [
+    {
+      "id": "scan-evolt-day1",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "scanDate": "2026-11-25",
+      "deviceName": "EVOLT 360",
+      "weightKg": 76.4,
+      "bmi": 28.4,
+      "bodyFatPct": 29.7,
+      "skeletalMuscleMassKg": 29.6,
+      "waistCm": 96.7,
+      "visceralFatLevel": 11,
+      "bmrKcal": 1529,
+      "teeKcal": 2354,
+      "notes": "Initial baseline EVOLT 360 body scan. Informational BIA estimate — not a medical diagnosis.",
+      "createdAt": "2026-11-25T12:34:04.724Z"
+    }
+  ],
+  "bodyMeasurements": [
+    {
+      "id": "meas-day1",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "measuredDate": "2026-11-25",
+      "weightKg": 76.4,
+      "waistCm": 96.7,
+      "bodyFatPct": 29.7,
+      "skeletalMuscleMassKg": 29.6,
+      "visceralFatLevel": 11,
+      "notes": "Day 1 Baseline (EVOLT 360)",
+      "createdAt": "2026-11-25T12:34:04.724Z"
+    }
+  ],
+  "nutritionTargets": {
+    "id": "target-initial",
+    "userId": "11111111-1111-4111-8111-111111111111",
+    "caloriesKcal": 1800,
+    "proteinG": 130,
+    "carbsG": 155,
+    "fatG": 65,
+    "waterMl": 3000,
+    "goal": "lean_athletic",
+    "isManualOverride": false,
+    "rationale": "Starting estimate for Lean Athletic Physique (Fat Loss + Muscle Preservation):\n• Your estimated daily burn (TEE) is ~2,354 kcal based on your BMR (~1,529 kcal) and 4–5x weekly gym routine.\n• 1,800 kcal/day creates a gentle, sustainable gap—never a crash diet—so you lose fat without losing strength or feeling starved.\n• 130g protein/day (~1.7g per kg) protects your 29.6 kg of muscle mass while trimming waist fat.\n• 176g carbs fuel your workouts and daily homemade Indian meals; 64g healthy fats support hormones and satiety.",
+    "updatedAt": "2026-11-25T12:34:04.724Z"
+  },
+  "foods": [
+    {
+      "id": "food-phulka-roti",
+      "name": "Whole Wheat Phulka / Roti (No Ghee)",
+      "regionalName": "Rotli / Chapati",
+      "category": "Roti & Breads",
+      "calories": 85,
+      "proteinG": 3,
+      "carbsG": 17.5,
+      "fatG": 0.5,
+      "fiberG": 2.5,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 30,
+      "state": "cooked",
+      "source": "ICMR-NIN Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "homemade",
+        "staple",
+        "low-fat"
+      ]
+    },
+    {
+      "id": "food-roti-ghee",
+      "name": "Whole Wheat Roti with 1/2 tsp Ghee",
+      "regionalName": "Ghee Rotli",
+      "category": "Roti & Breads",
+      "calories": 108,
+      "proteinG": 3,
+      "carbsG": 17.5,
+      "fatG": 3,
+      "fiberG": 2.5,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 33,
+      "state": "cooked",
+      "source": "ICMR-NIN + Ghee Adjustment",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 2.5,
+      "tags": [
+        "homemade",
+        "gujarati",
+        "staple"
+      ]
+    },
+    {
+      "id": "food-plain-paratha",
+      "name": "Whole Wheat Plain Paratha (1 tsp oil/ghee)",
+      "regionalName": "Paratha",
+      "category": "Roti & Breads",
+      "calories": 175,
+      "proteinG": 4.2,
+      "carbsG": 26,
+      "fatG": 6.2,
+      "fiberG": 3.2,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 55,
+      "state": "cooked",
+      "source": "Homemade Indian Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "homemade",
+        "breakfast"
+      ]
+    },
+    {
+      "id": "food-aloo-paratha",
+      "name": "Aloo Paratha (Homemade, medium)",
+      "category": "Roti & Breads",
+      "calories": 265,
+      "proteinG": 5.5,
+      "carbsG": 39,
+      "fatG": 9.5,
+      "fiberG": 3.8,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 110,
+      "state": "cooked",
+      "source": "Homemade Estimate (varies with butter/oil)",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 8,
+      "tags": [
+        "breakfast",
+        "comfort"
+      ]
+    },
+    {
+      "id": "food-methi-thepla",
+      "name": "Gujarati Methi Thepla",
+      "regionalName": "મેથી થેપલા",
+      "category": "Gujarati & Regional",
+      "calories": 135,
+      "proteinG": 3.6,
+      "carbsG": 19.5,
+      "fatG": 4.8,
+      "fiberG": 2.8,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 40,
+      "state": "cooked",
+      "source": "Gujarati Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4,
+      "tags": [
+        "gujarati",
+        "breakfast",
+        "travel-friendly"
+      ]
+    },
+    {
+      "id": "food-multigrain-bhakri",
+      "name": "Jowar / Bajra Bhakri",
+      "category": "Gujarati & Regional",
+      "calories": 120,
+      "proteinG": 3.4,
+      "carbsG": 23,
+      "fatG": 1.4,
+      "fiberG": 3.6,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 45,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "gujarati",
+        "high-fiber",
+        "gluten-free"
+      ]
+    },
+    {
+      "id": "food-steamed-rice",
+      "name": "Steamed White / Basmati Rice (Cooked)",
+      "regionalName": "Bhat / Chawal",
+      "category": "Rice & Grains",
+      "calories": 175,
+      "proteinG": 3.6,
+      "carbsG": 38.5,
+      "fatG": 0.4,
+      "fiberG": 0.6,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 140,
+      "state": "cooked",
+      "source": "USDA / ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "homemade",
+        "carb-source",
+        "pre-workout"
+      ]
+    },
+    {
+      "id": "food-jeera-rice",
+      "name": "Jeera Rice (Cooked with 1 tsp ghee)",
+      "category": "Rice & Grains",
+      "calories": 225,
+      "proteinG": 3.8,
+      "carbsG": 38.5,
+      "fatG": 5.5,
+      "fiberG": 0.8,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 150,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "homemade",
+        "lunch"
+      ]
+    },
+    {
+      "id": "food-poha",
+      "name": "Kanda / Batata Poha with Peanuts",
+      "category": "Rice & Grains",
+      "calories": 250,
+      "proteinG": 5.2,
+      "carbsG": 42,
+      "fatG": 6.8,
+      "fiberG": 2.5,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 160,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "breakfast",
+        "quick",
+        "pre-workout"
+      ]
+    },
+    {
+      "id": "food-upma",
+      "name": "Vegetable Rava Upma",
+      "category": "Rice & Grains",
+      "calories": 235,
+      "proteinG": 5.8,
+      "carbsG": 37,
+      "fatG": 6.5,
+      "fiberG": 2.8,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 170,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "breakfast",
+        "quick"
+      ]
+    },
+    {
+      "id": "food-moong-khichdi",
+      "name": "Moong Dal Khichdi (1:1 Rice & Dal)",
+      "regionalName": "ખિચડી",
+      "category": "Gujarati & Regional",
+      "calories": 230,
+      "proteinG": 8.5,
+      "carbsG": 36,
+      "fatG": 5,
+      "fiberG": 3.8,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 200,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4,
+      "tags": [
+        "gujarati",
+        "comfort",
+        "gut-friendly"
+      ]
+    },
+    {
+      "id": "food-oats-milk",
+      "name": "Rolled Oats (Raw, dry)",
+      "category": "Rice & Grains",
+      "calories": 152,
+      "proteinG": 5.3,
+      "carbsG": 27,
+      "fatG": 2.7,
+      "fiberG": 4,
+      "servingSize": 40,
+      "servingUnit": "g",
+      "weightGrams": 40,
+      "state": "raw",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "breakfast",
+        "high-fiber",
+        "pre-workout"
+      ]
+    },
+    {
+      "id": "food-moong-dal",
+      "name": "Yellow Moong Dal Tadka (Homemade)",
+      "category": "Dal & Legumes",
+      "calories": 165,
+      "proteinG": 9.8,
+      "carbsG": 23,
+      "fatG": 3.5,
+      "fiberG": 5,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "ICMR-NIN Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3,
+      "tags": [
+        "homemade",
+        "protein",
+        "easy-digest"
+      ]
+    },
+    {
+      "id": "food-masoor-dal",
+      "name": "Masoor Dal (Red Lentil Curry)",
+      "category": "Dal & Legumes",
+      "calories": 170,
+      "proteinG": 10.2,
+      "carbsG": 24,
+      "fatG": 3.4,
+      "fiberG": 5.4,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3,
+      "tags": [
+        "homemade",
+        "protein"
+      ]
+    },
+    {
+      "id": "food-toor-dal",
+      "name": "Toor / Arhar Dal Tadka",
+      "category": "Dal & Legumes",
+      "calories": 180,
+      "proteinG": 9.2,
+      "carbsG": 25,
+      "fatG": 4.2,
+      "fiberG": 4.8,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3.5,
+      "tags": [
+        "homemade",
+        "staple"
+      ]
+    },
+    {
+      "id": "food-gujarati-dal",
+      "name": "Gujarati Khatti-Mithi Toor Dal",
+      "regionalName": "ગુજરાતી દાળ",
+      "category": "Gujarati & Regional",
+      "calories": 175,
+      "proteinG": 7.8,
+      "carbsG": 27.5,
+      "fatG": 3.6,
+      "fiberG": 4.2,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "Gujarati Homemade Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3,
+      "tags": [
+        "gujarati",
+        "homemade"
+      ]
+    },
+    {
+      "id": "food-rajma",
+      "name": "Rajma Masala (Kidney Beans Curry)",
+      "category": "Dal & Legumes",
+      "calories": 215,
+      "proteinG": 11.5,
+      "carbsG": 31,
+      "fatG": 4.8,
+      "fiberG": 7.5,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "ICMR-NIN Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4,
+      "tags": [
+        "high-protein",
+        "high-fiber",
+        "lunch"
+      ]
+    },
+    {
+      "id": "food-chole",
+      "name": "Punjabi Chole / Chana Masala",
+      "category": "Dal & Legumes",
+      "calories": 225,
+      "proteinG": 10.8,
+      "carbsG": 32.5,
+      "fatG": 5.5,
+      "fiberG": 7.2,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "ICMR-NIN Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4.5,
+      "tags": [
+        "high-protein",
+        "high-fiber"
+      ]
+    },
+    {
+      "id": "food-kala-chana",
+      "name": "Boiled Kala Chana Chaat (with Onion/Lemon)",
+      "category": "Dal & Legumes",
+      "calories": 195,
+      "proteinG": 11.2,
+      "carbsG": 31,
+      "fatG": 2.8,
+      "fiberG": 8,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 150,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "budget-protein",
+        "snack"
+      ]
+    },
+    {
+      "id": "food-sprouted-moong",
+      "name": "Sprouted Moong Salad (Kachumber Style)",
+      "category": "Dal & Legumes",
+      "calories": 155,
+      "proteinG": 11.5,
+      "carbsG": 24,
+      "fatG": 1,
+      "fiberG": 6.2,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 150,
+      "state": "raw",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "low-calorie",
+        "snack"
+      ]
+    },
+    {
+      "id": "food-paneer-raw",
+      "name": "Fresh Paneer (Cottage Cheese, Raw)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 265,
+      "proteinG": 18.3,
+      "carbsG": 3.4,
+      "fatG": 20,
+      "fiberG": 0,
+      "servingSize": 100,
+      "servingUnit": "g",
+      "weightGrams": 100,
+      "state": "raw",
+      "source": "ICMR-NIN Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "vegetarian-protein"
+      ]
+    },
+    {
+      "id": "food-lowfat-paneer",
+      "name": "Low-Fat Paneer (Toned Milk)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 175,
+      "proteinG": 21,
+      "carbsG": 4,
+      "fatG": 8.2,
+      "fiberG": 0,
+      "servingSize": 100,
+      "servingUnit": "g",
+      "weightGrams": 100,
+      "state": "raw",
+      "source": "Dairy Label Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "fat-loss",
+        "lean"
+      ]
+    },
+    {
+      "id": "food-grilled-paneer-tikka",
+      "name": "Grilled Paneer Tikka (Homemade, air-fried/tawa)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 280,
+      "proteinG": 22,
+      "carbsG": 8.5,
+      "fatG": 17.5,
+      "fiberG": 1.5,
+      "servingSize": 1,
+      "servingUnit": "serving",
+      "weightGrams": 150,
+      "state": "cooked",
+      "source": "Homemade Recipe Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4,
+      "tags": [
+        "high-protein",
+        "dinner",
+        "post-workout"
+      ]
+    },
+    {
+      "id": "food-palak-paneer",
+      "name": "Homemade Palak Paneer (Light Cream/Oil)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 270,
+      "proteinG": 15.5,
+      "carbsG": 10.5,
+      "fatG": 18.5,
+      "fiberG": 3.5,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 200,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 6,
+      "tags": [
+        "high-protein",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "food-tofu",
+      "name": "Firm Tofu (Soya Paneer)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 144,
+      "proteinG": 16.5,
+      "carbsG": 3.2,
+      "fatG": 7.5,
+      "fiberG": 1.2,
+      "servingSize": 100,
+      "servingUnit": "g",
+      "weightGrams": 100,
+      "state": "raw",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "lean",
+        "fat-loss"
+      ]
+    },
+    {
+      "id": "food-soya-chunks-dry",
+      "name": "Soya Chunks / Meal Maker (Dry weight)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 172,
+      "proteinG": 26,
+      "carbsG": 16.5,
+      "fatG": 0.3,
+      "fiberG": 6.5,
+      "servingSize": 50,
+      "servingUnit": "g",
+      "weightGrams": 50,
+      "state": "raw",
+      "source": "Nutrela / ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "budget-protein",
+        "ultra-lean"
+      ]
+    },
+    {
+      "id": "food-soya-curry",
+      "name": "Soya Chunk Masala Curry (50g dry chunks)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 245,
+      "proteinG": 27.5,
+      "carbsG": 21,
+      "fatG": 5.2,
+      "fiberG": 7,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 220,
+      "state": "cooked",
+      "source": "Homemade High-Protein Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "high-protein",
+        "budget-protein",
+        "post-workout"
+      ]
+    },
+    {
+      "id": "food-curd-dahi",
+      "name": "Homemade Curd / Dahi (Toned Milk)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 98,
+      "proteinG": 5.5,
+      "carbsG": 7.2,
+      "fatG": 5,
+      "fiberG": 0,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 150,
+      "state": "packaged",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "probiotic",
+        "dairy",
+        "lunch"
+      ]
+    },
+    {
+      "id": "food-greek-yogurt",
+      "name": "Unsweetened Greek Yogurt / Hung Curd",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 110,
+      "proteinG": 14,
+      "carbsG": 5.5,
+      "fatG": 3.5,
+      "fiberG": 0,
+      "servingSize": 150,
+      "servingUnit": "g",
+      "weightGrams": 150,
+      "state": "packaged",
+      "source": "Dairy Label Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "snack",
+        "post-workout"
+      ]
+    },
+    {
+      "id": "food-milk-toned",
+      "name": "Toned Milk (3% fat)",
+      "category": "Paneer, Soya & Dairy",
+      "calories": 145,
+      "proteinG": 7.5,
+      "carbsG": 11.8,
+      "fatG": 7.5,
+      "fiberG": 0,
+      "servingSize": 250,
+      "servingUnit": "ml",
+      "weightGrams": 250,
+      "state": "packaged",
+      "source": "Amul / ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "dairy",
+        "breakfast"
+      ]
+    },
+    {
+      "id": "food-chaas",
+      "name": "Masala Chaas (Spiced Buttermilk)",
+      "regionalName": "છાશ",
+      "category": "Gujarati & Regional",
+      "calories": 48,
+      "proteinG": 2.5,
+      "carbsG": 4.5,
+      "fatG": 2,
+      "fiberG": 0,
+      "servingSize": 250,
+      "servingUnit": "ml",
+      "weightGrams": 250,
+      "state": "cooked",
+      "source": "Homemade Gujarati Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "gujarati",
+        "hydration",
+        "low-calorie"
+      ]
+    },
+    {
+      "id": "food-besan-chilla",
+      "name": "Besan Chilla (Chickpea Flour Crepe, 1 tsp oil)",
+      "category": "Gujarati & Regional",
+      "calories": 145,
+      "proteinG": 6.8,
+      "carbsG": 17.5,
+      "fatG": 5,
+      "fiberG": 3.2,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 65,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3.5,
+      "tags": [
+        "breakfast",
+        "high-protein",
+        "quick"
+      ]
+    },
+    {
+      "id": "food-moong-chilla",
+      "name": "Moong Dal Chilla (Paneer-stuffed, 1 pc)",
+      "category": "Gujarati & Regional",
+      "calories": 190,
+      "proteinG": 11.5,
+      "carbsG": 19,
+      "fatG": 7,
+      "fiberG": 3.8,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 90,
+      "state": "cooked",
+      "source": "Homemade High-Protein Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3.5,
+      "tags": [
+        "breakfast",
+        "high-protein"
+      ]
+    },
+    {
+      "id": "food-dhokla",
+      "name": "Khaman Dhokla (Steamed, with light tempering)",
+      "regionalName": "ખમણ ઢોકળા",
+      "category": "Gujarati & Regional",
+      "calories": 165,
+      "proteinG": 6.5,
+      "carbsG": 24.5,
+      "fatG": 4.5,
+      "fiberG": 2.2,
+      "servingSize": 3,
+      "servingUnit": "piece",
+      "weightGrams": 120,
+      "state": "cooked",
+      "source": "Gujarati Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 3,
+      "tags": [
+        "gujarati",
+        "steamed",
+        "snack"
+      ]
+    },
+    {
+      "id": "food-handvo",
+      "name": "Gujarati Vegetable Handvo (baked/pan)",
+      "regionalName": "હાંડવો",
+      "category": "Gujarati & Regional",
+      "calories": 215,
+      "proteinG": 7.5,
+      "carbsG": 29,
+      "fatG": 7.2,
+      "fiberG": 3.5,
+      "servingSize": 1,
+      "servingUnit": "slice",
+      "weightGrams": 120,
+      "state": "cooked",
+      "source": "Gujarati Homemade Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "gujarati",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "food-idli",
+      "name": "Steamed Idli (2 pieces)",
+      "category": "South Indian",
+      "calories": 130,
+      "proteinG": 4.2,
+      "carbsG": 26,
+      "fatG": 0.6,
+      "fiberG": 1.4,
+      "servingSize": 2,
+      "servingUnit": "piece",
+      "weightGrams": 100,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "south-indian",
+        "steamed",
+        "low-fat"
+      ]
+    },
+    {
+      "id": "food-plain-dosa",
+      "name": "Plain Dosa (1 medium, 1 tsp oil)",
+      "category": "South Indian",
+      "calories": 170,
+      "proteinG": 4.5,
+      "carbsG": 28,
+      "fatG": 4.5,
+      "fiberG": 1.6,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 95,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4,
+      "tags": [
+        "south-indian",
+        "breakfast"
+      ]
+    },
+    {
+      "id": "food-sambar",
+      "name": "Vegetable Sambar",
+      "category": "South Indian",
+      "calories": 115,
+      "proteinG": 5.2,
+      "carbsG": 17,
+      "fatG": 2.8,
+      "fiberG": 4,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 180,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 2,
+      "tags": [
+        "south-indian",
+        "high-fiber"
+      ]
+    },
+    {
+      "id": "food-banana",
+      "name": "Banana (Medium, Robusta/Yelakki)",
+      "category": "Fruits & Veggies",
+      "calories": 105,
+      "proteinG": 1.3,
+      "carbsG": 27,
+      "fatG": 0.3,
+      "fiberG": 3.1,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 118,
+      "state": "raw",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "pre-workout",
+        "fruit",
+        "energy"
+      ]
+    },
+    {
+      "id": "food-apple",
+      "name": "Apple (Medium)",
+      "category": "Fruits & Veggies",
+      "calories": 95,
+      "proteinG": 0.5,
+      "carbsG": 25,
+      "fatG": 0.3,
+      "fiberG": 4.4,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 182,
+      "state": "raw",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "fruit",
+        "high-fiber"
+      ]
+    },
+    {
+      "id": "food-kachumber",
+      "name": "Cucumber Tomato Onion Kachumber Salad",
+      "category": "Fruits & Veggies",
+      "calories": 42,
+      "proteinG": 1.6,
+      "carbsG": 8.5,
+      "fatG": 0.3,
+      "fiberG": 2.6,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 130,
+      "state": "raw",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "salad",
+        "low-calorie",
+        "volume-eating"
+      ]
+    },
+    {
+      "id": "food-bhindi-sabzi",
+      "name": "Bhindi Masala / Okra Sabzi (Homemade)",
+      "category": "Fruits & Veggies",
+      "calories": 135,
+      "proteinG": 2.8,
+      "carbsG": 14.5,
+      "fatG": 7.2,
+      "fiberG": 4.5,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 140,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 6,
+      "tags": [
+        "sabzi",
+        "homemade"
+      ]
+    },
+    {
+      "id": "food-mixed-veg-sabzi",
+      "name": "Mixed Veg / Lauki Sabzi (Light Oil)",
+      "category": "Fruits & Veggies",
+      "calories": 110,
+      "proteinG": 3,
+      "carbsG": 13,
+      "fatG": 5,
+      "fiberG": 4.2,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 150,
+      "state": "cooked",
+      "source": "Homemade Standard",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 4,
+      "tags": [
+        "sabzi",
+        "low-calorie"
+      ]
+    },
+    {
+      "id": "food-almonds",
+      "name": "Raw Almonds (Badam, 10 pieces)",
+      "category": "Nuts, Seeds & Fats",
+      "calories": 70,
+      "proteinG": 2.6,
+      "carbsG": 2.6,
+      "fatG": 6,
+      "fiberG": 1.5,
+      "servingSize": 10,
+      "servingUnit": "piece",
+      "weightGrams": 12,
+      "state": "raw",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "healthy-fats",
+        "snack"
+      ]
+    },
+    {
+      "id": "food-roasted-makhana",
+      "name": "Roasted Makhana (Fox Nuts, 1 bowl)",
+      "category": "Snacks & Street",
+      "calories": 105,
+      "proteinG": 3,
+      "carbsG": 20.5,
+      "fatG": 1.2,
+      "fiberG": 2,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 30,
+      "state": "cooked",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 1,
+      "tags": [
+        "snack",
+        "low-calorie",
+        "crunchy"
+      ]
+    },
+    {
+      "id": "food-peanut-butter",
+      "name": "Unsweetened Peanut Butter (1 tbsp)",
+      "category": "Nuts, Seeds & Fats",
+      "calories": 95,
+      "proteinG": 4,
+      "carbsG": 3.2,
+      "fatG": 8,
+      "fiberG": 1.2,
+      "servingSize": 1,
+      "servingUnit": "tbsp",
+      "weightGrams": 16,
+      "state": "packaged",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "healthy-fats",
+        "protein"
+      ]
+    },
+    {
+      "id": "food-ghee",
+      "name": "Pure Cow Ghee (1 tsp)",
+      "category": "Nuts, Seeds & Fats",
+      "calories": 45,
+      "proteinG": 0,
+      "carbsG": 0,
+      "fatG": 5,
+      "fiberG": 0,
+      "servingSize": 1,
+      "servingUnit": "tsp",
+      "weightGrams": 5,
+      "state": "packaged",
+      "source": "ICMR-NIN",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "cooking-fat",
+        "track-carefully"
+      ]
+    },
+    {
+      "id": "food-cooking-oil",
+      "name": "Cooking Oil (Groundnut / Mustard / Olive, 1 tsp)",
+      "category": "Nuts, Seeds & Fats",
+      "calories": 44,
+      "proteinG": 0,
+      "carbsG": 0,
+      "fatG": 5,
+      "fiberG": 0,
+      "servingSize": 1,
+      "servingUnit": "tsp",
+      "weightGrams": 5,
+      "state": "packaged",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 5,
+      "tags": [
+        "cooking-fat",
+        "track-carefully"
+      ]
+    },
+    {
+      "id": "food-sugar",
+      "name": "White Sugar / Jaggery (1 tsp)",
+      "category": "Nuts, Seeds & Fats",
+      "calories": 20,
+      "proteinG": 0,
+      "carbsG": 5,
+      "fatG": 0,
+      "fiberG": 0,
+      "servingSize": 1,
+      "servingUnit": "tsp",
+      "weightGrams": 5,
+      "state": "packaged",
+      "source": "USDA Verified",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "sweetener"
+      ]
+    },
+    {
+      "id": "food-whey-protein",
+      "name": "Whey Protein Isolate / Concentrate (1 scoop in water)",
+      "category": "Protein & Drinks",
+      "calories": 120,
+      "proteinG": 24,
+      "carbsG": 3,
+      "fatG": 1.5,
+      "fiberG": 0,
+      "servingSize": 32,
+      "servingUnit": "g",
+      "weightGrams": 32,
+      "state": "packaged",
+      "source": "Supplement Label Standard",
+      "confidence": "verified",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "high-protein",
+        "post-workout",
+        "convenient"
+      ]
+    },
+    {
+      "id": "food-masala-chai",
+      "name": "Masala Chai (Low-fat Milk, minimal sugar)",
+      "category": "Protein & Drinks",
+      "calories": 75,
+      "proteinG": 2.8,
+      "carbsG": 9.5,
+      "fatG": 2.5,
+      "fiberG": 0,
+      "servingSize": 1,
+      "servingUnit": "cup",
+      "weightGrams": 150,
+      "state": "cooked",
+      "source": "Homemade Estimate",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 0,
+      "tags": [
+        "beverage",
+        "morning"
+      ]
+    },
+    {
+      "id": "food-samosa",
+      "name": "Punjabi Aloo Samosa (1 piece)",
+      "category": "Snacks & Street",
+      "calories": 260,
+      "proteinG": 4.5,
+      "carbsG": 32,
+      "fatG": 13,
+      "fiberG": 2.5,
+      "servingSize": 1,
+      "servingUnit": "piece",
+      "weightGrams": 90,
+      "state": "cooked",
+      "source": "Restaurant / Street Estimate",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 12,
+      "tags": [
+        "restaurant",
+        "fried",
+        "occasional"
+      ]
+    },
+    {
+      "id": "food-pav-bhaji",
+      "name": "Pav Bhaji (2 Butter Pav + Bhaji)",
+      "category": "Snacks & Street",
+      "calories": 520,
+      "proteinG": 11,
+      "carbsG": 68,
+      "fatG": 22,
+      "fiberG": 6,
+      "servingSize": 1,
+      "servingUnit": "serving",
+      "weightGrams": 350,
+      "state": "cooked",
+      "source": "Restaurant Estimate (butter varies)",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 18,
+      "tags": [
+        "restaurant",
+        "occasional"
+      ]
+    },
+    {
+      "id": "food-paneer-butter-masala",
+      "name": "Restaurant Paneer Butter Masala (1 bowl)",
+      "category": "Snacks & Street",
+      "calories": 410,
+      "proteinG": 14,
+      "carbsG": 18,
+      "fatG": 31,
+      "fiberG": 2.5,
+      "servingSize": 1,
+      "servingUnit": "bowl",
+      "weightGrams": 220,
+      "state": "cooked",
+      "source": "Restaurant Estimate (cream & butter)",
+      "confidence": "estimate",
+      "isVegetarian": true,
+      "hasEgg": false,
+      "oilOrGheeIncludedG": 20,
+      "tags": [
+        "restaurant",
+        "high-fat"
+      ]
+    }
+  ],
+  "recipes": [
+    {
+      "id": "rec-grilled-paneer-tikka",
+      "name": "Grilled Paneer Tikka Salad",
+      "description": "Charred marinated low-fat cottage cheese tossed with crisp greens, cucumber, and roasted cumin-mint dressing.",
+      "category": "High Protein Dinner",
+      "prepTimeMin": 25,
+      "servings": 1,
+      "caloriesPerServing": 365,
+      "proteinPerServing": 32,
+      "carbsPerServing": 16,
+      "fatPerServing": 19,
+      "ingredients": [
+        {
+          "name": "Low-Fat Paneer (cubed)",
+          "quantity": "150 g",
+          "grams": 150,
+          "inPantry": true
+        },
+        {
+          "name": "Hung Curd / Greek Yogurt",
+          "quantity": "2 tbsp (40 g)",
+          "grams": 40,
+          "inPantry": true
+        },
+        {
+          "name": "Bell Peppers & Red Onion",
+          "quantity": "100 g",
+          "grams": 100,
+          "inPantry": true
+        },
+        {
+          "name": "Fresh Mint & Coriander Chutney",
+          "quantity": "2 tbsp",
+          "grams": 30,
+          "inPantry": true
+        },
+        {
+          "name": "Cold-Pressed Mustard Oil",
+          "quantity": "1 tsp (5 ml)",
+          "grams": 5,
+          "inPantry": true
+        },
+        {
+          "name": "Tandoori Masala, Jeera & Lemon",
+          "quantity": "1 tsp",
+          "grams": 5,
+          "inPantry": true
+        }
+      ],
+      "instructions": [
+        "Whisk hung curd, mustard oil, tandoori masala, turmeric, ginger-garlic paste, and salt in a bowl.",
+        "Coat paneer cubes, diced bell peppers, and onions gently; rest for 15 minutes.",
+        "Sear on a hot non-stick tawa or air-fry at 200°C for 10–12 minutes until charred at edges.",
+        "Serve over crisp cucumber-lettuce greens with fresh mint-coriander chutney and lemon juice."
+      ],
+      "oilGheeNotes": "Uses only 1 tsp (5g) mustard oil instead of restaurant cream/butter, saving ~180 kcal.",
+      "difficulty": "Easy",
+      "tags": [
+        "high-protein",
+        "pure-veg",
+        "no-egg",
+        "dinner"
+      ],
+      "isVegetarian": true,
+      "hasEgg": false
+    },
+    {
+      "id": "rec-soya-chunk-biryani",
+      "name": "High-Protein Soya Chunk Biryani",
+      "description": "Fragrant basmati rice layered with spiced protein-rich soya chunks, mint, and caramelized onions.",
+      "category": "High Protein Lunch",
+      "prepTimeMin": 30,
+      "servings": 1,
+      "caloriesPerServing": 430,
+      "proteinPerServing": 33,
+      "carbsPerServing": 54,
+      "fatPerServing": 9,
+      "ingredients": [
+        {
+          "name": "Soya Chunks (Dry)",
+          "quantity": "50 g",
+          "grams": 50,
+          "inPantry": true
+        },
+        {
+          "name": "Basmati Rice (Raw)",
+          "quantity": "55 g",
+          "grams": 55,
+          "inPantry": true
+        },
+        {
+          "name": "Curd / Dahi",
+          "quantity": "3 tbsp (45 g)",
+          "grams": 45,
+          "inPantry": true
+        },
+        {
+          "name": "Onion, Tomato & Mint",
+          "quantity": "100 g",
+          "grams": 100,
+          "inPantry": true
+        },
+        {
+          "name": "Cow Ghee",
+          "quantity": "1 tsp (5 g)",
+          "grams": 5,
+          "inPantry": true
+        }
+      ],
+      "instructions": [
+        "Boil soya chunks in salted water for 5 minutes, drain, and squeeze out excess water.",
+        "Marinate chunks with curd, ginger-garlic paste, biryani masala, and chopped mint.",
+        "Sauté sliced onions in 1 tsp ghee until golden, add marinated soya and cook 5 minutes.",
+        "Layer 80%-cooked basmati rice on top, cover tightly, and steam on low heat for 8 minutes."
+      ],
+      "oilGheeNotes": "Measured 1 tsp ghee gives authentic aroma with only 45 kcal from added fat.",
+      "difficulty": "Medium",
+      "tags": [
+        "high-protein",
+        "budget-protein",
+        "pure-veg",
+        "lunch"
+      ],
+      "isVegetarian": true,
+      "hasEgg": false
+    },
+    {
+      "id": "rec-moong-dal-chilla",
+      "name": "Paneer-Stuffed Moong Dal Chilla (2 pcs)",
+      "description": "Crispy savory green-yellow moong lentil crepes stuffed with spiced grated paneer and herbs.",
+      "category": "High Protein Breakfast",
+      "prepTimeMin": 20,
+      "servings": 1,
+      "caloriesPerServing": 380,
+      "proteinPerServing": 24,
+      "carbsPerServing": 38,
+      "fatPerServing": 14,
+      "ingredients": [
+        {
+          "name": "Split Yellow Moong Dal (Soaked)",
+          "quantity": "60 g dry",
+          "grams": 60,
+          "inPantry": true
+        },
+        {
+          "name": "Grated Paneer",
+          "quantity": "60 g",
+          "grams": 60,
+          "inPantry": true
+        },
+        {
+          "name": "Chopped Onion, Coriander & Green Chilli",
+          "quantity": "50 g",
+          "grams": 50,
+          "inPantry": true
+        },
+        {
+          "name": "Cooking Oil / Ghee",
+          "quantity": "1.5 tsp (7 g)",
+          "grams": 7,
+          "inPantry": true
+        }
+      ],
+      "instructions": [
+        "Blend soaked moong dal with ginger, green chilli, and a splash of water into a smooth batter.",
+        "Spread ladleful onto a warm non-stick tawa; drizzle 1/2 tsp oil around edges.",
+        "Add grated paneer mixed with chaat masala and coriander on one half, fold, and serve with mint chutney."
+      ],
+      "oilGheeNotes": "Non-stick tawa keeps oil under 1.5 tsp for two full chillas.",
+      "difficulty": "Easy",
+      "tags": [
+        "breakfast",
+        "high-protein",
+        "pure-veg",
+        "no-egg"
+      ],
+      "isVegetarian": true,
+      "hasEgg": false
+    },
+    {
+      "id": "rec-gujarati-protein-thali",
+      "name": "High-Protein Gujarati Homemade Thali",
+      "description": "Balanced Gujarati meal: 2 Methi Thepla, Gujarati Dal, 100g Paneer Bhurji, Kachumber & Masala Chaas.",
+      "category": "Gujarati & Regional",
+      "prepTimeMin": 25,
+      "servings": 1,
+      "caloriesPerServing": 540,
+      "proteinPerServing": 31,
+      "carbsPerServing": 56,
+      "fatPerServing": 20,
+      "ingredients": [
+        {
+          "name": "Methi Thepla (Light Oil)",
+          "quantity": "2 pieces",
+          "grams": 80,
+          "inPantry": true
+        },
+        {
+          "name": "Gujarati Toor Dal",
+          "quantity": "1 bowl (180 g)",
+          "grams": 180,
+          "inPantry": true
+        },
+        {
+          "name": "Low-Fat Paneer Bhurji",
+          "quantity": "100 g paneer",
+          "grams": 100,
+          "inPantry": false
+        },
+        {
+          "name": "Masala Chaas",
+          "quantity": "1 glass (250 ml)",
+          "grams": 250,
+          "inPantry": true
+        },
+        {
+          "name": "Kachumber Salad",
+          "quantity": "1 bowl",
+          "grams": 120,
+          "inPantry": true
+        }
+      ],
+      "instructions": [
+        "Prepare paneer bhurji with onion, tomato, turmeric, cumin, and 1 tsp oil.",
+        "Warm 2 homemade methi theplas on a dry tawa.",
+        "Serve alongside a bowl of Gujarati dal, fresh kachumber salad, and chilled masala chaas."
+      ],
+      "oilGheeNotes": "Replaces extra ghee on thepla with protein-rich paneer bhurji and probiotic chaas.",
+      "difficulty": "Easy",
+      "tags": [
+        "gujarati",
+        "homemade",
+        "high-protein",
+        "lunch"
+      ],
+      "isVegetarian": true,
+      "hasEgg": false
+    }
+  ],
+  "foodLogs": [],
+  "favoriteMeals": [
+    {
+      "id": "fav-moong-chilla-combo",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "name": "2 Moong Dal Chilla + Greek Yogurt",
+      "mealSlot": "breakfast",
+      "items": [
+        {
+          "foodId": "food-moong-chilla",
+          "foodName": "Moong Dal Chilla (Paneer-stuffed, 1 pc)",
+          "quantity": 2,
+          "unit": "piece",
+          "weightGrams": 180,
+          "calories": 380,
+          "proteinG": 23,
+          "carbsG": 38,
+          "fatG": 14,
+          "oilGheeGrams": 7
+        },
+        {
+          "foodId": "food-greek-yogurt",
+          "foodName": "Unsweetened Greek Yogurt / Hung Curd",
+          "quantity": 1,
+          "unit": "serving",
+          "weightGrams": 150,
+          "calories": 110,
+          "proteinG": 14,
+          "carbsG": 5.5,
+          "fatG": 3.5,
+          "oilGheeGrams": 0
+        }
+      ],
+      "totalCalories": 490,
+      "totalProteinG": 37,
+      "createdAt": "2026-11-25T12:34:04.724Z"
+    }
+  ],
+  "mealPlans": [
+    {
+      "id": "plan-7c616174",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "planType": "7_day",
+      "startDate": "2026-11-25",
+      "days": [
+        {
+          "dayNumber": 1,
+          "label": "Day 1",
+          "meals": {
+            "breakfast": {
+              "title": "2 Moong Dal Chillas + Mint Chutney + 150g Greek Yogurt",
+              "recipeId": "rec-moong-dal-chilla",
+              "items": [
+                {
+                  "name": "Moong Dal Chilla (Paneer-stuffed)",
+                  "quantity": "2 pcs",
+                  "calories": 380,
+                  "proteinG": 23,
+                  "carbsG": 38,
+                  "fatG": 14
+                },
+                {
+                  "name": "Unsweetened Greek Yogurt / Hung Curd",
+                  "quantity": "150 g",
+                  "calories": 110,
+                  "proteinG": 14,
+                  "carbsG": 5.5,
+                  "fatG": 3.5
+                }
+              ],
+              "totalCalories": 490,
+              "totalProteinG": 37,
+              "prepNotes": "Use a non-stick tawa with max 1.5 tsp oil total."
+            },
+            "lunch": {
+              "title": "High-Protein Gujarati Thali (2 Thepla + Dal + Paneer + Chaas)",
+              "recipeId": "rec-gujarati-protein-thali",
+              "items": [
+                {
+                  "name": "Methi Thepla",
+                  "quantity": "2 pcs",
+                  "calories": 270,
+                  "proteinG": 7.2,
+                  "carbsG": 39,
+                  "fatG": 9.6
+                },
+                {
+                  "name": "Gujarati Toor Dal",
+                  "quantity": "1 bowl",
+                  "calories": 175,
+                  "proteinG": 7.8,
+                  "carbsG": 27.5,
+                  "fatG": 3.6
+                },
+                {
+                  "name": "Low-Fat Paneer Bhurji",
+                  "quantity": "100 g",
+                  "calories": 175,
+                  "proteinG": 21,
+                  "carbsG": 4,
+                  "fatG": 8.2
+                },
+                {
+                  "name": "Masala Chaas + Kachumber",
+                  "quantity": "1 glass + 1 bowl",
+                  "calories": 90,
+                  "proteinG": 4.1,
+                  "carbsG": 13,
+                  "fatG": 2.3
+                }
+              ],
+              "totalCalories": 710,
+              "totalProteinG": 40,
+              "prepNotes": "Skip extra ghee on top of theplas to keep fats balanced."
+            },
+            "snacks": {
+              "title": "Pre-Gym Banana + Post-Gym Whey Shake + Makhana",
+              "items": [
+                {
+                  "name": "Medium Banana",
+                  "quantity": "1 pc",
+                  "calories": 105,
+                  "proteinG": 1.3,
+                  "carbsG": 27,
+                  "fatG": 0.3
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 225,
+              "totalProteinG": 25.3,
+              "prepNotes": "Banana 45 mins before gym; protein shake right after."
+            },
+            "dinner": {
+              "title": "Grilled Paneer Tikka Salad",
+              "recipeId": "rec-grilled-paneer-tikka",
+              "items": [
+                {
+                  "name": "Grilled Low-Fat Paneer Tikka",
+                  "quantity": "150 g",
+                  "calories": 280,
+                  "proteinG": 28,
+                  "carbsG": 8,
+                  "fatG": 12
+                },
+                {
+                  "name": "Kachumber & Leafy Greens",
+                  "quantity": "1 large bowl",
+                  "calories": 65,
+                  "proteinG": 2.2,
+                  "carbsG": 10,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 345,
+              "totalProteinG": 30.2,
+              "prepNotes": "Light, high-protein dinner that digests easily before sleep."
+            }
+          }
+        },
+        {
+          "dayNumber": 2,
+          "label": "Day 2",
+          "meals": {
+            "breakfast": {
+              "title": "High-Protein Besan Chilla (2 pcs) + Toned Milk",
+              "items": [
+                {
+                  "name": "Besan Chilla (with veggies)",
+                  "quantity": "2 pcs",
+                  "calories": 290,
+                  "proteinG": 13.6,
+                  "carbsG": 35,
+                  "fatG": 10
+                },
+                {
+                  "name": "Toned Milk / Whey Coffee",
+                  "quantity": "250 ml",
+                  "calories": 145,
+                  "proteinG": 7.5,
+                  "carbsG": 11.8,
+                  "fatG": 7.5
+                }
+              ],
+              "totalCalories": 435,
+              "totalProteinG": 21.1,
+              "prepNotes": "Add grated cabbage/spinach to besan batter for extra volume."
+            },
+            "lunch": {
+              "title": "Soya Chunk Biryani + Cucumber Raita",
+              "recipeId": "rec-soya-chunk-biryani",
+              "items": [
+                {
+                  "name": "High-Protein Soya Chunk Biryani",
+                  "quantity": "1 large bowl",
+                  "calories": 430,
+                  "proteinG": 33,
+                  "carbsG": 54,
+                  "fatG": 9
+                },
+                {
+                  "name": "Homemade Curd Raita",
+                  "quantity": "1 bowl (150g)",
+                  "calories": 98,
+                  "proteinG": 5.5,
+                  "carbsG": 7.2,
+                  "fatG": 5
+                }
+              ],
+              "totalCalories": 528,
+              "totalProteinG": 38.5,
+              "prepNotes": "Budget-friendly 38g protein lunch."
+            },
+            "snacks": {
+              "title": "Sprouted Moong Salad + 10 Almonds + Whey Scoop",
+              "items": [
+                {
+                  "name": "Sprouted Moong Salad",
+                  "quantity": "1 bowl",
+                  "calories": 155,
+                  "proteinG": 11.5,
+                  "carbsG": 24,
+                  "fatG": 1
+                },
+                {
+                  "name": "Raw Almonds",
+                  "quantity": "10 pcs",
+                  "calories": 70,
+                  "proteinG": 2.6,
+                  "carbsG": 2.6,
+                  "fatG": 6
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 345,
+              "totalProteinG": 38.1,
+              "prepNotes": "Season sprouts with lemon juice, chaat masala & coriander."
+            },
+            "dinner": {
+              "title": "2 Phulka Rotis + Palak Paneer + Kachumber",
+              "items": [
+                {
+                  "name": "Whole Wheat Phulka (no ghee)",
+                  "quantity": "2 pcs",
+                  "calories": 170,
+                  "proteinG": 6,
+                  "carbsG": 35,
+                  "fatG": 1
+                },
+                {
+                  "name": "Homemade Palak Paneer",
+                  "quantity": "1 bowl",
+                  "calories": 270,
+                  "proteinG": 15.5,
+                  "carbsG": 10.5,
+                  "fatG": 18.5
+                },
+                {
+                  "name": "Kachumber Salad",
+                  "quantity": "1 bowl",
+                  "calories": 42,
+                  "proteinG": 1.6,
+                  "carbsG": 8.5,
+                  "fatG": 0.3
+                }
+              ],
+              "totalCalories": 482,
+              "totalProteinG": 23.1,
+              "prepNotes": "Swap heavy cream in palak paneer with 2 tbsp blended curd."
+            }
+          }
+        },
+        {
+          "dayNumber": 3,
+          "label": "Day 3",
+          "meals": {
+            "breakfast": {
+              "title": "Masala Oats / Poha + Hung Curd + Almonds",
+              "items": [
+                {
+                  "name": "Kanda Poha with Peanuts",
+                  "quantity": "1 bowl",
+                  "calories": 250,
+                  "proteinG": 5.2,
+                  "carbsG": 42,
+                  "fatG": 6.8
+                },
+                {
+                  "name": "Hung Curd / Greek Yogurt",
+                  "quantity": "150 g",
+                  "calories": 110,
+                  "proteinG": 14,
+                  "carbsG": 5.5,
+                  "fatG": 3.5
+                },
+                {
+                  "name": "Raw Almonds",
+                  "quantity": "10 pcs",
+                  "calories": 70,
+                  "proteinG": 2.6,
+                  "carbsG": 2.6,
+                  "fatG": 6
+                }
+              ],
+              "totalCalories": 430,
+              "totalProteinG": 21.8,
+              "prepNotes": "Great pre-morning-workout fuel."
+            },
+            "lunch": {
+              "title": "Rajma Chawal + 100g Grilled Tofu/Paneer + Salad",
+              "items": [
+                {
+                  "name": "Rajma Masala",
+                  "quantity": "1 bowl",
+                  "calories": 215,
+                  "proteinG": 11.5,
+                  "carbsG": 31,
+                  "fatG": 4.8
+                },
+                {
+                  "name": "Steamed Basmati Rice",
+                  "quantity": "1 bowl",
+                  "calories": 175,
+                  "proteinG": 3.6,
+                  "carbsG": 38.5,
+                  "fatG": 0.4
+                },
+                {
+                  "name": "Grilled Firm Tofu",
+                  "quantity": "100 g",
+                  "calories": 144,
+                  "proteinG": 16.5,
+                  "carbsG": 3.2,
+                  "fatG": 7.5
+                }
+              ],
+              "totalCalories": 534,
+              "totalProteinG": 31.6,
+              "prepNotes": "Rajma + Rice forms a complete amino acid profile."
+            },
+            "snacks": {
+              "title": "Khaman Dhokla + Whey Protein Shake",
+              "items": [
+                {
+                  "name": "Khaman Dhokla",
+                  "quantity": "3 pcs",
+                  "calories": 165,
+                  "proteinG": 6.5,
+                  "carbsG": 24.5,
+                  "fatG": 4.5
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 285,
+              "totalProteinG": 30.5,
+              "prepNotes": "Steamed Gujarati snack + fast post-gym protein."
+            },
+            "dinner": {
+              "title": "Moong Dal Khichdi + Soya Chunk Stir-Fry + Chaas",
+              "items": [
+                {
+                  "name": "Moong Dal Khichdi",
+                  "quantity": "1 bowl",
+                  "calories": 230,
+                  "proteinG": 8.5,
+                  "carbsG": 36,
+                  "fatG": 5
+                },
+                {
+                  "name": "Soya Chunk Masala (40g dry)",
+                  "quantity": "1 bowl",
+                  "calories": 205,
+                  "proteinG": 22,
+                  "carbsG": 17,
+                  "fatG": 4.5
+                },
+                {
+                  "name": "Masala Chaas",
+                  "quantity": "250 ml",
+                  "calories": 48,
+                  "proteinG": 2.5,
+                  "carbsG": 4.5,
+                  "fatG": 2
+                }
+              ],
+              "totalCalories": 483,
+              "totalProteinG": 33,
+              "prepNotes": "Comforting, gut-friendly high-protein dinner."
+            }
+          }
+        },
+        {
+          "dayNumber": 4,
+          "label": "Day 4",
+          "meals": {
+            "breakfast": {
+              "title": "2 Moong Dal Chillas + Mint Chutney + 150g Greek Yogurt",
+              "recipeId": "rec-moong-dal-chilla",
+              "items": [
+                {
+                  "name": "Moong Dal Chilla (Paneer-stuffed)",
+                  "quantity": "2 pcs",
+                  "calories": 380,
+                  "proteinG": 23,
+                  "carbsG": 38,
+                  "fatG": 14
+                },
+                {
+                  "name": "Unsweetened Greek Yogurt / Hung Curd",
+                  "quantity": "150 g",
+                  "calories": 110,
+                  "proteinG": 14,
+                  "carbsG": 5.5,
+                  "fatG": 3.5
+                }
+              ],
+              "totalCalories": 490,
+              "totalProteinG": 37,
+              "prepNotes": "Use a non-stick tawa with max 1.5 tsp oil total."
+            },
+            "lunch": {
+              "title": "High-Protein Gujarati Thali (2 Thepla + Dal + Paneer + Chaas)",
+              "recipeId": "rec-gujarati-protein-thali",
+              "items": [
+                {
+                  "name": "Methi Thepla",
+                  "quantity": "2 pcs",
+                  "calories": 270,
+                  "proteinG": 7.2,
+                  "carbsG": 39,
+                  "fatG": 9.6
+                },
+                {
+                  "name": "Gujarati Toor Dal",
+                  "quantity": "1 bowl",
+                  "calories": 175,
+                  "proteinG": 7.8,
+                  "carbsG": 27.5,
+                  "fatG": 3.6
+                },
+                {
+                  "name": "Low-Fat Paneer Bhurji",
+                  "quantity": "100 g",
+                  "calories": 175,
+                  "proteinG": 21,
+                  "carbsG": 4,
+                  "fatG": 8.2
+                },
+                {
+                  "name": "Masala Chaas + Kachumber",
+                  "quantity": "1 glass + 1 bowl",
+                  "calories": 90,
+                  "proteinG": 4.1,
+                  "carbsG": 13,
+                  "fatG": 2.3
+                }
+              ],
+              "totalCalories": 710,
+              "totalProteinG": 40,
+              "prepNotes": "Skip extra ghee on top of theplas to keep fats balanced."
+            },
+            "snacks": {
+              "title": "Pre-Gym Banana + Post-Gym Whey Shake + Makhana",
+              "items": [
+                {
+                  "name": "Medium Banana",
+                  "quantity": "1 pc",
+                  "calories": 105,
+                  "proteinG": 1.3,
+                  "carbsG": 27,
+                  "fatG": 0.3
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 225,
+              "totalProteinG": 25.3,
+              "prepNotes": "Banana 45 mins before gym; protein shake right after."
+            },
+            "dinner": {
+              "title": "Grilled Paneer Tikka Salad",
+              "recipeId": "rec-grilled-paneer-tikka",
+              "items": [
+                {
+                  "name": "Grilled Low-Fat Paneer Tikka",
+                  "quantity": "150 g",
+                  "calories": 280,
+                  "proteinG": 28,
+                  "carbsG": 8,
+                  "fatG": 12
+                },
+                {
+                  "name": "Kachumber & Leafy Greens",
+                  "quantity": "1 large bowl",
+                  "calories": 65,
+                  "proteinG": 2.2,
+                  "carbsG": 10,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 345,
+              "totalProteinG": 30.2,
+              "prepNotes": "Light, high-protein dinner that digests easily before sleep."
+            }
+          }
+        },
+        {
+          "dayNumber": 5,
+          "label": "Day 5",
+          "meals": {
+            "breakfast": {
+              "title": "High-Protein Besan Chilla (2 pcs) + Toned Milk",
+              "items": [
+                {
+                  "name": "Besan Chilla (with veggies)",
+                  "quantity": "2 pcs",
+                  "calories": 290,
+                  "proteinG": 13.6,
+                  "carbsG": 35,
+                  "fatG": 10
+                },
+                {
+                  "name": "Toned Milk / Whey Coffee",
+                  "quantity": "250 ml",
+                  "calories": 145,
+                  "proteinG": 7.5,
+                  "carbsG": 11.8,
+                  "fatG": 7.5
+                }
+              ],
+              "totalCalories": 435,
+              "totalProteinG": 21.1,
+              "prepNotes": "Add grated cabbage/spinach to besan batter for extra volume."
+            },
+            "lunch": {
+              "title": "Soya Chunk Biryani + Cucumber Raita",
+              "recipeId": "rec-soya-chunk-biryani",
+              "items": [
+                {
+                  "name": "High-Protein Soya Chunk Biryani",
+                  "quantity": "1 large bowl",
+                  "calories": 430,
+                  "proteinG": 33,
+                  "carbsG": 54,
+                  "fatG": 9
+                },
+                {
+                  "name": "Homemade Curd Raita",
+                  "quantity": "1 bowl (150g)",
+                  "calories": 98,
+                  "proteinG": 5.5,
+                  "carbsG": 7.2,
+                  "fatG": 5
+                }
+              ],
+              "totalCalories": 528,
+              "totalProteinG": 38.5,
+              "prepNotes": "Budget-friendly 38g protein lunch."
+            },
+            "snacks": {
+              "title": "Sprouted Moong Salad + 10 Almonds + Whey Scoop",
+              "items": [
+                {
+                  "name": "Sprouted Moong Salad",
+                  "quantity": "1 bowl",
+                  "calories": 155,
+                  "proteinG": 11.5,
+                  "carbsG": 24,
+                  "fatG": 1
+                },
+                {
+                  "name": "Raw Almonds",
+                  "quantity": "10 pcs",
+                  "calories": 70,
+                  "proteinG": 2.6,
+                  "carbsG": 2.6,
+                  "fatG": 6
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 345,
+              "totalProteinG": 38.1,
+              "prepNotes": "Season sprouts with lemon juice, chaat masala & coriander."
+            },
+            "dinner": {
+              "title": "2 Phulka Rotis + Palak Paneer + Kachumber",
+              "items": [
+                {
+                  "name": "Whole Wheat Phulka (no ghee)",
+                  "quantity": "2 pcs",
+                  "calories": 170,
+                  "proteinG": 6,
+                  "carbsG": 35,
+                  "fatG": 1
+                },
+                {
+                  "name": "Homemade Palak Paneer",
+                  "quantity": "1 bowl",
+                  "calories": 270,
+                  "proteinG": 15.5,
+                  "carbsG": 10.5,
+                  "fatG": 18.5
+                },
+                {
+                  "name": "Kachumber Salad",
+                  "quantity": "1 bowl",
+                  "calories": 42,
+                  "proteinG": 1.6,
+                  "carbsG": 8.5,
+                  "fatG": 0.3
+                }
+              ],
+              "totalCalories": 482,
+              "totalProteinG": 23.1,
+              "prepNotes": "Swap heavy cream in palak paneer with 2 tbsp blended curd."
+            }
+          }
+        },
+        {
+          "dayNumber": 6,
+          "label": "Day 6",
+          "meals": {
+            "breakfast": {
+              "title": "Masala Oats / Poha + Hung Curd + Almonds",
+              "items": [
+                {
+                  "name": "Kanda Poha with Peanuts",
+                  "quantity": "1 bowl",
+                  "calories": 250,
+                  "proteinG": 5.2,
+                  "carbsG": 42,
+                  "fatG": 6.8
+                },
+                {
+                  "name": "Hung Curd / Greek Yogurt",
+                  "quantity": "150 g",
+                  "calories": 110,
+                  "proteinG": 14,
+                  "carbsG": 5.5,
+                  "fatG": 3.5
+                },
+                {
+                  "name": "Raw Almonds",
+                  "quantity": "10 pcs",
+                  "calories": 70,
+                  "proteinG": 2.6,
+                  "carbsG": 2.6,
+                  "fatG": 6
+                }
+              ],
+              "totalCalories": 430,
+              "totalProteinG": 21.8,
+              "prepNotes": "Great pre-morning-workout fuel."
+            },
+            "lunch": {
+              "title": "Rajma Chawal + 100g Grilled Tofu/Paneer + Salad",
+              "items": [
+                {
+                  "name": "Rajma Masala",
+                  "quantity": "1 bowl",
+                  "calories": 215,
+                  "proteinG": 11.5,
+                  "carbsG": 31,
+                  "fatG": 4.8
+                },
+                {
+                  "name": "Steamed Basmati Rice",
+                  "quantity": "1 bowl",
+                  "calories": 175,
+                  "proteinG": 3.6,
+                  "carbsG": 38.5,
+                  "fatG": 0.4
+                },
+                {
+                  "name": "Grilled Firm Tofu",
+                  "quantity": "100 g",
+                  "calories": 144,
+                  "proteinG": 16.5,
+                  "carbsG": 3.2,
+                  "fatG": 7.5
+                }
+              ],
+              "totalCalories": 534,
+              "totalProteinG": 31.6,
+              "prepNotes": "Rajma + Rice forms a complete amino acid profile."
+            },
+            "snacks": {
+              "title": "Khaman Dhokla + Whey Protein Shake",
+              "items": [
+                {
+                  "name": "Khaman Dhokla",
+                  "quantity": "3 pcs",
+                  "calories": 165,
+                  "proteinG": 6.5,
+                  "carbsG": 24.5,
+                  "fatG": 4.5
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 285,
+              "totalProteinG": 30.5,
+              "prepNotes": "Steamed Gujarati snack + fast post-gym protein."
+            },
+            "dinner": {
+              "title": "Moong Dal Khichdi + Soya Chunk Stir-Fry + Chaas",
+              "items": [
+                {
+                  "name": "Moong Dal Khichdi",
+                  "quantity": "1 bowl",
+                  "calories": 230,
+                  "proteinG": 8.5,
+                  "carbsG": 36,
+                  "fatG": 5
+                },
+                {
+                  "name": "Soya Chunk Masala (40g dry)",
+                  "quantity": "1 bowl",
+                  "calories": 205,
+                  "proteinG": 22,
+                  "carbsG": 17,
+                  "fatG": 4.5
+                },
+                {
+                  "name": "Masala Chaas",
+                  "quantity": "250 ml",
+                  "calories": 48,
+                  "proteinG": 2.5,
+                  "carbsG": 4.5,
+                  "fatG": 2
+                }
+              ],
+              "totalCalories": 483,
+              "totalProteinG": 33,
+              "prepNotes": "Comforting, gut-friendly high-protein dinner."
+            }
+          }
+        },
+        {
+          "dayNumber": 7,
+          "label": "Day 7",
+          "meals": {
+            "breakfast": {
+              "title": "2 Moong Dal Chillas + Mint Chutney + 150g Greek Yogurt",
+              "recipeId": "rec-moong-dal-chilla",
+              "items": [
+                {
+                  "name": "Moong Dal Chilla (Paneer-stuffed)",
+                  "quantity": "2 pcs",
+                  "calories": 380,
+                  "proteinG": 23,
+                  "carbsG": 38,
+                  "fatG": 14
+                },
+                {
+                  "name": "Unsweetened Greek Yogurt / Hung Curd",
+                  "quantity": "150 g",
+                  "calories": 110,
+                  "proteinG": 14,
+                  "carbsG": 5.5,
+                  "fatG": 3.5
+                }
+              ],
+              "totalCalories": 490,
+              "totalProteinG": 37,
+              "prepNotes": "Use a non-stick tawa with max 1.5 tsp oil total."
+            },
+            "lunch": {
+              "title": "High-Protein Gujarati Thali (2 Thepla + Dal + Paneer + Chaas)",
+              "recipeId": "rec-gujarati-protein-thali",
+              "items": [
+                {
+                  "name": "Methi Thepla",
+                  "quantity": "2 pcs",
+                  "calories": 270,
+                  "proteinG": 7.2,
+                  "carbsG": 39,
+                  "fatG": 9.6
+                },
+                {
+                  "name": "Gujarati Toor Dal",
+                  "quantity": "1 bowl",
+                  "calories": 175,
+                  "proteinG": 7.8,
+                  "carbsG": 27.5,
+                  "fatG": 3.6
+                },
+                {
+                  "name": "Low-Fat Paneer Bhurji",
+                  "quantity": "100 g",
+                  "calories": 175,
+                  "proteinG": 21,
+                  "carbsG": 4,
+                  "fatG": 8.2
+                },
+                {
+                  "name": "Masala Chaas + Kachumber",
+                  "quantity": "1 glass + 1 bowl",
+                  "calories": 90,
+                  "proteinG": 4.1,
+                  "carbsG": 13,
+                  "fatG": 2.3
+                }
+              ],
+              "totalCalories": 710,
+              "totalProteinG": 40,
+              "prepNotes": "Skip extra ghee on top of theplas to keep fats balanced."
+            },
+            "snacks": {
+              "title": "Pre-Gym Banana + Post-Gym Whey Shake + Makhana",
+              "items": [
+                {
+                  "name": "Medium Banana",
+                  "quantity": "1 pc",
+                  "calories": 105,
+                  "proteinG": 1.3,
+                  "carbsG": 27,
+                  "fatG": 0.3
+                },
+                {
+                  "name": "Whey Protein in Water",
+                  "quantity": "1 scoop",
+                  "calories": 120,
+                  "proteinG": 24,
+                  "carbsG": 3,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 225,
+              "totalProteinG": 25.3,
+              "prepNotes": "Banana 45 mins before gym; protein shake right after."
+            },
+            "dinner": {
+              "title": "Grilled Paneer Tikka Salad",
+              "recipeId": "rec-grilled-paneer-tikka",
+              "items": [
+                {
+                  "name": "Grilled Low-Fat Paneer Tikka",
+                  "quantity": "150 g",
+                  "calories": 280,
+                  "proteinG": 28,
+                  "carbsG": 8,
+                  "fatG": 12
+                },
+                {
+                  "name": "Kachumber & Leafy Greens",
+                  "quantity": "1 large bowl",
+                  "calories": 65,
+                  "proteinG": 2.2,
+                  "carbsG": 10,
+                  "fatG": 1.5
+                }
+              ],
+              "totalCalories": 345,
+              "totalProteinG": 30.2,
+              "prepNotes": "Light, high-protein dinner that digests easily before sleep."
+            }
+          }
+        }
+      ],
+      "targetCalories": 1800,
+      "targetProteinG": 130,
+      "createdAt": "2026-11-25T12:46:49.310Z"
+    }
+  ],
+  "groceryLists": [
+    {
+      "id": "grocery-weekly-default",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "period": "weekly",
+      "items": [
+        {
+          "id": "g-1",
+          "name": "Low-Fat Paneer (Amul / Fresh)",
+          "category": "Protein",
+          "quantity": "1 kg (200g x 5)",
+          "estimatedCostInr": 420,
+          "purchased": false,
+          "isBudgetProteinTip": false
+        },
+        {
+          "id": "g-2",
+          "name": "Soya Chunks (Nutrela)",
+          "category": "Budget Protein",
+          "quantity": "500 g",
+          "estimatedCostInr": 95,
+          "purchased": false,
+          "isBudgetProteinTip": true
+        },
+        {
+          "id": "g-3",
+          "name": "Yellow Moong Dal & Toor Dal",
+          "category": "Dal & Legumes",
+          "quantity": "1 kg",
+          "estimatedCostInr": 150,
+          "purchased": false,
+          "isBudgetProteinTip": true
+        },
+        {
+          "id": "g-4",
+          "name": "Hung Curd / Toned Milk for Dahi",
+          "category": "Dairy",
+          "quantity": "3.5 Liters",
+          "estimatedCostInr": 210,
+          "purchased": false,
+          "isBudgetProteinTip": true
+        },
+        {
+          "id": "g-5",
+          "name": "Whole Wheat Chakki Atta",
+          "category": "Grains",
+          "quantity": "2 kg",
+          "estimatedCostInr": 110,
+          "purchased": false
+        },
+        {
+          "id": "g-6",
+          "name": "Cucumber, Tomato, Onion, Spinach & Methi",
+          "category": "Vegetables",
+          "quantity": "2.5 kg assorted",
+          "estimatedCostInr": 180,
+          "purchased": false
+        },
+        {
+          "id": "g-7",
+          "name": "Bananas & Apples",
+          "category": "Fruits",
+          "quantity": "12 pcs",
+          "estimatedCostInr": 160,
+          "purchased": false
+        },
+        {
+          "id": "g-8",
+          "name": "Roasted Makhana & Raw Almonds",
+          "category": "Snacks & Fats",
+          "quantity": "250 g",
+          "estimatedCostInr": 220,
+          "purchased": false
+        }
+      ],
+      "updatedAt": "2026-11-25T12:34:04.724Z"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ex-bench",
+      "name": "Barbell / Dumbbell Bench Press",
+      "muscleGroup": "Chest",
+      "equipment": "Barbell or Dumbbells",
+      "instructions": "Keep shoulder blades tucked, lower under control to mid-chest, press up smoothly.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-incline-db",
+      "name": "Incline Dumbbell Press",
+      "muscleGroup": "Chest",
+      "equipment": "Dumbbells + Bench",
+      "instructions": "Set bench to 30°. Focus on upper chest stretch and controlled lockout.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-pec-fly",
+      "name": "Cable / Machine Chest Fly",
+      "muscleGroup": "Chest",
+      "equipment": "Cable or Machine",
+      "instructions": "Slight bend in elbows, squeeze chest at center.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-lat-pulldown",
+      "name": "Lat Pulldown",
+      "muscleGroup": "Back",
+      "equipment": "Cable Machine",
+      "instructions": "Pull bar to upper chest by driving elbows down, avoid swinging torso.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-db-row",
+      "name": "Single-Arm Dumbbell Row",
+      "muscleGroup": "Back",
+      "equipment": "Dumbbell + Bench",
+      "instructions": "Keep spine neutral, pull dumbbell toward hip pocket.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-seated-row",
+      "name": "Seated Cable Row",
+      "muscleGroup": "Back",
+      "equipment": "Cable Machine",
+      "instructions": "Squeeze shoulder blades together at the end of each rep.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-face-pull",
+      "name": "Rope Face Pulls",
+      "muscleGroup": "Shoulders",
+      "equipment": "Cable Rope",
+      "instructions": "Pull toward forehead with elbows high for posture and rear delts.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-ohp",
+      "name": "Overhead Dumbbell Shoulder Press",
+      "muscleGroup": "Shoulders",
+      "equipment": "Dumbbells",
+      "instructions": "Brace core, press overhead without arching lower back.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-lat-raise",
+      "name": "Dumbbell Lateral Raises",
+      "muscleGroup": "Shoulders",
+      "equipment": "Dumbbells",
+      "instructions": "Lead with elbows up to shoulder height, slow 2-second lowering.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-squat",
+      "name": "Goblet / Barbell Squat",
+      "muscleGroup": "Legs",
+      "equipment": "Barbell or Dumbbell",
+      "instructions": "Keep chest proud, sit between hips, drive through mid-foot.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-leg-press",
+      "name": "Leg Press",
+      "muscleGroup": "Legs",
+      "equipment": "Leg Press Machine",
+      "instructions": "Place feet shoulder-width, lower to 90° knee bend without lifting lower back.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-rdl",
+      "name": "Dumbbell Romanian Deadlift",
+      "muscleGroup": "Legs",
+      "equipment": "Dumbbells",
+      "instructions": "Push hips back with soft knees until you feel a hamstring stretch.",
+      "isCompound": true
+    },
+    {
+      "id": "ex-leg-curl",
+      "name": "Seated / Lying Leg Curl",
+      "muscleGroup": "Legs",
+      "equipment": "Machine",
+      "instructions": "Controlled curl for hamstrings, pause briefly at peak contraction.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-calf-raise",
+      "name": "Standing Calf Raises",
+      "muscleGroup": "Legs",
+      "equipment": "Machine / Step",
+      "instructions": "Full stretch at bottom, pause 1 second at top.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-bicep-curl",
+      "name": "Dumbbell Bicep Curls",
+      "muscleGroup": "Arms",
+      "equipment": "Dumbbells",
+      "instructions": "Keep elbows pinned at sides, avoid momentum.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-tricep-pushdown",
+      "name": "Rope Tricep Pushdown",
+      "muscleGroup": "Arms",
+      "equipment": "Cable Rope",
+      "instructions": "Lock elbows at sides and spread rope at the bottom.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-plank",
+      "name": "Forearm Plank",
+      "muscleGroup": "Core",
+      "equipment": "Bodyweight",
+      "instructions": "Brace abs and glutes, keep a straight line from head to heels.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-leg-raise",
+      "name": "Hanging / Lying Leg Raises",
+      "muscleGroup": "Core",
+      "equipment": "Pull-up Bar or Mat",
+      "instructions": "Lift legs with controlled lower-ab contraction, avoid swinging.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-incline-walk",
+      "name": "Incline Treadmill Walk",
+      "muscleGroup": "Cardio",
+      "equipment": "Treadmill",
+      "instructions": "8–10% incline at brisk 4.8–5.5 km/h pace — joint-friendly fat loss.",
+      "isCompound": false
+    },
+    {
+      "id": "ex-cycling",
+      "name": "Stationary Cycling",
+      "muscleGroup": "Cardio",
+      "equipment": "Spin Bike",
+      "instructions": "Moderate steady resistance for 20–30 minutes.",
+      "isCompound": false
+    }
+  ],
+  "workoutRoutine": [
+    {
+      "id": "routine-mon",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 1,
+      "title": "Upper Body Push (Chest, Shoulders, Triceps)",
+      "focus": "Strength & Muscle Retention",
+      "isRestDay": false,
+      "plannedExercises": [
+        {
+          "exerciseName": "Incline Dumbbell Press",
+          "sets": 3,
+          "reps": "8-10",
+          "restSec": 90
+        },
+        {
+          "exerciseName": "Barbell / Dumbbell Bench Press",
+          "sets": 3,
+          "reps": "8-12",
+          "restSec": 90
+        },
+        {
+          "exerciseName": "Overhead Dumbbell Shoulder Press",
+          "sets": 3,
+          "reps": "10",
+          "restSec": 75
+        },
+        {
+          "exerciseName": "Dumbbell Lateral Raises",
+          "sets": 3,
+          "reps": "12-15",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Rope Tricep Pushdown",
+          "sets": 3,
+          "reps": "12",
+          "restSec": 60
+        }
+      ]
+    },
+    {
+      "id": "routine-tue",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 2,
+      "title": "Upper Body Pull (Back, Rear Delts, Biceps)",
+      "focus": "Posture & V-Taper",
+      "isRestDay": false,
+      "plannedExercises": [
+        {
+          "exerciseName": "Lat Pulldown",
+          "sets": 3,
+          "reps": "10-12",
+          "restSec": 90
+        },
+        {
+          "exerciseName": "Seated Cable Row",
+          "sets": 3,
+          "reps": "10-12",
+          "restSec": 75
+        },
+        {
+          "exerciseName": "Single-Arm Dumbbell Row",
+          "sets": 3,
+          "reps": "10 each",
+          "restSec": 75
+        },
+        {
+          "exerciseName": "Rope Face Pulls",
+          "sets": 3,
+          "reps": "15",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Dumbbell Bicep Curls",
+          "sets": 3,
+          "reps": "12",
+          "restSec": 60
+        }
+      ]
+    },
+    {
+      "id": "routine-wed",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 3,
+      "title": "Active Recovery & Core Mobility",
+      "focus": "Steps + Light Core",
+      "isRestDay": true,
+      "plannedExercises": [
+        {
+          "exerciseName": "Incline Treadmill Walk",
+          "sets": 1,
+          "reps": "25 min",
+          "restSec": 0
+        },
+        {
+          "exerciseName": "Forearm Plank",
+          "sets": 3,
+          "reps": "45 sec",
+          "restSec": 45
+        }
+      ]
+    },
+    {
+      "id": "routine-thu",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 4,
+      "title": "Lower Body Strength (Quads, Hamstrings, Calves)",
+      "focus": "Metabolic & Leg Power",
+      "isRestDay": false,
+      "plannedExercises": [
+        {
+          "exerciseName": "Goblet / Barbell Squat",
+          "sets": 3,
+          "reps": "8-10",
+          "restSec": 120
+        },
+        {
+          "exerciseName": "Dumbbell Romanian Deadlift",
+          "sets": 3,
+          "reps": "10-12",
+          "restSec": 90
+        },
+        {
+          "exerciseName": "Leg Press",
+          "sets": 3,
+          "reps": "12",
+          "restSec": 90
+        },
+        {
+          "exerciseName": "Seated / Lying Leg Curl",
+          "sets": 3,
+          "reps": "12-15",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Standing Calf Raises",
+          "sets": 3,
+          "reps": "15",
+          "restSec": 45
+        }
+      ]
+    },
+    {
+      "id": "routine-fri",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 5,
+      "title": "Full Body Athletic + Conditioning",
+      "focus": "Compound + Fat Burn",
+      "isRestDay": false,
+      "plannedExercises": [
+        {
+          "exerciseName": "Barbell / Dumbbell Bench Press",
+          "sets": 3,
+          "reps": "10",
+          "restSec": 90
+        },
+        {
+          "exerciseName": "Lat Pulldown",
+          "sets": 3,
+          "reps": "10",
+          "restSec": 75
+        },
+        {
+          "exerciseName": "Dumbbell Lateral Raises",
+          "sets": 3,
+          "reps": "15",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Hanging / Lying Leg Raises",
+          "sets": 3,
+          "reps": "12",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Incline Treadmill Walk",
+          "sets": 1,
+          "reps": "20 min",
+          "restSec": 0
+        }
+      ]
+    },
+    {
+      "id": "routine-sat",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 6,
+      "title": "Upper Pump & Core + Cardio",
+      "focus": "Arms, Shoulders & Waist Trim",
+      "isRestDay": false,
+      "plannedExercises": [
+        {
+          "exerciseName": "Incline Dumbbell Press",
+          "sets": 3,
+          "reps": "12",
+          "restSec": 75
+        },
+        {
+          "exerciseName": "Seated Cable Row",
+          "sets": 3,
+          "reps": "12",
+          "restSec": 75
+        },
+        {
+          "exerciseName": "Dumbbell Bicep Curls",
+          "sets": 3,
+          "reps": "12-15",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Rope Tricep Pushdown",
+          "sets": 3,
+          "reps": "12-15",
+          "restSec": 60
+        },
+        {
+          "exerciseName": "Stationary Cycling",
+          "sets": 1,
+          "reps": "20 min",
+          "restSec": 0
+        }
+      ]
+    },
+    {
+      "id": "routine-sun",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "dayOfWeek": 7,
+      "title": "Full Rest & Recovery Day",
+      "focus": "Sleep, Hydration & Light Walk",
+      "isRestDay": true,
+      "plannedExercises": []
+    }
+  ],
+  "workoutLogs": [],
+  "waterLogs": [],
+  "habitLogs": [],
+  "progressPhotos": [],
+  "aiConversations": [
+    {
+      "id": "ai-welcome",
+      "userId": "11111111-1111-4111-8111-111111111111",
+      "role": "assistant",
+      "content": "Namaste! I'm your personal AI Dietitian. I already have your EVOLT 360 baseline (76.4 kg, 29.7% body fat, 29.6 kg muscle) and your Pure Vegetarian (no eggs) homemade Indian food preference. Your starting targets are ~1,800 kcal and 130g protein/day to lean out while keeping your gym strength. Log your first meal or ask me anything!",
+      "mode": "local_engine",
+      "createdAt": "2026-11-25T12:34:04.724Z"
+    }
+  ],
+  "preferences": {
+    "userId": "11111111-1111-4111-8111-111111111111",
+    "units": "metric",
+    "currency": "INR",
+    "remindersEnabled": true,
+    "localCachingEnabled": true,
+    "updatedAt": "2026-11-25T12:34:04.724Z"
+  }
+}

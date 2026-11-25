@@ -1,0 +1,16 @@
+{
+  "name": "NutriFit AI — Personal Dietitian & Transformation",
+  "short_name": "NutriFit AI",
+  "description": "Personal AI-powered pure-vegetarian Indian dietitian, food scanner, and body transformation tracker.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F4EF",
+  "theme_color": "#FB923C",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
