@@ -27,19 +27,23 @@ export async function POST(req: Request) {
     // Update in-memory runtime
     process.env.GEMINI_API_KEY = apiKey;
 
-    // Persist to .env.local
-    let content = '';
-    if (fs.existsSync(ENV_LOCAL_PATH)) {
-      content = fs.readFileSync(ENV_LOCAL_PATH, 'utf8');
-    }
+    // Persist to .env.local if filesystem is writable
+    try {
+      let content = '';
+      if (fs.existsSync(ENV_LOCAL_PATH)) {
+        content = fs.readFileSync(ENV_LOCAL_PATH, 'utf8');
+      }
 
-    if (content.includes('GEMINI_API_KEY=')) {
-      content = content.replace(/GEMINI_API_KEY=.*$/m, `GEMINI_API_KEY=${apiKey}`);
-    } else {
-      content += `\nGEMINI_API_KEY=${apiKey}\n`;
-    }
+      if (content.includes('GEMINI_API_KEY=')) {
+        content = content.replace(/GEMINI_API_KEY=.*$/m, `GEMINI_API_KEY=${apiKey}`);
+      } else {
+        content += `\nGEMINI_API_KEY=${apiKey}\n`;
+      }
 
-    fs.writeFileSync(ENV_LOCAL_PATH, content, 'utf8');
+      fs.writeFileSync(ENV_LOCAL_PATH, content, 'utf8');
+    } catch {
+      // In serverless read-only environments, in-memory process.env update is preserved
+    }
 
     return NextResponse.json({
       ok: true,

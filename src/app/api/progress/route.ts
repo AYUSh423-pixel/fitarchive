@@ -41,15 +41,22 @@ export async function POST(req: Request) {
       if (!base64) return NextResponse.json({ error: 'Image required.' }, { status: 400 });
       const filename = `progress-${Date.now()}-${crypto.randomBytes(3).toString('hex')}.jpg`;
       const dir = path.join(UPLOADS_DIR, 'progress');
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, filename), Buffer.from(base64, 'base64'));
+      let photoUrl = `data:image/jpeg;base64,${base64}`;
+
+      try {
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, filename), Buffer.from(base64, 'base64'));
+        photoUrl = `/api/files/progress/${filename}`;
+      } catch {
+        // Fallback to data URI in serverless read-only environments
+      }
 
       const photo: ProgressPhoto = {
         id: `photo-${crypto.randomBytes(4).toString('hex')}`,
         userId: guard.session.userId,
         photoDate: String(body.photoDate || todayIsoDate()),
         pose: body.pose || 'front',
-        url: `/api/files/progress/${filename}`,
+        url: photoUrl,
         milestoneDay: body.milestoneDay ? Number(body.milestoneDay) : undefined,
         notes: body.notes ? String(body.notes) : undefined,
         createdAt: new Date().toISOString(),
@@ -74,9 +81,14 @@ export async function POST(req: Request) {
         const ext = body.reportMime === 'application/pdf' ? 'pdf' : 'jpg';
         const filename = `scan-${Date.now()}.${ext}`;
         const dir = path.join(UPLOADS_DIR, 'scans');
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(path.join(dir, filename), Buffer.from(String(body.reportBase64), 'base64'));
-        reportUrl = `/api/files/scans/${filename}`;
+        reportUrl = `data:${body.reportMime || 'application/pdf'};base64,${body.reportBase64}`;
+        try {
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(path.join(dir, filename), Buffer.from(String(body.reportBase64), 'base64'));
+          reportUrl = `/api/files/scans/${filename}`;
+        } catch {
+          // Fallback to data URI in serverless read-only environments
+        }
       }
 
       const scan: BodyScan = {

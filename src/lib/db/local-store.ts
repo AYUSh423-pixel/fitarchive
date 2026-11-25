@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import crypto from 'crypto';
 import type { DatabaseState } from '@/types/nutrifit';
 import { hashPassword } from '@/lib/auth';
@@ -7,11 +8,52 @@ import { SEED_INDIAN_FOODS, SEED_RECIPES } from '@/lib/indian-foods-seed';
 import { SEED_EXERCISES, createDefaultRoutine } from '@/lib/workouts-seed';
 import { calculateRecommendedTargets } from '@/lib/nutrition-engine';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'nutrifit-db.json');
-export const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
-
 export const DEFAULT_USER_ID = '11111111-1111-4111-8111-111111111111';
+
+// Determine safe storage directory (Vercel serverless has read-only /var/task, must use /tmp)
+function resolveStorageDirs() {
+  const isServerless =
+    Boolean(process.env.VERCEL) ||
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    process.cwd().startsWith('/var/task');
+
+  if (isServerless) {
+    const tmpData = path.join(os.tmpdir(), 'nutrifit-data');
+    return {
+      dataDir: tmpData,
+      dbFile: path.join(tmpData, 'nutrifit-db.json'),
+      uploadsDir: path.join(tmpData, 'uploads'),
+    };
+  }
+
+  // Local development
+  try {
+    const localDir = path.join(process.cwd(), 'data');
+    return {
+      dataDir: localDir,
+      dbFile: path.join(localDir, 'nutrifit-db.json'),
+      uploadsDir: path.join(localDir, 'uploads'),
+    };
+  } catch {
+    const tmpData = path.join(os.tmpdir(), 'nutrifit-data');
+    return {
+      dataDir: tmpData,
+      dbFile: path.join(tmpData, 'nutrifit-db.json'),
+      uploadsDir: path.join(tmpData, 'uploads'),
+    };
+  }
+}
+
+const dirs = resolveStorageDirs();
+export const DATA_DIR = dirs.dataDir;
+export const DB_FILE = dirs.dbFile;
+export const UPLOADS_DIR = dirs.uploadsDir;
+
+// Global in-memory cache to guarantee persistence across serverless warm invocations
+declare global {
+  // eslint-disable-next-line no-var
+  var __nutrifit_db__: DatabaseState | undefined;
+}
 
 export function todayIsoDate(): string {
   const now = new Date();
@@ -194,26 +236,47 @@ export function createInitialDatabaseState(): DatabaseState {
 }
 
 function ensureDirectories() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  } catch {
+    // If running in a read-only container, ignore filesystem error and rely on memory cache
+  }
 }
 
 export function readDatabase(): DatabaseState {
-  ensureDirectories();
-  if (!fs.existsSync(DB_FILE)) {
-    const initial = createInitialDatabaseState();
-    writeDatabase(initial);
-    return initial;
+  if (globalThis.__nutrifit_db__) {
+    return globalThis.__nutrifit_db__;
   }
-  const raw = fs.readFileSync(DB_FILE, 'utf8');
-  return JSON.parse(raw) as DatabaseState;
+
+  ensureDirectories();
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const raw = fs.readFileSync(DB_FILE, 'utf8');
+      const parsed = JSON.parse(raw) as DatabaseState;
+      globalThis.__nutrifit_db__ = parsed;
+      return parsed;
+    }
+  } catch {
+    // Fallback to in-memory creation
+  }
+
+  const initial = createInitialDatabaseState();
+  globalThis.__nutrifit_db__ = initial;
+  writeDatabase(initial);
+  return initial;
 }
 
 export function writeDatabase(state: DatabaseState): void {
-  ensureDirectories();
-  const tmpFile = `${DB_FILE}.${crypto.randomBytes(4).toString('hex')}.tmp`;
-  fs.writeFileSync(tmpFile, JSON.stringify(state, null, 2), 'utf8');
-  fs.renameSync(tmpFile, DB_FILE);
+  globalThis.__nutrifit_db__ = state;
+  try {
+    ensureDirectories();
+    const tmpFile = `${DB_FILE}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+    fs.writeFileSync(tmpFile, JSON.stringify(state, null, 2), 'utf8');
+    fs.renameSync(tmpFile, DB_FILE);
+  } catch {
+    // Graceful fallback for read-only serverless filesystems
+  }
 }
 
 export function updateDatabase(mutator: (draft: DatabaseState) => void): DatabaseState {
