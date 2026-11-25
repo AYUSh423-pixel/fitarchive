@@ -333,7 +333,8 @@ Respond ONLY in this exact JSON shape:
         console.log('[analyzeFoodPhoto] Raw jsonText (first 500 chars):', jsonText?.substring(0, 500));
         const parsed = extractJsonFromAiResponse(jsonText);
         console.log('[analyzeFoodPhoto] Parsed result:', parsed ? 'Success' : 'Failed', parsed ? { dishTitle: parsed.dishTitle, itemsCount: parsed.items?.length } : null);
-        if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
+        if (parsed && Array.isArray(parsed.items)) {
+          // Return AI response even if items is empty - it may have clarifying questions
           const items: ScannedCandidateItem[] = (parsed.items || []).map((it: ScannedCandidateItem, idx: number) => ({
             ...it,
             tempId: `scan-${Date.now()}-${idx}`,
