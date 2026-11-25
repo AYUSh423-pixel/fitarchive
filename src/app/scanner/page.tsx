@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Zap, Minus, Plus, Trash2, Camera, Image as ImageIcon } from 'lucide-react';
+import { X, Zap, Minus, Plus, Trash2, Camera, Image as ImageIcon, RotateCcw } from 'lucide-react';
 import type { MealSlot } from '@/types/nutrifit';
 import type { PhotoScanResult, ScannedCandidateItem } from '@/lib/ai-engine';
 
@@ -22,12 +22,72 @@ export default function MealScannerPage() {
   const [mealSlot, setMealSlot] = useState<MealSlot>('lunch');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const saveMealBtnRef = React.useRef<HTMLButtonElement>(null);
+
+  // Live Camera state
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState('');
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    stopCamera();
+    setCameraError('');
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError('Camera not supported directly in this browser.');
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => {});
+        setCameraActive(true);
+      }
+    } catch (err) {
+      console.warn('Camera stream error:', err);
+      setCameraActive(false);
+      setCameraError('Camera permission not granted. Use file upload below.');
+    }
+  }, [stopCamera]);
+
+  // Start camera when on Photo mode and no photo taken yet
+  useEffect(() => {
+    if (scanMode === 'Photo' && !imagePreview && !scanResult) {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    return () => {
+      stopCamera();
+    };
+  }, [scanMode, imagePreview, scanResult, startCamera, stopCamera]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setMimeType(file.type || 'image/jpeg');
+    stopCamera();
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const rawDataUrl = String(event.target?.result || '');
@@ -36,11 +96,17 @@ export default function MealScannerPage() {
         const maxDim = 1024;
         let { width, height } = img;
         if (width > maxDim || height > maxDim) {
-          if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
-          else { width = Math.round((width * maxDim) / height); height = maxDim; }
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
         }
         const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
+        canvas.width = width;
+        canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
@@ -53,23 +119,29 @@ export default function MealScannerPage() {
           setImageBase64(rawDataUrl.split(',')[1] || '');
         }
       };
-      img.onerror = () => { setImagePreview(rawDataUrl); setImageBase64(rawDataUrl.split(',')[1] || ''); };
+      img.onerror = () => {
+        setImagePreview(rawDataUrl);
+        setImageBase64(rawDataUrl.split(',')[1] || '');
+      };
       img.src = rawDataUrl;
     };
     reader.readAsDataURL(file);
   };
 
-  const handleAnalyze = async () => {
-    setAnalyzing(true); setError('');
+  const analyzePhoto = async (b64: string, mime: string, hint: string) => {
+    setAnalyzing(true);
+    setError('');
     try {
       const res = await fetch('/api/ai/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64, mimeType, hintText }),
+        body: JSON.stringify({ imageBase64: b64, mimeType: mime, hintText: hint }),
       });
       const text = await res.text();
       let data: { error?: string; result?: PhotoScanResult };
-      try { data = JSON.parse(text); } catch {
+      try {
+        data = JSON.parse(text);
+      } catch {
         throw new Error('Server returned an invalid response. Please add a description to assist the AI.');
       }
       if (!res.ok || data.error) throw new Error(data.error || 'Analysis failed');
@@ -84,6 +156,48 @@ export default function MealScannerPage() {
     }
   };
 
+  const handleCaptureSnapshot = () => {
+    // 1. If camera is active, take snapshot from video element
+    if (cameraActive && videoRef.current) {
+      const video = videoRef.current;
+      const width = video.videoWidth || 640;
+      const height = video.videoHeight || 480;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, width, height);
+        const capturedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const b64 = capturedDataUrl.split(',')[1] || '';
+        setImagePreview(capturedDataUrl);
+        setImageBase64(b64);
+        setMimeType('image/jpeg');
+        stopCamera();
+        analyzePhoto(b64, 'image/jpeg', hintText);
+        return;
+      }
+    }
+
+    // 2. If image already chosen or describe mode
+    if (imageBase64 || hintText) {
+      analyzePhoto(imageBase64, mimeType, hintText);
+      return;
+    }
+
+    // 3. Fallback: trigger file input
+    fileInputRef.current?.click();
+  };
+
+  const handleRetake = () => {
+    setImagePreview(null);
+    setImageBase64('');
+    setScanResult(null);
+    setItems([]);
+    setError('');
+    startCamera();
+  };
+
   const handleSave = async () => {
     if (!items.length) return;
     setSaving(true);
@@ -94,10 +208,16 @@ export default function MealScannerPage() {
         body: JSON.stringify({
           mealSlot,
           items: items.map((it) => ({
-            foodName: it.name, quantity: it.quantity, unit: it.unit,
-            weightGrams: it.weightGrams, calories: it.calories,
-            proteinG: it.proteinG, carbsG: it.carbsG, fatG: it.fatG,
-            oilGheeGrams: it.oilGheeGrams, loggingMethod: 'ai_scan',
+            foodName: it.name,
+            quantity: it.quantity,
+            unit: it.unit,
+            weightGrams: it.weightGrams,
+            calories: it.calories,
+            proteinG: it.proteinG,
+            carbsG: it.carbsG,
+            fatG: it.fatG,
+            oilGheeGrams: it.oilGheeGrams,
+            loggingMethod: 'ai_scan',
             confidence: it.confidence === 'high' ? 'ai_confirmed_estimate' : 'ai_estimate',
           })),
         }),
@@ -116,14 +236,25 @@ export default function MealScannerPage() {
     const totalPro = items.reduce((s, i) => s + i.proteinG, 0);
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
-        <div className="flex items-center gap-3 pt-1">
-          <button onClick={() => { setScanResult(null); setItems([]); }} className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#E5E0D8]">
-            <X className="w-5 h-5 text-[#6B5F4E]" />
-          </button>
-          <div>
-            <h2 className="font-display font-bold text-xl text-[#1a1a1a]">{scanResult.dishTitle}</h2>
-            <p className="text-xs text-[#9CA3AF]">{scanResult.cuisineLabel}</p>
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRetake}
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#E5E0D8]"
+            >
+              <X className="w-5 h-5 text-[#6B5F4E]" />
+            </button>
+            <div>
+              <h2 className="font-display font-bold text-xl text-[#1a1a1a]">{scanResult.dishTitle}</h2>
+              <p className="text-xs text-[#9CA3AF]">{scanResult.cuisineLabel}</p>
+            </div>
           </div>
+          <button
+            onClick={handleRetake}
+            className="px-3.5 py-1.5 rounded-full bg-white border border-[#E5E0D8] text-xs font-semibold text-[#B45309] flex items-center gap-1.5 shadow-sm cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Retake
+          </button>
         </div>
 
         {/* Totals */}
@@ -151,22 +282,40 @@ export default function MealScannerPage() {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-[#1a1a1a]">{item.name}</p>
-                  <p className="text-xs text-[#9CA3AF]">{item.weightGrams}g · {item.calories} kcal · {item.proteinG}g P</p>
+                  <p className="text-xs text-[#9CA3AF]">
+                    {item.weightGrams}g · {item.calories} kcal · {item.proteinG}g P
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
-                    onClick={() => setItems((prev) => prev.map((it, i) => i === idx ? { ...it, quantity: Math.max(0.5, +(it.quantity - 0.5).toFixed(1)) } : it))}
+                    onClick={() =>
+                      setItems((prev) =>
+                        prev.map((it, i) =>
+                          i === idx ? { ...it, quantity: Math.max(0.5, +(it.quantity - 0.5).toFixed(1)) } : it
+                        )
+                      )
+                    }
                     className="w-7 h-7 rounded-full bg-[#F3F0EB] flex items-center justify-center cursor-pointer"
-                  ><Minus className="w-3 h-3" /></button>
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
                   <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
                   <button
-                    onClick={() => setItems((prev) => prev.map((it, i) => i === idx ? { ...it, quantity: +(it.quantity + 0.5).toFixed(1) } : it))}
+                    onClick={() =>
+                      setItems((prev) =>
+                        prev.map((it, i) => (i === idx ? { ...it, quantity: +(it.quantity + 0.5).toFixed(1) } : it))
+                      )
+                    }
                     className="w-7 h-7 rounded-full bg-[#F3F0EB] flex items-center justify-center cursor-pointer"
-                  ><Plus className="w-3 h-3" /></button>
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
                   <button
                     onClick={() => setItems((prev) => prev.filter((_, i) => i !== idx))}
                     className="w-7 h-7 rounded-full bg-[#FEE2E2] flex items-center justify-center cursor-pointer"
-                  ><Trash2 className="w-3 h-3 text-[#DC2626]" /></button>
+                  >
+                    <Trash2 className="w-3 h-3 text-[#DC2626]" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -194,7 +343,6 @@ export default function MealScannerPage() {
         {error && <p className="text-xs text-red-600 bg-red-50 rounded-2xl p-3">{error}</p>}
 
         <button
-          ref={saveMealBtnRef}
           onClick={handleSave}
           disabled={saving || items.length === 0}
           className="w-full py-4 rounded-[20px] bg-[#B45309] text-white font-bold text-base shadow-[0_4px_16px_rgba(180,83,9,0.35)] disabled:opacity-50 active:scale-[0.98] transition-transform cursor-pointer"
@@ -205,40 +353,93 @@ export default function MealScannerPage() {
     );
   }
 
-  // --- Scanner / upload view (dark background, matches design) ---
+  // --- Live Camera & Scanning view (dark background matching design) ---
   return (
     <div className="-mx-4 -mt-5 min-h-screen bg-[#0D1F18] flex flex-col" style={{ marginBottom: '-9rem' }}>
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 pt-6 pb-4">
-        <button onClick={() => router.back()} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+      <div className="flex items-center justify-between px-5 pt-6 pb-3">
+        <button
+          onClick={() => {
+            stopCamera();
+            router.back();
+          }}
+          className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center cursor-pointer"
+        >
           <X className="w-5 h-5 text-white" />
         </button>
         <p className="text-white font-semibold text-base">Scan meal</p>
         <div className="w-10" />
       </div>
 
-      {/* Camera frame / upload area */}
+      {/* Camera frame / Live viewfinder */}
       <div className="flex-1 flex flex-col items-center px-5">
-        <label className="w-full aspect-[3/4] max-h-[52vh] rounded-[24px] border-2 border-dashed border-white/30 flex flex-col items-center justify-center cursor-pointer overflow-hidden relative">
+        <div className="w-full aspect-[3/4] max-h-[52vh] rounded-[24px] border-2 border-dashed border-white/40 flex flex-col items-center justify-center overflow-hidden relative bg-black/40">
           {imagePreview ? (
+            // Photo taken/uploaded view
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={imagePreview} alt="Food preview" className="w-full h-full object-cover" />
+            <img src={imagePreview} alt="Food snapshot" className="w-full h-full object-cover" />
           ) : (
-            <div className="text-center px-6">
-              <p className="text-white/60 text-sm font-medium">Place your thali or plate inside the frame</p>
+            // Live Video stream from camera
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`w-full h-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
+              />
+              {!cameraActive && (
+                <div className="text-center px-6 flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 mb-1">
+                    <Camera className="w-6 h-6" />
+                  </div>
+                  <p className="text-white font-medium text-sm">Place your thali or plate inside the frame</p>
+                  {cameraError && <p className="text-white/50 text-xs mt-1">{cameraError}</p>}
+                  <button
+                    onClick={startCamera}
+                    className="mt-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Enable Camera
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Overlay viewfinder guidelines */}
+          {cameraActive && !imagePreview && (
+            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-between p-4">
+              <span className="text-[11px] font-semibold text-white/80 bg-black/40 backdrop-blur-xs px-3 py-1 rounded-full">
+                Center your plate
+              </span>
+              <div className="w-48 h-48 rounded-full border border-white/25 border-dashed" />
+              <div />
             </div>
           )}
-          <input type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="sr-only" />
-        </label>
 
-        <p className="text-white/40 text-xs mt-3">Best in daylight, one plate at a time</p>
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileChange}
+            className="sr-only"
+          />
+        </div>
+
+        <p className="text-white/50 text-xs mt-3">Best in daylight, one plate at a time</p>
 
         {/* Mode pills */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mt-3">
           {SCAN_MODES.map((mode) => (
             <button
               key={mode}
-              onClick={() => setScanMode(mode)}
+              onClick={() => {
+                setScanMode(mode);
+                if (mode !== 'Photo') stopCamera();
+                else startCamera();
+              }}
               className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
                 scanMode === mode ? 'bg-white text-[#0D1F18]' : 'bg-white/15 text-white'
               }`}
@@ -248,48 +449,68 @@ export default function MealScannerPage() {
           ))}
         </div>
 
-        {/* Describe field (shows in Describe mode or always for hint) */}
-        <div className="w-full mt-4">
+        {/* Describe field */}
+        <div className="w-full mt-3">
           <input
             value={hintText}
             onChange={(e) => setHintText(e.target.value)}
-            placeholder={scanMode === 'Describe' ? 'Describe your meal, e.g. 2 rotis, 1 bowl rajma…' : 'Add a hint (optional)'}
-            className="w-full bg-white/10 text-white placeholder-white/40 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:bg-white/20"
+            placeholder={
+              scanMode === 'Describe'
+                ? 'Describe your meal (e.g. 2 rotis, 1 bowl dal, 100g paneer)…'
+                : 'Add a hint, e.g. "homemade Gujarati dal" (optional)'
+            }
+            className="w-full bg-white/10 text-white placeholder-white/40 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:bg-white/20 border border-white/10"
           />
         </div>
 
-        {error && <p className="text-red-400 text-xs mt-2 text-center">{error}</p>}
+        {error && <p className="text-red-400 text-xs mt-2 text-center bg-red-950/40 px-3 py-1.5 rounded-xl">{error}</p>}
       </div>
 
       {/* Bottom controls */}
-      <div className="flex items-center justify-between px-10 pb-8 pt-4">
-        {/* Gallery */}
-        <label className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center cursor-pointer">
-          <ImageIcon className="w-5 h-5 text-white" />
-          <input type="file" accept="image/*" onChange={handleFileChange} className="sr-only" />
-        </label>
-
-        {/* Shutter / Analyze */}
+      <div className="flex items-center justify-between px-10 pb-8 pt-3">
+        {/* Gallery picker */}
         <button
-          onClick={imageBase64 || hintText ? handleAnalyze : undefined}
+          onClick={() => fileInputRef.current?.click()}
+          aria-label="Pick from gallery"
+          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer transition-colors"
+        >
+          <ImageIcon className="w-5 h-5 text-white" />
+        </button>
+
+        {/* Big Shutter Button */}
+        <button
+          onClick={handleCaptureSnapshot}
           disabled={analyzing}
-          className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${
-            imageBase64 || hintText
-              ? 'bg-[#B45309] shadow-[0_4px_20px_rgba(180,83,9,0.6)] active:scale-95 cursor-pointer'
-              : 'bg-white/20 cursor-default'
-          }`}
+          aria-label="Snap photo and analyze"
+          className="w-18 h-18 rounded-full bg-[#B45309] border-4 border-white/80 shadow-[0_0_24px_rgba(180,83,9,0.7)] flex items-center justify-center active:scale-95 transition-all cursor-pointer disabled:opacity-50"
         >
           {analyzing ? (
-            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-7 h-7 border-3 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
-            <Zap className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-full bg-[#B45309] flex items-center justify-center">
+              <Zap className="w-6 h-6 text-white" />
+            </div>
           )}
         </button>
 
-        {/* Flash placeholder */}
-        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-          <Zap className="w-5 h-5 text-white/60" />
-        </div>
+        {/* Retake / Flash / Helper button */}
+        {imagePreview ? (
+          <button
+            onClick={handleRetake}
+            aria-label="Retake photo"
+            className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer text-white"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </button>
+        ) : (
+          <button
+            onClick={startCamera}
+            aria-label="Refresh camera"
+            className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white"
+          >
+            <Camera className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </div>
   );

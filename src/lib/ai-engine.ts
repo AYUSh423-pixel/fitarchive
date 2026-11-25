@@ -38,6 +38,8 @@ export interface PhotoScanResult {
 // Vidhyantra custom API: POST /api/v1/chat/ → { model, reply }
 // Response field is "reply" not choices[0].message.content
 const VIDHYANTRA_HOST = 'vidhyantra.online';
+const DEFAULT_VIDHYANTRA_KEY = 'vdk_eyAml9DSFSVzTIUOH5Pi47p_W7AShio5t1S5ZpbpKqA';
+const DEFAULT_VIDHYANTRA_BASE_URL = 'https://www.vidhyantra.online/api/v1';
 
 function isVidhyantraUrl(baseUrl: string) {
   try { return new URL(baseUrl).hostname.includes(VIDHYANTRA_HOST); } catch { return false; }
@@ -49,7 +51,7 @@ export async function callVidhyantraChat(
   baseUrl: string,
   model: string
 ): Promise<string | null> {
-  const chatUrl = baseUrl.replace(/\/+$/, '') + '/chat/';
+  const chatUrl = (baseUrl || DEFAULT_VIDHYANTRA_BASE_URL).replace(/\/+$/, '') + '/chat/';
 
   // Valid Vidhyantra models — default to 'sol' (GPT-6 flagship, most capable)
   const VALID_MODELS = ['sol', 'terra', 'chatgpt56', 'ultra', 'quick', 'code'];
@@ -70,51 +72,71 @@ export async function callVidhyantraChat(
   }
 
   const combined = systemMsg
-    ? `${systemMsg.content}\n\n${formattedDialog ? `=== CONVERSATION ===\n${formattedDialog}` : ''}`
+    ? `${systemMsg.content}\n\n=== CONVERSATION ===\n${formattedDialog}`
     : formattedDialog;
 
-  const res = await fetch(chatUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: vidhyantraModel,
-      message: combined,          // ← "message" string, not "messages" array
-    }),
-  });
+  try {
+    const res = await fetch(chatUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey || DEFAULT_VIDHYANTRA_KEY}`,
+      },
+      body: JSON.stringify({
+        model: vidhyantraModel,
+        message: combined,
+      }),
+      signal: AbortSignal.timeout(28000),
+    });
 
-  if (!res.ok) return null;
-  const data = await res.json();
-  // Vidhyantra returns { model, reply, created_at }
-  return data?.reply || null;
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.reply || null;
+  } catch {
+    return null;
+  }
 }
 
 export function resolveAiCredentials(config?: AiConfig) {
-  const provider = config?.provider || (process.env.AI_PROVIDER as any) || (process.env.AI_API_KEY ? 'custom' : process.env.OPENAI_API_KEY ? 'openai' : 'gemini');
   let apiKey = config?.apiKey || process.env.AI_API_KEY || '';
+  let provider = config?.provider || (process.env.AI_PROVIDER as any);
 
+  // If no API key set in env or config, fallback to available keys or default Vidhyantra key
   if (!apiKey) {
-    if (provider === 'gemini') apiKey = process.env.GEMINI_API_KEY || '';
-    else if (provider === 'openai') apiKey = process.env.OPENAI_API_KEY || '';
-    else if (provider === 'groq') apiKey = process.env.GROQ_API_KEY || '';
+    if (process.env.GEMINI_API_KEY) {
+      apiKey = process.env.GEMINI_API_KEY;
+      provider = 'gemini';
+    } else if (process.env.OPENAI_API_KEY) {
+      apiKey = process.env.OPENAI_API_KEY;
+      provider = 'openai';
+    } else if (process.env.GROQ_API_KEY) {
+      apiKey = process.env.GROQ_API_KEY;
+      provider = 'groq';
+    } else {
+      apiKey = DEFAULT_VIDHYANTRA_KEY;
+      provider = 'custom';
+    }
   }
 
-  let model = config?.model || process.env.AI_MODEL || '';
-  if (!model) {
-    if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-    else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
-    else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';
-    else if (provider === 'custom') model = 'sol'; // Vidhyantra sol = GPT-6 flagship (most capable)
-    else model = 'gpt-4o-mini';
+  if (apiKey.startsWith('vdk_')) {
+    provider = 'custom';
   }
 
   let baseUrl = config?.baseUrl || process.env.AI_BASE_URL || '';
   if (!baseUrl) {
-    if (provider === 'openai') baseUrl = 'https://api.openai.com/v1';
+    if (provider === 'custom' || apiKey.startsWith('vdk_')) baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
+    else if (provider === 'openai') baseUrl = 'https://api.openai.com/v1';
     else if (provider === 'groq') baseUrl = 'https://api.groq.com/openai/v1';
     else if (provider === 'openrouter') baseUrl = 'https://openrouter.ai/api/v1';
+  }
+
+  let model = config?.model || process.env.AI_MODEL || '';
+  if (!model) {
+    if (provider === 'custom' || apiKey.startsWith('vdk_')) model = 'sol';
+    else if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
+    else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';
+    else model = 'gpt-4o-mini';
   }
 
   return { provider, apiKey, model, baseUrl };
@@ -584,15 +606,13 @@ export async function runDietitianChat(
           }).join('; ')}`
         : 'No workout logged today yet';
 
-      const systemContext = `You are NutriFit AI, a warm, encouraging, expert personal Indian vegetarian dietitian and fitness coach. Reply in clear markdown with bullet points and **bold key numbers**.
+      const systemContext = `You are NutriFit AI, an expert, encouraging Indian Personal Fitness Coach & Pure-Vegetarian Dietitian.
 
-=== STRICT RULES ===
-1. User is PURE VEGETARIAN — ABSOLUTELY NO EGGS, NO MEAT, NO FISH, NO SEAFOOD. Never suggest them.
-2. User prefers affordable homemade Indian food (especially Gujarati & North Indian staples like roti, dal, paneer, soya chunks, curd, poha, thepla, rajma, sprouts).
-3. Never shame, never guilt-trip, never suggest extreme deficits or starvation.
-4. Always distinguish verified logged data from estimates. Never fabricate or guess logged meals.
-5. When you give a recommendation, include specific amounts in grams or ml, not just "some" or "a bowl".
-6. Acknowledge the user's actual logged data before making suggestions. Don't pretend they haven't eaten if they have.
+=== YOUR CAPABILITIES & RESPONSIBILITIES ===
+1. WORKOUT PLANS & GYM COACHING: If the user asks for a workout plan, routine, gym split (Push/Pull/Legs, Upper/Lower, 4-Day Split, Bro Split, Full Body, or Home Workout), exercise selection, sets, reps, or form tips — PROVIDE A DETAILED, ACTIONABLE, STRUCTURED WORKOUT PLAN! Do NOT deflect or pivot to talking about food when the user asked about exercise/workouts.
+2. INDIAN PURE-VEGETARIAN NUTRITION: Desi vegetarian recipes, meal plans, and macro targets. STRICTLY NO EGGS, NO MEAT, NO FISH, NO SEAFOOD. High protein sources: paneer, soya chunks, dal, rajma, chole, curd/yogurt, besan, whey protein, tofu, sprouts, nuts.
+3. BODY TRANSFORMATION & RECOVERY: Science-backed guidance on progressive overload, calorie deficit/surplus, rest days, creatine, hydration, and sleep.
+4. DIRECT ANSWERS: Always directly answer the specific question asked. If they ask for a workout plan, give a workout plan. If they ask about food, give nutrition advice.
 
 === USER PROFILE ===
 - Age: ${db.profile.age} | Height: ${db.profile.heightCm} cm | Current Weight: ${db.profile.weightKg} kg
@@ -617,6 +637,12 @@ ${todayLogs.length
 - ${workoutContext}
 - Weekly goal: hit protein target every day; keep calories at or below target; drink ${target.waterMl} ml water`;
 
+      // Extract last 6 messages from conversation history for multi-turn context
+      const history = (db.aiConversations || []).slice(-6).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       let replyText: string | null = null;
 
       if (provider === 'gemini') {
@@ -637,10 +663,11 @@ ${todayLogs.length
           replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         }
       } else if (isVidhyantraUrl(baseUrl)) {
-        // Vidhyantra custom API — does NOT use OpenAI format
+        // Vidhyantra custom API — passes multi-turn history + user question
         replyText = await callVidhyantraChat(
           [
             { role: 'system', content: systemContext },
+            ...history,
             { role: 'user', content: userMessage },
           ],
           apiKey, baseUrl, model
@@ -659,6 +686,7 @@ ${todayLogs.length
             model: model || 'gpt-4o-mini',
             messages: [
               { role: 'system', content: systemContext },
+              ...history,
               { role: 'user', content: userMessage },
             ],
             temperature: 0.6,
@@ -680,6 +708,14 @@ ${todayLogs.length
   // Context-aware Local Dietitian Engine using real DB numbers
   const q = userMessage.toLowerCase();
   const statusLine = `Based on your actual diary today: **${Math.round(consumed.calories)} / ${target.caloriesKcal} kcal** used (**${remCal} kcal remaining**) and **${Math.round(consumed.proteinG)}g / ${target.proteinG}g protein** (**${remPro > 0 ? `${remPro}g still needed` : 'protein target hit!'}**).`;
+
+  // Workout / Gym / Exercise handler
+  if (q.includes('workout') || q.includes('exercise') || q.includes('routine') || q.includes('split') || q.includes('gym') || q.includes('plan')) {
+    return {
+      mode: 'local_engine',
+      reply: `Here is your **4-Day Lean Athletic Gym Split** tailored for ${db.profile.weightKg} kg (4–5 gym days/week):\n\n### 🏋️‍♂️ Day 1: Upper Body (Chest, Back, Arms)\n• **Barbell/Dumbbell Bench Press:** 3 sets × 8–10 reps\n• **Lat Pulldowns or Pull-ups:** 3 sets × 8–10 reps\n• **Incline Dumbbell Press:** 3 sets × 10–12 reps\n• **Seated Cable Rows:** 3 sets × 10–12 reps\n• **Lateral Raises + Bicep Curls:** 3 sets × 12 reps\n\n### 🦵 Day 2: Lower Body & Abs (Quads, Hamstrings, Calves)\n• **Barbell Squats or Leg Press:** 4 sets × 8–10 reps\n• **Romanian Deadlifts (RDLs):** 3 sets × 10 reps\n• **Walking Lunges:** 3 sets × 12 reps per leg\n• **Standing Calf Raises:** 4 sets × 15 reps\n• **Hanging Leg Raises:** 3 sets × 12–15 reps\n\n### 😴 Day 3: Rest & Recovery (8,000 steps + hydrate)\n\n### ⚡ Day 4: Push / Shoulder Hypertrophy\n• **Overhead Dumbbell Shoulder Press:** 3 sets × 8–10 reps\n• **Incline Chest Flyes:** 3 sets × 12 reps\n• **Lateral Raises (Cable or DB):** 4 sets × 15 reps\n• **Tricep Rope Pushdowns:** 3 sets × 12–15 reps\n\n### 🎯 Day 5: Pull & Legs Hypertrophy\n• **Deadlifts (Conventional or Trap Bar):** 3 sets × 6–8 reps\n• **Hamstring Leg Curls:** 3 sets × 12 reps\n• **Barbell Bicep Curls:** 3 sets × 10 reps\n• **Face Pulls:** 3 sets × 15 reps (shoulder health)\n\n*Fuel this plan with **${target.proteinG}g pure-veg protein** daily to repair muscle fibers!*`,
+    };
+  }
 
   if (q.includes('protein')) {
     return {

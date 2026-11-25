@@ -466,14 +466,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span>Diary</span>
           </Link>
 
-          {/* Centre Camera FAB */}
-          <div className="flex flex-col items-center flex-1 -mt-6">
+          {/* Centre Camera FAB — Prominently elevated above nav bar */}
+          <div className="flex flex-col items-center flex-1 -mt-9 relative z-50">
             <Link
               href="/scanner"
               aria-label="Scan Meal"
-              className="w-14 h-14 rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_4px_16px_rgba(180,83,9,0.5)] active:scale-95 transition-transform"
+              className="w-[66px] h-[66px] rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(180,83,9,0.45)] border-[5px] border-[#E8E4DC] active:scale-95 transition-all"
             >
-              <Camera className="w-6 h-6" />
+              <Camera className="w-7 h-7 text-white stroke-[2.2]" />
             </Link>
           </div>
 
