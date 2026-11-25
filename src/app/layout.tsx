@@ -54,7 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }}
         />
       </head>
-      <body className="min-h-full bg-[#F7F4EF] text-[#1B1B1E]">
+      <body className="min-h-full bg-[#E8E4DC] text-[#1a1a1a]">
         <Suspense fallback={<div className="min-h-screen bg-[#F7F4EF]" />}>
           <AppShell>{children}</AppShell>
         </Suspense>
