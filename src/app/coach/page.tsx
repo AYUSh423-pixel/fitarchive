@@ -74,7 +74,7 @@ export default function AiDietitianPage() {
           </div>
           <div>
             <h2 className="font-display font-bold text-sm text-[#1B1B1E]">
-              Personal AI Dietitian (Pure Veg • No Eggs)
+              Personal AI Dietitian (Pure Veg • No Eggs) testing
             </h2>
 
           </div>
