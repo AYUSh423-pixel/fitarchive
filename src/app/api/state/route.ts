@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-guard';
-import { todayIsoDate, updateDatabase } from '@/lib/db/local-store';
+import { DEFAULT_USER_ID, todayIsoDate, updateDatabase } from '@/lib/db/local-store';
+import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
 import { calculateBmi, calculateBmr, calculateRecommendedTargets, calculateTee } from '@/lib/nutrition-engine';
 
 export async function GET(req: Request) {
@@ -31,8 +32,8 @@ export async function GET(req: Request) {
     workoutRoutine: db.workoutRoutine,
     workoutLogs: db.workoutLogs.slice(0, 10),
     preferences: db.preferences,
-    aiConfigured: Boolean(process.env.GEMINI_API_KEY),
-    supabaseConfigured: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    aiConfigured: Boolean(process.env.GEMINI_API_KEY || process.env.AI_API_KEY),
+    supabaseConfigured: isSupabaseEnabled(),
   });
 }
 
@@ -42,10 +43,83 @@ export async function PATCH(req: Request) {
 
   try {
     const body = await req.json();
+    const isSupabaseUser = isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID;
+
+    if (isSupabaseUser && supabaseAdmin) {
+      if (body.profile) {
+        const p = { ...guard.db.profile, ...body.profile };
+        const bmi = calculateBmi(Number(p.weightKg), Number(p.heightCm));
+        let bmrKcal = p.bmrKcal;
+        let teeKcal = p.teeKcal;
+
+        if (body.recalculateMetabolism || !bmrKcal) {
+          bmrKcal = calculateBmr(Number(p.weightKg), Number(p.heightCm), Number(p.age), p.gender);
+          teeKcal = calculateTee(bmrKcal, p.activityLevel);
+        }
+
+        await supabaseAdmin
+          .from('user_profiles')
+          .update({
+            name: p.name,
+            age: p.age,
+            gender: p.gender,
+            height_cm: p.heightCm,
+            weight_kg: p.weightKg,
+            bmi,
+            bmr_kcal: bmrKcal,
+            tee_kcal: teeKcal,
+            diet_type: p.dietType,
+            activity_level: p.activityLevel,
+            food_preference: p.foodPreference,
+            goal: p.goal,
+            onboarding_completed: Boolean(p.onboardingCompleted),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', guard.session.userId);
+
+        if (body.recalculateTargets) {
+          const calc = calculateRecommendedTargets({ ...p, bmi, bmrKcal, teeKcal });
+          await supabaseAdmin
+            .from('nutrition_targets')
+            .upsert({
+              user_id: guard.session.userId,
+              calories_kcal: calc.caloriesKcal,
+              protein_g: calc.proteinG,
+              carbs_g: calc.carbsG,
+              fat_g: calc.fatG,
+              water_ml: calc.waterMl,
+            }, { onConflict: 'user_id' });
+        }
+      }
+
+      if (body.nutritionTargets) {
+        const t = body.nutritionTargets;
+        const safeCalories = Math.max(1300, Number(t.caloriesKcal ?? 1800));
+        await supabaseAdmin
+          .from('nutrition_targets')
+          .upsert({
+            user_id: guard.session.userId,
+            calories_kcal: safeCalories,
+            protein_g: t.proteinG,
+            carbs_g: t.carbsG,
+            fat_g: t.fatG,
+            water_ml: t.waterMl,
+          }, { onConflict: 'user_id' });
+      }
+
+      // Re-fetch updated state
+      const refreshed = await requireAuth();
+      return NextResponse.json({
+        profile: refreshed.db?.profile,
+        nutritionTargets: refreshed.db?.nutritionTargets,
+        preferences: refreshed.db?.preferences,
+      });
+    }
+
+    // Local mode fallback
     const updated = updateDatabase((draft) => {
       if (body.profile) {
         const p = { ...draft.profile, ...body.profile, updatedAt: new Date().toISOString() };
-        // Always enforce pure_veg_no_egg unless explicitly changed, and recalculate BMI/BMR/TEE if height/weight/age changed
         p.bmi = calculateBmi(Number(p.weightKg), Number(p.heightCm));
         if (body.recalculateMetabolism) {
           p.bmrKcal = calculateBmr(Number(p.weightKg), Number(p.heightCm), Number(p.age), p.gender);
@@ -71,7 +145,6 @@ export async function PATCH(req: Request) {
 
       if (body.nutritionTargets) {
         const t = body.nutritionTargets;
-        // Enforce safe minimum floor (never starvation diets)
         const safeCalories = Math.max(1300, Number(t.caloriesKcal ?? draft.nutritionTargets.caloriesKcal));
         draft.nutritionTargets = {
           ...draft.nutritionTargets,
