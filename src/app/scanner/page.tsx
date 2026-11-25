@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { X, Zap, Minus, Plus, Trash2, Camera, Image as ImageIcon, RotateCcw } from 'lucide-react';
 import type { MealSlot } from '@/types/nutrifit';
 import type { PhotoScanResult, ScannedCandidateItem } from '@/lib/ai-engine';
+import { CalmLoader, CalmLoaderCompact } from '@/components/CalmLoader';
 
 const SCAN_MODES = ['Photo', 'Barcode', 'Describe'] as const;
 type ScanMode = typeof SCAN_MODES[number];
@@ -536,10 +537,7 @@ export default function MealScannerPage() {
               className="w-full py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               {analyzing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Analyzing Meal…</span>
-                </>
+                <CalmLoader size={72} text="Analyzing Meal…" />
               ) : (
                 <>
                   <Zap className="w-4 h-4" />
@@ -554,22 +552,45 @@ export default function MealScannerPage() {
               Retake photo
             </button>
           </div>
+        ) : (scanMode === 'Describe' && hintText.trim() ? (
+          <div className="flex-1 flex flex-col items-center px-3">
+            <button
+              onClick={() => analyzePhoto('', 'text/plain', hintText)}
+              disabled={analyzing}
+              className="w-full py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+            >
+              {analyzing ? (
+                <CalmLoader size={72} text="Analyzing Description…" />
+              ) : (
+                <>
+                  <Zap className="w-4 h-4" />
+                  <span>Analyze Description</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => setHintText('')}
+              className="text-white/60 hover:text-white text-xs mt-1.5 underline cursor-pointer"
+            >
+              Clear description
+            </button>
+          </div>
         ) : (
           <button
             onClick={handleCaptureSnapshot}
-            disabled={analyzing}
-            aria-label="Snap photo and analyze"
+            disabled={analyzing || !cameraActive}
+            aria-label={cameraActive ? "Snap photo and analyze" : "Start camera"}
             className="w-[72px] h-[72px] rounded-full bg-[#B45309] border-4 border-white/80 shadow-[0_0_24px_rgba(180,83,9,0.7)] flex items-center justify-center active:scale-95 transition-all cursor-pointer disabled:opacity-50"
           >
             {analyzing ? (
-              <div className="w-7 h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <CalmLoaderCompact size={56} />
             ) : (
               <div className="w-14 h-14 rounded-full bg-[#B45309] flex items-center justify-center">
                 <Camera className="w-7 h-7 text-white stroke-[2.2]" />
               </div>
             )}
           </button>
-        )}
+        ))}
 
         {/* Helper / Retake button */}
         <div className="w-12 flex justify-end shrink-0">
