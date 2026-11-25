@@ -235,7 +235,7 @@ export default function MealScannerPage() {
     }
   };
 
-  // --- Results view ---
+  // --- Results view (with items) ---
   if (scanResult && items.length > 0) {
     const totalCals = items.reduce((s, i) => s + i.calories, 0);
     const totalPro = items.reduce((s, i) => s + i.proteinG, 0);
@@ -354,6 +354,51 @@ export default function MealScannerPage() {
         >
           {saving ? 'Saving…' : `Save ${items.length} item${items.length !== 1 ? 's' : ''} to ${mealSlot}`}
         </button>
+      </div>
+    );
+  }
+
+  // --- Results view (AI response with no items but has clarifying questions) ---
+  if (scanResult && items.length === 0 && scanResult.clarifyingQuestions?.length > 0) {
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRetake}
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#E5E0D8]"
+            >
+              <X className="w-5 h-5 text-[#6B5F4E]" />
+            </button>
+            <div>
+              <h2 className="font-display font-bold text-xl text-[#1a1a1a]">{scanResult.dishTitle}</h2>
+              <p className="text-xs text-[#9CA3AF]">{scanResult.cuisineLabel}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleRetake}
+            className="px-3.5 py-1.5 rounded-full bg-white border border-[#E5E0D8] text-xs font-semibold text-[#B45309] flex items-center gap-1.5 shadow-sm cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Retake
+          </button>
+        </div>
+
+        <div className="bg-white rounded-[20px] p-4 shadow-sm">
+          <p className="text-sm text-[#1a1a1a] mb-3">{scanResult.disclaimer}</p>
+          <div className="space-y-2">
+            {scanResult.clarifyingQuestions.map((q, i) => (
+              <div key={i} className="bg-[#FEF3C7] border border-[#FCD34D] rounded-xl p-3">
+                <p className="text-sm text-[#92400E]">💡 {q}</p>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={handleRetake}
+            className="w-full mt-4 py-3 rounded-[16px] bg-[#B45309] text-white font-bold cursor-pointer"
+          >
+            Retake Photo / Add Description
+          </button>
+        </div>
       </div>
     );
   }
