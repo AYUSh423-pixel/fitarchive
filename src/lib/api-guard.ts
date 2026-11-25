@@ -29,6 +29,7 @@ export async function requireAuth(): Promise<
         workoutsRes,
         bodyScansRes,
         bodyMeasurementsRes,
+        aiConversationsRes,
       ] = await Promise.all([
         supabaseAdmin.from('user_profiles').select('*').eq('id', session.userId).single(),
         supabaseAdmin.from('nutrition_targets').select('*').eq('user_id', session.userId).maybeSingle(),
@@ -41,6 +42,7 @@ export async function requireAuth(): Promise<
         supabaseAdmin.from('workouts').select('*').eq('user_id', session.userId),
         supabaseAdmin.from('body_scans').select('*').eq('user_id', session.userId).order('scan_date', { ascending: false }),
         supabaseAdmin.from('body_measurements').select('*').eq('user_id', session.userId).order('measured_date', { ascending: false }),
+        supabaseAdmin.from('ai_conversations').select('*').eq('user_id', session.userId).order('created_at', { ascending: true }),
       ]);
 
       const baseDb = readDatabase();
@@ -170,6 +172,15 @@ export async function requireAuth(): Promise<
           createdAt: m.created_at || new Date().toISOString(),
         }));
 
+        const userAiConversations: DatabaseState['aiConversations'] = (aiConversationsRes.data || []).map((c: any) => ({
+          id: c.id,
+          userId: c.user_id,
+          role: c.role as 'user' | 'assistant',
+          content: c.content,
+          mode: c.metadata?.mode,
+          createdAt: c.created_at,
+        }));
+
         const scopedDb: DatabaseState = {
           ...baseDb,
           auth: {
@@ -184,6 +195,7 @@ export async function requireAuth(): Promise<
           habitLogs: userHabitLogs,
           bodyScans: userBodyScans,
           bodyMeasurements: userBodyMeasurements,
+          aiConversations: userAiConversations,
         };
 
         return { session, db: scopedDb };
@@ -195,5 +207,11 @@ export async function requireAuth(): Promise<
 
   // 2. Local database fallback (Single personal profile / offline mode)
   const db = readDatabase();
-  return { session, db };
+  const userFilteredDb: DatabaseState = {
+    ...db,
+    aiConversations: (db.aiConversations || []).filter(
+      (c) => !c.userId || c.userId === session.userId || session.userId === DEFAULT_USER_ID
+    ),
+  };
+  return { session, db: userFilteredDb };
 }

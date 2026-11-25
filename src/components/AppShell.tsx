@@ -85,6 +85,7 @@ const NAV_GROUPS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isScannerPage = pathname === '/scanner';
   const [auth, setAuth] = useState<AuthState>({ checked: false, authenticated: false });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -350,42 +351,44 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Column */}
-      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen w-full">
-        {/* Top Header — new clean design */}
-        <header className="sticky top-0 z-30 h-16 bg-[#E8E4DC]/90 backdrop-blur-xl border-b border-[#D6D0C4]/40 px-4 sm:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Open navigation menu"
-              className="lg:hidden w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#6B5F4E] hover:text-[#1a1a1a] shadow-sm"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <h1 className="font-display text-lg sm:text-xl font-bold text-[#1a1a1a] tracking-tight">
-              {pageTitle}
-            </h1>
-          </div>
+      <div className={`flex-1 lg:pl-64 flex flex-col min-h-screen w-full ${isScannerPage ? 'bg-[#0D1F18]' : ''}`}>
+        {/* Top Header — new clean design, hidden on scanner */}
+        {!isScannerPage && (
+          <header className="sticky top-0 z-30 h-16 bg-[#E8E4DC]/90 backdrop-blur-xl border-b border-[#D6D0C4]/40 px-4 sm:px-6 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Open navigation menu"
+                className="lg:hidden w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#6B5F4E] hover:text-[#1a1a1a] shadow-sm"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h1 className="font-display text-lg sm:text-xl font-bold text-[#1a1a1a] tracking-tight">
+                {pageTitle}
+              </h1>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/explore"
-              aria-label="Search Indian foods"
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#6B5F4E] hover:text-[#1a1a1a] shadow-sm transition-colors"
-            >
-              <Search className="w-[18px] h-[18px]" />
-            </Link>
-            <Link
-              href="/profile"
-              aria-label="Body profile"
-              className="w-9 h-9 rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-sm font-bold text-sm"
-            >
-              {auth.name ? auth.name.charAt(0).toUpperCase() : <User className="w-[17px] h-[17px]" />}
-            </Link>
-          </div>
-        </header>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/explore"
+                aria-label="Search Indian foods"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#6B5F4E] hover:text-[#1a1a1a] shadow-sm transition-colors"
+              >
+                <Search className="w-[18px] h-[18px]" />
+              </Link>
+              <Link
+                href="/profile"
+                aria-label="Body profile"
+                className="w-9 h-9 rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-sm font-bold text-sm"
+              >
+                {auth.name ? auth.name.charAt(0).toUpperCase() : <User className="w-[17px] h-[17px]" />}
+              </Link>
+            </div>
+          </header>
+        )}
 
         {/* Page Content */}
-        <main className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-5 pt-5 pb-36 lg:pb-12">
+        <main className={isScannerPage ? "flex-1 w-full" : "flex-1 w-full max-w-2xl mx-auto px-4 sm:px-5 pt-5 pb-36 lg:pb-12"}>
           {children}
         </main>
       </div>
@@ -441,62 +444,64 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Mobile Floating Pill Bottom Navigation — New Design */}
-      <nav
-        aria-label="Primary Mobile Navigation"
-        className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none"
-      >
-        <div className="pointer-events-auto bg-white rounded-[28px] px-4 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center gap-0 w-full max-w-sm">
-          <Link
-            href="/"
-            className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-              pathname === '/' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
-            }`}
-          >
-            <Home className="w-5 h-5 mb-0.5" />
-            <span>Today</span>
-          </Link>
-          <Link
-            href="/diary"
-            className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-              pathname === '/diary' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
-            }`}
-          >
-            <BookOpen className="w-5 h-5 mb-0.5" />
-            <span>Diary</span>
-          </Link>
-
-          {/* Centre Camera FAB — Prominently elevated above nav bar */}
-          <div className="flex flex-col items-center flex-1 -mt-9 relative z-50">
+      {/* Mobile Floating Pill Bottom Navigation — Hidden on Scanner Page */}
+      {!isScannerPage && (
+        <nav
+          aria-label="Primary Mobile Navigation"
+          className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none"
+        >
+          <div className="pointer-events-auto bg-white rounded-[28px] px-4 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center gap-0 w-full max-w-sm">
             <Link
-              href="/scanner"
-              aria-label="Scan Meal"
-              className="w-[66px] h-[66px] rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(180,83,9,0.45)] border-[5px] border-[#E8E4DC] active:scale-95 transition-all"
+              href="/"
+              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
+                pathname === '/' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+              }`}
             >
-              <Camera className="w-7 h-7 text-white stroke-[2.2]" />
+              <Home className="w-5 h-5 mb-0.5" />
+              <span>Today</span>
+            </Link>
+            <Link
+              href="/diary"
+              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
+                pathname === '/diary' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+              }`}
+            >
+              <BookOpen className="w-5 h-5 mb-0.5" />
+              <span>Diary</span>
+            </Link>
+
+            {/* Centre Camera FAB — Prominently elevated above nav bar */}
+            <div className="flex flex-col items-center flex-1 -mt-9 relative z-50">
+              <Link
+                href="/scanner"
+                aria-label="Scan Meal"
+                className="w-[66px] h-[66px] rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(180,83,9,0.45)] border-[5px] border-[#E8E4DC] active:scale-95 transition-all"
+              >
+                <Camera className="w-7 h-7 text-white stroke-[2.2]" />
+              </Link>
+            </div>
+
+            <Link
+              href="/explore"
+              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
+                pathname === '/explore' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+              }`}
+            >
+              <Compass className="w-5 h-5 mb-0.5" />
+              <span>Explore</span>
+            </Link>
+            <Link
+              href="/coach"
+              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
+                pathname === '/coach' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
+              }`}
+            >
+              <Sparkles className="w-5 h-5 mb-0.5" />
+              <span>Coach</span>
             </Link>
           </div>
-
-          <Link
-            href="/explore"
-            className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-              pathname === '/explore' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
-            }`}
-          >
-            <Compass className="w-5 h-5 mb-0.5" />
-            <span>Explore</span>
-          </Link>
-          <Link
-            href="/coach"
-            className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-              pathname === '/coach' ? 'text-[#B45309]' : 'text-[#9CA3AF] hover:text-[#1a1a1a]'
-            }`}
-          >
-            <Sparkles className="w-5 h-5 mb-0.5" />
-            <span>Coach</span>
-          </Link>
-        </div>
-      </nav>
+        </nav>
+      )}
     </div>
   );
 }

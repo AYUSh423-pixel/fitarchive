@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { requireAuth } from '@/lib/api-guard';
-import { updateDatabase } from '@/lib/db/local-store';
+import { updateDatabase, DEFAULT_USER_ID } from '@/lib/db/local-store';
+import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
 import { runDietitianChat } from '@/lib/ai-engine';
 import type { AiMessage } from '@/types/nutrifit';
 
@@ -18,7 +19,7 @@ export async function GET() {
       process.env.GROQ_API_KEY ||
       process.env.AI_API_KEY
     ),
-    provider: guard.db.aiConfig?.provider || 'gemini',
+    provider: guard.db.aiConfig?.provider || 'custom',
   });
 }
 
@@ -51,6 +52,29 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     };
 
+    // 1. If Supabase is enabled, save to user-isolated Supabase table
+    if (isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID) {
+      try {
+        await supabaseAdmin.from('ai_conversations').insert([
+          {
+            user_id: guard.session.userId,
+            role: 'user',
+            content: message,
+            metadata: {},
+          },
+          {
+            user_id: guard.session.userId,
+            role: 'assistant',
+            content: reply,
+            metadata: { mode },
+          },
+        ]);
+      } catch (err) {
+        console.error('Failed to save message to Supabase ai_conversations:', err);
+      }
+    }
+
+    // 2. Also keep local copy updated with userId attached
     updateDatabase((draft) => {
       draft.aiConversations.push(userMsg, assistantMsg);
     });
@@ -65,8 +89,16 @@ export async function DELETE() {
   const guard = await requireAuth();
   if (guard.error) return guard.error;
 
+  if (isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID) {
+    try {
+      await supabaseAdmin.from('ai_conversations').delete().eq('user_id', guard.session.userId);
+    } catch (err) {
+      console.error('Failed to clear Supabase ai_conversations:', err);
+    }
+  }
+
   updateDatabase((draft) => {
-    draft.aiConversations = draft.aiConversations.slice(0, 1);
+    draft.aiConversations = draft.aiConversations.filter((c) => c.userId !== guard.session.userId);
   });
   return NextResponse.json({ ok: true });
 }

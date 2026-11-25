@@ -355,7 +355,7 @@ export default function MealScannerPage() {
 
   // --- Live Camera & Scanning view (dark background matching design) ---
   return (
-    <div className="-mx-4 -mt-5 min-h-screen bg-[#0D1F18] flex flex-col" style={{ marginBottom: '-9rem' }}>
+    <div className="min-h-screen bg-[#0D1F18] flex flex-col pb-8">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-6 pb-3">
         <button
@@ -373,7 +373,7 @@ export default function MealScannerPage() {
 
       {/* Camera frame / Live viewfinder */}
       <div className="flex-1 flex flex-col items-center px-5">
-        <div className="w-full aspect-[3/4] max-h-[52vh] rounded-[24px] border-2 border-dashed border-white/40 flex flex-col items-center justify-center overflow-hidden relative bg-black/40">
+        <div className="w-full aspect-[3/4] max-h-[50vh] rounded-[24px] border-2 border-dashed border-white/40 flex flex-col items-center justify-center overflow-hidden relative bg-black/40">
           {imagePreview ? (
             // Photo taken/uploaded view
             // eslint-disable-next-line @next/next/no-img-element
@@ -467,50 +467,80 @@ export default function MealScannerPage() {
       </div>
 
       {/* Bottom controls */}
-      <div className="flex items-center justify-between px-10 pb-8 pt-3">
+      <div className="flex items-center justify-between px-8 pb-6 pt-4 relative z-30">
         {/* Gallery picker */}
         <button
           onClick={() => fileInputRef.current?.click()}
           aria-label="Pick from gallery"
-          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer transition-colors"
+          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer transition-colors shrink-0"
         >
           <ImageIcon className="w-5 h-5 text-white" />
         </button>
 
-        {/* Big Shutter Button */}
-        <button
-          onClick={handleCaptureSnapshot}
-          disabled={analyzing}
-          aria-label="Snap photo and analyze"
-          className="w-18 h-18 rounded-full bg-[#B45309] border-4 border-white/80 shadow-[0_0_24px_rgba(180,83,9,0.7)] flex items-center justify-center active:scale-95 transition-all cursor-pointer disabled:opacity-50"
-        >
-          {analyzing ? (
-            <div className="w-7 h-7 border-3 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-[#B45309] flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-          )}
-        </button>
-
-        {/* Retake / Flash / Helper button */}
+        {/* Center action button */}
         {imagePreview ? (
-          <button
-            onClick={handleRetake}
-            aria-label="Retake photo"
-            className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer text-white"
-          >
-            <RotateCcw className="w-5 h-5" />
-          </button>
+          <div className="flex-1 flex flex-col items-center px-4">
+            <button
+              onClick={() => analyzePhoto(imageBase64, mimeType, hintText)}
+              disabled={analyzing}
+              className="w-full max-w-[220px] py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+            >
+              {analyzing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Analyzing…</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4" />
+                  <span>Analyze Meal</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleRetake}
+              className="text-white/60 hover:text-white text-xs mt-2 underline cursor-pointer"
+            >
+              Retake photo
+            </button>
+          </div>
         ) : (
           <button
-            onClick={startCamera}
-            aria-label="Refresh camera"
-            className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white"
+            onClick={handleCaptureSnapshot}
+            disabled={analyzing}
+            aria-label="Snap photo and analyze"
+            className="w-[72px] h-[72px] rounded-full bg-[#B45309] border-4 border-white/80 shadow-[0_0_24px_rgba(180,83,9,0.7)] flex items-center justify-center active:scale-95 transition-all cursor-pointer disabled:opacity-50"
           >
-            <Camera className="w-5 h-5" />
+            {analyzing ? (
+              <div className="w-7 h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-[#B45309] flex items-center justify-center">
+                <Camera className="w-6 h-6 text-white" />
+              </div>
+            )}
           </button>
         )}
+
+        {/* Helper / Retake button */}
+        <div className="w-12 flex justify-end shrink-0">
+          {imagePreview ? (
+            <button
+              onClick={handleRetake}
+              aria-label="Retake photo"
+              className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer text-white"
+            >
+              <RotateCcw className="w-5 h-5" />
+            </button>
+          ) : (
+            <button
+              onClick={startCamera}
+              aria-label="Restart camera"
+              className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white"
+            >
+              <Camera className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
