@@ -48,14 +48,14 @@ export async function callVidhyantraChat(
   baseUrl: string,
   model: string
 ): Promise<string | null> {
-  // Vidhyantra format: last user message goes as prompt, uses POST /chat/
   const chatUrl = baseUrl.replace(/\/+$/, '') + '/chat/';
-  // Supported models: chatgpt56, code, quick, sol, terra, ultra
-  // Default to 'ultra' (most capable)
-  const vidhyantraModel = model && ['chatgpt56','code','quick','sol','terra','ultra'].includes(model)
-    ? model : 'ultra';
 
-  // Build a single prompt by combining system + user messages
+  // Valid Vidhyantra models — default to 'sol' (GPT-6 flagship, most capable)
+  const VALID_MODELS = ['sol', 'terra', 'chatgpt56', 'ultra', 'quick', 'code'];
+  const vidhyantraModel = VALID_MODELS.includes(model) ? model : 'sol';
+
+  // Vidhyantra API uses a single "message" string field (not OpenAI messages array)
+  // Combine system context + user message into one prompt string
   const systemMsg = messages.find(m => m.role === 'system');
   const userMsg = messages.filter(m => m.role === 'user').pop();
   const combined = systemMsg
@@ -70,14 +70,14 @@ export async function callVidhyantraChat(
     },
     body: JSON.stringify({
       model: vidhyantraModel,
-      messages: [{ role: 'user', content: combined }],
+      message: combined,          // ← "message" string, not "messages" array
     }),
   });
 
   if (!res.ok) return null;
   const data = await res.json();
   // Vidhyantra returns { model, reply, created_at }
-  return data?.reply || data?.choices?.[0]?.message?.content || null;
+  return data?.reply || null;
 }
 
 export function resolveAiCredentials(config?: AiConfig) {
@@ -95,7 +95,7 @@ export function resolveAiCredentials(config?: AiConfig) {
     if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
     else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';
-    else if (provider === 'custom') model = 'ultra'; // default for Vidhyantra
+    else if (provider === 'custom') model = 'sol'; // Vidhyantra sol = GPT-6 flagship (most capable)
     else model = 'gpt-4o-mini';
   }
 
