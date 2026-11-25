@@ -39,6 +39,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${epilogue.variable} ${manrope.variable} h-full antialiased`}>
+      <head>
+        <script src="/button.js" />
+        <script src="/tabs.js" />
+      </head>
       <body className="min-h-full bg-[#F7F4EF] text-[#1B1B1E]">
         <Suspense fallback={<div className="min-h-screen bg-[#F7F4EF]" />}>
           <AppShell>{children}</AppShell>

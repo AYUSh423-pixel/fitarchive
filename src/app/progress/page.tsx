@@ -57,6 +57,10 @@ export default function ProgressPage() {
   const [uploadingReport, setUploadingReport] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [auditModalScan, setAuditModalScan] = useState<BodyScan | null>(null);
+  const [activeSection, setActiveSection] = useState<'overview' | 'history' | 'charts' | 'photos'>('overview');
+
+  const tabsRef = React.useRef<HTMLElementTagNameMap['sakuga-tabs'] | null>(null);
+  const confirmBtnRef = React.useRef<HTMLElementTagNameMap['sakuga-button'] | null>(null);
 
   // Review Form Fields
   const [editWeight, setEditWeight] = useState(76.4);
@@ -88,6 +92,17 @@ export default function ProgressPage() {
   useEffect(() => {
     loadProgress();
   }, []);
+
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const handleChange = (e: any) => {
+      const val = e.detail?.value || 'overview';
+      setActiveSection(val as any);
+    };
+    el.addEventListener('change', handleChange);
+    return () => el.removeEventListener('change', handleChange);
+  }, [data]);
 
   // Compute live BMI from currently edited values
   const currentCalculatedBmi = editHeight > 0 && editWeight > 0 ? calculateBmi(editWeight, editHeight) : 0;
@@ -192,8 +207,11 @@ export default function ProgressPage() {
 
       if (res.ok) {
         setToast(`✅ Body assessment saved! Profile updated to ${editWeight}kg & BMI ${currentCalculatedBmi}.`);
-        setReviewModalOpen(false);
-        loadProgress();
+        confirmBtnRef.current?.done();
+        setTimeout(() => {
+          setReviewModalOpen(false);
+          loadProgress();
+        }, 800);
       } else {
         const err = await res.json();
         setToast(`Error: ${err?.error || 'Failed to save'}`);
@@ -270,37 +288,49 @@ export default function ProgressPage() {
         </span>
       </div>
 
-      {/* AI Assessment Upload Banner */}
-      <section className="tactile-card p-5 bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5]/60 border-2 border-[#FB923C]/40 space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-xl bg-[#FB923C] text-white">
-                <Sparkles className="w-4 h-4" />
-              </span>
-              <h2 className="font-display font-bold text-base text-[#1B1B1E]">
-                Upload BMI / EVOLT 360 / InBody Report
-              </h2>
-            </div>
-            <p className="text-xs text-[#554337] leading-relaxed">
-              Upload your PDF report or body photo. The AI extracts your height, weight, body fat %, and muscle mass,
-              and cross-checks printed BMI against the scientific formula before saving.
-            </p>
-          </div>
+      {/* Sakuga Anime Tabs for Section Navigation */}
+      <div className="flex justify-center sm:justify-start">
+        <sakuga-tabs ref={tabsRef} label="Progress Sections">
+          <option value="overview">Overview</option>
+          <option value="history">BMI Reports</option>
+          <option value="charts">Weight Chart</option>
+          <option value="photos">Photos</option>
+        </sakuga-tabs>
+      </div>
 
-          <label className="shrink-0 px-4 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#EA580C] transition-colors cursor-pointer shadow-sm">
-            <Upload className="w-4 h-4" />
-            <span>{uploadingReport ? 'Analyzing Report...' : 'Upload Report / Photo'}</span>
-            <input
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg"
-              onChange={handleReportFileSelect}
-              disabled={uploadingReport}
-              className="hidden"
-            />
-          </label>
-        </div>
-      </section>
+      {/* AI Assessment Upload Banner & Reports History */}
+      {(activeSection === 'overview' || activeSection === 'history') && (
+        <>
+          <section className="tactile-card p-5 bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5]/60 border-2 border-[#FB923C]/40 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-xl bg-[#FB923C] text-white">
+                    <Sparkles className="w-4 h-4" />
+                  </span>
+                  <h2 className="font-display font-bold text-base text-[#1B1B1E]">
+                    Upload BMI / EVOLT 360 / InBody Report
+                  </h2>
+                </div>
+                <p className="text-xs text-[#554337] leading-relaxed">
+                  Upload your PDF report or body photo. The AI extracts your height, weight, body fat %, and muscle mass,
+                  and cross-checks printed BMI against the scientific formula before saving.
+                </p>
+              </div>
+
+              <label className="shrink-0 px-4 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#EA580C] transition-colors cursor-pointer shadow-sm">
+                <Upload className="w-4 h-4" />
+                <span>{uploadingReport ? 'Analyzing Report...' : 'Upload Report / Photo'}</span>
+                <input
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  onChange={handleReportFileSelect}
+                  disabled={uploadingReport}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </section>
 
       {/* Key Composition Metrics */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -445,148 +475,159 @@ export default function ProgressPage() {
           </div>
         )}
       </section>
+        </>
+      )}
 
-      {/* Charts */}
-      <section className="tactile-card-white p-5 space-y-4">
-        <h2 className="font-display text-lg font-bold">Weight &amp; Waist Over Time</h2>
-        <div className="h-56 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E4E0D8" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11 }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="weight" name="Weight (kg)" stroke="#FB923C" strokeWidth={3} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="waist" name="Waist (cm)" stroke="#006C4B" strokeWidth={2.5} dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+      {/* Charts & Quick Log */}
+      {(activeSection === 'overview' || activeSection === 'charts') && (
+        <>
+          <section className="tactile-card-white p-5 space-y-4">
+            <h2 className="font-display text-lg font-bold">Weight &amp; Waist Over Time</h2>
+            <div className="h-56 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E0D8" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="weight" name="Weight (kg)" stroke="#FB923C" strokeWidth={3} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="waist" name="Waist (cm)" stroke="#006C4B" strokeWidth={2.5} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
 
-      {/* Log Weight / Waist / Body Scan */}
-      <form onSubmit={handleLogEntry} className="tactile-card-white p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-display font-bold text-base flex items-center gap-2">
-            <Scale className="w-4 h-4 text-[#944A00]" /> Manual Quick Log
-          </h3>
-          <button
-            type="button"
-            onClick={() => setScanMode((v) => !v)}
-            className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${
-              scanMode ? 'bg-[#674BB5] text-white' : 'bg-[#F2EFE9] text-[#554337]'
-            }`}
-          >
-            {scanMode ? 'EVOLT 360 Scan Mode' : 'Quick Weight/Waist'}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div>
-            <label className="text-xs font-semibold block mb-1">Weight (kg)</label>
-            <input
-              type="number"
-              step="0.1"
-              value={weightKg}
-              onChange={(e) => setWeightKg(Number(e.target.value))}
-              className="tactile-input w-full px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold block mb-1">Waist (cm)</label>
-            <input
-              type="number"
-              step="0.1"
-              value={waistCm}
-              onChange={(e) => setWaistCm(Number(e.target.value))}
-              className="tactile-input w-full px-3 py-2 text-sm"
-            />
-          </div>
-          {scanMode && (
-            <>
-              <div>
-                <label className="text-xs font-semibold block mb-1">Body Fat (%)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={bodyFatPct}
-                  onChange={(e) => setBodyFatPct(Number(e.target.value))}
-                  className="tactile-input w-full px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold block mb-1">Muscle (kg)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={smmKg}
-                  onChange={(e) => setSmmKg(Number(e.target.value))}
-                  className="tactile-input w-full px-3 py-2 text-sm"
-                />
-              </div>
-            </>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="px-6 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" /> Save Entry
-        </button>
-      </form>
-
-      {/* Day 1, 7, 15, 30, 60, 90 Comparisons */}
-      <section className="tactile-card-white p-5 space-y-3">
-        <h3 className="font-display font-bold text-base">Transformation Milestones (Day 1 → Day 90)</h3>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {milestones.map((dayNum) => {
-            const reached = data.measurements.length >= dayNum || dayNum === 1;
-            const ref = dayNum === 1 ? day1 : latest;
-            return (
-              <div
-                key={dayNum}
-                className={`p-3 rounded-2xl text-center ${
-                  reached ? 'bg-[#DCFCE7]/70 text-[#14532D]' : 'bg-[#F5F3F6] text-[#71717A]'
+          {/* Log Weight / Waist / Body Scan */}
+          <form onSubmit={handleLogEntry} className="tactile-card-white p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-base flex items-center gap-2">
+                <Scale className="w-4 h-4 text-[#944A00]" /> Manual Quick Log
+              </h3>
+              <button
+                type="button"
+                onClick={() => setScanMode((v) => !v)}
+                className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${
+                  scanMode ? 'bg-[#674BB5] text-white' : 'bg-[#F2EFE9] text-[#554337]'
                 }`}
               >
-                <p className="text-[10px] font-bold uppercase">Day {dayNum}</p>
-                <p className="font-display font-bold text-sm mt-1">
-                  {reached && ref ? `${ref.weightKg}kg` : '—'}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+                {scanMode ? 'EVOLT 360 Scan Mode' : 'Quick Weight/Waist'}
+              </button>
+            </div>
 
-      {/* Private Progress Photos */}
-      <section className="tactile-card-white p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-display font-bold text-base">Private Progress Photos</h3>
-            <p className="text-xs text-[#554337]">Stored privately — never publicly exposed</p>
-          </div>
-          <label className="px-4 py-2 rounded-full bg-[#1B1B1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
-            <Camera className="w-3.5 h-3.5" /> Upload Photo
-            <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-          </label>
-        </div>
-
-        {data.progressPhotos.length === 0 ? (
-          <div className="p-5 rounded-2xl bg-[#F5F3F6] text-center text-xs text-[#554337]">
-            No progress photos uploaded yet. Take a Day 1 front/side photo in consistent lighting!
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {data.progressPhotos.map((p) => (
-              <div key={p.id} className="rounded-2xl overflow-hidden bg-[#F5F3F6] border border-[#E4E0D8]">
-                <img src={p.url} alt={`Progress ${p.photoDate}`} className="w-full h-36 object-cover" />
-                <p className="p-2 text-[11px] font-semibold text-center text-[#554337]">{p.photoDate}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <label className="text-xs font-semibold block mb-1">Weight (kg)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={weightKg}
+                  onChange={(e) => setWeightKg(Number(e.target.value))}
+                  className="tactile-input w-full px-3 py-2 text-sm"
+                />
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+              <div>
+                <label className="text-xs font-semibold block mb-1">Waist (cm)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={waistCm}
+                  onChange={(e) => setWaistCm(Number(e.target.value))}
+                  className="tactile-input w-full px-3 py-2 text-sm"
+                />
+              </div>
+              {scanMode && (
+                <>
+                  <div>
+                    <label className="text-xs font-semibold block mb-1">Body Fat (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={bodyFatPct}
+                      onChange={(e) => setBodyFatPct(Number(e.target.value))}
+                      className="tactile-input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold block mb-1">Muscle (kg)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={smmKg}
+                      onChange={(e) => setSmmKg(Number(e.target.value))}
+                      className="tactile-input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="px-6 py-2.5 rounded-full bg-[#FB923C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Save Entry
+            </button>
+          </form>
+        </>
+      )}
+
+      {/* Milestones & Photos */}
+      {(activeSection === 'overview' || activeSection === 'photos') && (
+        <>
+          {/* Day 1, 7, 15, 30, 60, 90 Comparisons */}
+          <section className="tactile-card-white p-5 space-y-3">
+            <h3 className="font-display font-bold text-base">Transformation Milestones (Day 1 → Day 90)</h3>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {milestones.map((dayNum) => {
+                const reached = data.measurements.length >= dayNum || dayNum === 1;
+                const ref = dayNum === 1 ? day1 : latest;
+                return (
+                  <div
+                    key={dayNum}
+                    className={`p-3 rounded-2xl text-center ${
+                      reached ? 'bg-[#DCFCE7]/70 text-[#14532D]' : 'bg-[#F5F3F6] text-[#71717A]'
+                    }`}
+                  >
+                    <p className="text-[10px] font-bold uppercase">Day {dayNum}</p>
+                    <p className="font-display font-bold text-sm mt-1">
+                      {reached && ref ? `${ref.weightKg}kg` : '—'}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Private Progress Photos */}
+          <section className="tactile-card-white p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-display font-bold text-base">Private Progress Photos</h3>
+                <p className="text-xs text-[#554337]">Stored privately — never publicly exposed</p>
+              </div>
+              <label className="px-4 py-2 rounded-full bg-[#1B1B1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <Camera className="w-3.5 h-3.5" /> Upload Photo
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+              </label>
+            </div>
+
+            {data.progressPhotos.length === 0 ? (
+              <div className="p-5 rounded-2xl bg-[#F5F3F6] text-center text-xs text-[#554337]">
+                No progress photos uploaded yet. Take a Day 1 front/side photo in consistent lighting!
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {data.progressPhotos.map((p) => (
+                  <div key={p.id} className="rounded-2xl overflow-hidden bg-[#F5F3F6] border border-[#E4E0D8]">
+                    <img src={p.url} alt={`Progress ${p.photoDate}`} className="w-full h-36 object-cover" />
+                    <p className="p-2 text-[11px] font-semibold text-center text-[#554337]">{p.photoDate}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
 
       {/* REVIEW & VERIFY ASSESSMENT MODAL */}
       {reviewModalOpen && (
@@ -740,20 +781,18 @@ export default function ProgressPage() {
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E4E0D8]">
-              <button
-                type="button"
+              <sakuga-button
+                variant="secondary"
                 onClick={() => setReviewModalOpen(false)}
-                className="px-4 py-2 rounded-full text-xs font-semibold text-[#554337] hover:bg-[#F5F3F6] cursor-pointer"
               >
                 Cancel
-              </button>
-              <button
-                type="button"
+              </sakuga-button>
+              <sakuga-button
+                ref={confirmBtnRef}
                 onClick={handleConfirmAssessment}
-                className="px-6 py-2.5 rounded-full bg-[#FB923C] hover:bg-[#EA580C] text-white text-xs font-bold cursor-pointer shadow-md transition-colors"
               >
-                Confirm &amp; Save Assessment
-              </button>
+                Confirm
+              </sakuga-button>
             </div>
           </div>
         </div>

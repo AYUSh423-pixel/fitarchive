@@ -20,6 +20,26 @@
   --tertiary: #674bb5;
   --tertiary-fixed: #e8ddff;
   --outline-variant: #dbc1b2;
+
+  /* Sakuga VFX anime components — customized for NutriFit Warm Earth & Citrus Punch */
+  --sk-card: #ffffff;
+  --sk-ink: #1b1b1e;
+  --sk-dim: #71717a;
+  --sk-soft: #ffdcc5;
+  --sk-pri: #fb923c;
+  --sk-pri-ink: #1b1b1e;
+  --sk-acc: #006c4b;
+  --sk-track: #e4e0d8;
+  --sk-r: 16px;
+  --sk-bw: 2.8px;
+  --sk-sh: 4px 5px 0 #ffdcc5;
+  --sk-btn-sh: 4px 5px 0 #ffdcc5;
+  --sk-btn-line: #1b1b1e;
+  --sk-alt-sh: 3px 4px 0 #e4e0d8;
+  --sk-alt-line: #554337;
+  --sk-tick: #1b1b1e;
+  --sk-fill: #006c4b;
+  --sk-on-pri: #ffffff;
 }
 
 @theme inline {

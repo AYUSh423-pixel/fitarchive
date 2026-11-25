@@ -33,6 +33,7 @@ export default function MealScannerPage() {
   const [viewMode, setViewMode] = useState<'petal' | 'items'>('petal');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const saveMealBtnRef = React.useRef<HTMLElementTagNameMap['sakuga-button'] | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -140,7 +141,10 @@ export default function MealScannerPage() {
         }),
       });
       if (!res.ok) throw new Error('Failed to save confirmed meal');
-      router.push('/diary');
+      saveMealBtnRef.current?.done();
+      setTimeout(() => {
+        router.push('/diary');
+      }, 750);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -423,16 +427,21 @@ export default function MealScannerPage() {
               ))}
             </div>
 
-            <button
-              onClick={handleConfirmAndSave}
-              disabled={saving || items.length === 0}
-              className="w-full py-3.5 rounded-full bg-[#1B1B1E] hover:bg-[#303033] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-            >
-              <CheckCircle2 className="w-4 h-4 text-[#34D399]" />
-              <span className="capitalize">
-                {saving ? 'Saving...' : `Confirm & Log to ${mealSlot}`}
-              </span>
-            </button>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <sakuga-button
+                variant="secondary"
+                onClick={() => setScanResult(null)}
+              >
+                Cancel
+              </sakuga-button>
+              <sakuga-button
+                ref={saveMealBtnRef}
+                disabled={saving || items.length === 0}
+                onClick={handleConfirmAndSave}
+              >
+                Confirm
+              </sakuga-button>
+            </div>
           </section>
         </>
       )}
