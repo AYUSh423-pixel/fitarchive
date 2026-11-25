@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const hintText = body.hintText ? String(body.hintText) : undefined;
 
     // Never saves unconfirmed AI estimates to food_logs; returns candidate items for user confirmation
-    const result = await analyzeFoodPhoto(base64Image, mimeType, guard.db.foods, hintText);
+    const result = await analyzeFoodPhoto(base64Image, mimeType, guard.db.foods, hintText, guard.db.aiConfig);
     return NextResponse.json(result);
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 400 });

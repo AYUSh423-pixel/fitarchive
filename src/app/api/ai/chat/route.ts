@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { requireAuth } from '@/lib/api-guard';
 import { updateDatabase } from '@/lib/db/local-store';
 import { runDietitianChat } from '@/lib/ai-engine';
+import type { AiMessage } from '@/types/nutrifit';
 
 export async function GET() {
   const guard = await requireAuth();
@@ -10,7 +11,14 @@ export async function GET() {
 
   return NextResponse.json({
     messages: guard.db.aiConversations,
-    aiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    aiConfigured: Boolean(
+      guard.db.aiConfig?.apiKey ||
+      process.env.GEMINI_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      process.env.GROQ_API_KEY ||
+      process.env.AI_API_KEY
+    ),
+    provider: guard.db.aiConfig?.provider || 'gemini',
   });
 }
 
@@ -34,12 +42,12 @@ export async function POST(req: Request) {
     };
 
     const { reply, mode } = await runDietitianChat(message, guard.db);
-    const assistantMsg = {
+    const assistantMsg: AiMessage = {
       id: `msg-${crypto.randomBytes(4).toString('hex')}`,
       userId: guard.session.userId,
       role: 'assistant' as const,
       content: reply,
-      mode,
+      mode: mode as AiMessage['mode'],
       createdAt: new Date().toISOString(),
     };
 

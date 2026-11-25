@@ -224,6 +224,13 @@ export function createInitialDatabaseState(): DatabaseState {
         createdAt: nowIso,
       },
     ],
+    aiConfig: {
+      provider: 'gemini',
+      apiKey: process.env.GEMINI_API_KEY || '',
+      model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+      baseUrl: '',
+      configured: Boolean(process.env.GEMINI_API_KEY),
+    },
     preferences: {
       userId: DEFAULT_USER_ID,
       units: 'metric',

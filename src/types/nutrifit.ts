@@ -316,8 +316,18 @@ export interface AiMessage {
   userId: string;
   role: 'user' | 'assistant';
   content: string;
-  mode?: 'gemini' | 'local_engine';
+  mode?: 'gemini' | 'openai' | 'groq' | 'openrouter' | 'custom' | 'local_engine';
   createdAt: string;
+}
+
+export type AiProvider = 'gemini' | 'openai' | 'groq' | 'openrouter' | 'custom';
+
+export interface AiConfig {
+  provider: AiProvider;
+  apiKey: string;
+  model: string;
+  baseUrl?: string;
+  configured: boolean;
 }
 
 export interface UserPreferences {
@@ -353,5 +363,6 @@ export interface DatabaseState {
   habitLogs: HabitLog[];
   progressPhotos: ProgressPhoto[];
   aiConversations: AiMessage[];
+  aiConfig?: AiConfig;
   preferences: UserPreferences;
 }

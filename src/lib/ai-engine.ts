@@ -1,4 +1,12 @@
-import type { DatabaseState, FoodItem, FoodLog, FoodUnit, MealPlanDay, MealSlot } from '@/types/nutrifit';
+import type {
+  AiConfig,
+  DatabaseState,
+  FoodItem,
+  FoodLog,
+  FoodUnit,
+  MealPlanDay,
+  MealSlot,
+} from '@/types/nutrifit';
 import { todayIsoDate } from '@/lib/db/local-store';
 
 export interface ScannedCandidateItem {
@@ -18,7 +26,7 @@ export interface ScannedCandidateItem {
 }
 
 export interface PhotoScanResult {
-  mode: 'gemini' | 'local_estimate';
+  mode: string;
   dishTitle: string;
   cuisineLabel: string;
   items: ScannedCandidateItem[];
@@ -26,14 +34,42 @@ export interface PhotoScanResult {
   disclaimer: string;
 }
 
+export function resolveAiCredentials(config?: AiConfig) {
+  const provider = config?.provider || (process.env.AI_PROVIDER as any) || (process.env.OPENAI_API_KEY ? 'openai' : 'gemini');
+  let apiKey = config?.apiKey || process.env.AI_API_KEY || '';
+
+  if (!apiKey) {
+    if (provider === 'gemini') apiKey = process.env.GEMINI_API_KEY || '';
+    else if (provider === 'openai') apiKey = process.env.OPENAI_API_KEY || '';
+    else if (provider === 'groq') apiKey = process.env.GROQ_API_KEY || '';
+  }
+
+  let model = config?.model || process.env.AI_MODEL || '';
+  if (!model) {
+    if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
+    else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';
+    else model = 'gpt-4o-mini';
+  }
+
+  let baseUrl = config?.baseUrl || process.env.AI_BASE_URL || '';
+  if (!baseUrl) {
+    if (provider === 'openai') baseUrl = 'https://api.openai.com/v1';
+    else if (provider === 'groq') baseUrl = 'https://api.groq.com/openai/v1';
+    else if (provider === 'openrouter') baseUrl = 'https://openrouter.ai/api/v1';
+  }
+
+  return { provider, apiKey, model, baseUrl };
+}
+
 export async function analyzeFoodPhoto(
   base64Image: string,
   mimeType: string,
   foods: FoodItem[],
-  hintText?: string
+  hintText?: string,
+  config?: AiConfig
 ): Promise<PhotoScanResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const { provider, apiKey, model, baseUrl } = resolveAiCredentials(config);
 
   if (apiKey) {
     try {
@@ -61,46 +97,85 @@ Respond ONLY in valid JSON with this exact shape:
   "clarifyingQuestions": ["question about ghee/oil or portion size"]
 }`;
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
+      let jsonText: string | null = null;
+
+      if (provider === 'gemini') {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    { text: prompt },
+                    { inlineData: { mimeType: mimeType || 'image/jpeg', data: base64Image } },
+                  ],
+                },
+              ],
+              generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+            }),
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        }
+      } else {
+        // OpenAI / Groq / OpenRouter / Custom vision endpoint
+        const targetUrl = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
+        const res = await fetch(targetUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            ...(provider === 'openrouter' ? { 'HTTP-Referer': 'https://nutrifit.app', 'X-Title': 'NutriFit AI' } : {}),
+          },
           body: JSON.stringify({
-            contents: [
+            model: model || 'gpt-4o-mini',
+            messages: [
               {
-                parts: [
-                  { text: prompt },
-                  { inlineData: { mimeType: mimeType || 'image/jpeg', data: base64Image } },
+                role: 'user',
+                content: [
+                  { type: 'text', text: prompt },
+                  {
+                    type: 'image_url',
+                    image_url: { url: `data:${mimeType || 'image/jpeg'};base64,${base64Image}` },
+                  },
                 ],
               },
             ],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+            response_format: { type: 'json_object' },
+            temperature: 0.2,
           }),
-        }
-      );
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-          const parsed = JSON.parse(text);
-          const items: ScannedCandidateItem[] = (parsed.items || []).map((it: ScannedCandidateItem, idx: number) => ({
-            ...it,
-            tempId: `scan-${Date.now()}-${idx}`,
-          }));
-          return {
-            mode: 'gemini',
-            dishTitle: parsed.dishTitle || 'Scanned Indian Meal',
-            cuisineLabel: parsed.cuisineLabel || 'Homemade Indian • Estimated',
-            items,
-            clarifyingQuestions: parsed.clarifyingQuestions || [
-              'Was extra ghee or butter added on top of the roti/dal?',
-            ],
-            disclaimer:
-              'Photo-based nutrition values are AI estimates, not exact lab measurements. Please review and adjust before saving.',
-          };
+        if (res.ok) {
+          const data = await res.json();
+          jsonText = data?.choices?.[0]?.message?.content;
         }
+      }
+
+      if (jsonText) {
+        const cleaned = jsonText.replace(/^```json/m, '').replace(/```$/m, '').trim();
+        const parsed = JSON.parse(cleaned);
+        const items: ScannedCandidateItem[] = (parsed.items || []).map((it: ScannedCandidateItem, idx: number) => ({
+          ...it,
+          tempId: `scan-${Date.now()}-${idx}`,
+        }));
+        return {
+          mode: provider,
+          dishTitle: parsed.dishTitle || 'Scanned Indian Meal',
+          cuisineLabel: parsed.cuisineLabel || 'Homemade Indian • Estimated',
+          items,
+          clarifyingQuestions: parsed.clarifyingQuestions || [
+            'Was extra ghee or butter added on top of the roti/dal?',
+          ],
+          disclaimer:
+            'Photo-based nutrition values are AI estimates, not exact lab measurements. Please review and adjust before saving.',
+        };
       }
     } catch {
       // Fall through cleanly to labelled local fallback
@@ -365,7 +440,7 @@ export function parseNaturalLanguageFood(
 export async function runDietitianChat(
   userMessage: string,
   db: DatabaseState
-): Promise<{ reply: string; mode: 'gemini' | 'local_engine' }> {
+): Promise<{ reply: string; mode: string }> {
   const today = todayIsoDate();
   const todayLogs = db.foodLogs.filter((l) => l.logDate === today);
   const consumed = todayLogs.reduce(
@@ -385,8 +460,7 @@ export async function runDietitianChat(
     .filter((w) => w.logDate === today)
     .reduce((s, w) => s + w.amountMl, 0);
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const { provider, apiKey, model, baseUrl } = resolveAiCredentials(db.aiConfig);
 
   if (apiKey) {
     try {
@@ -401,23 +475,52 @@ STRICT RULES:
 7. Today's Actual Logged Totals (${today}): ${Math.round(consumed.calories)} kcal, ${Math.round(consumed.proteinG)}g protein, ${Math.round(consumed.carbsG)}g carbs, ${Math.round(consumed.fatG)}g fat. Water: ${todayWater} ml.
 8. Today's Logged Foods: ${todayLogs.length ? todayLogs.map((l) => `${l.mealSlot}: ${l.foodName} (${l.calories} kcal, ${l.proteinG}g P)`).join('; ') : 'Nothing logged yet today.'}`;
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${systemContext}\n\nUser asks: ${userMessage}` }] }],
-            generationConfig: { temperature: 0.6 },
-          }),
-        }
-      );
+      let replyText: string | null = null;
 
-      if (res.ok) {
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) return { reply: text, mode: 'gemini' };
+      if (provider === 'gemini') {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${systemContext}\n\nUser asks: ${userMessage}` }] }],
+              generationConfig: { temperature: 0.6 },
+            }),
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        }
+      } else {
+        // OpenAI / Groq / OpenRouter / Custom compatible completion endpoint
+        const targetUrl = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
+        const res = await fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            ...(provider === 'openrouter' ? { 'HTTP-Referer': 'https://nutrifit.app', 'X-Title': 'NutriFit AI' } : {}),
+          },
+          body: JSON.stringify({
+            model: model || 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: systemContext },
+              { role: 'user', content: userMessage },
+            ],
+            temperature: 0.6,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          replyText = data?.choices?.[0]?.message?.content;
+        }
       }
+
+      if (replyText) return { reply: replyText, mode: provider };
     } catch {
       // Fallback to local engine
     }

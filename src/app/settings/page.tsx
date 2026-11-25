@@ -17,6 +17,9 @@ import {
 export default function SettingsPrivacyPage() {
   const [aiConfigured, setAiConfigured] = useState(false);
   const [supabaseConfigured, setSupabaseConfigured] = useState(false);
+  const [provider, setProvider] = useState<'gemini' | 'openai' | 'groq' | 'openrouter' | 'custom'>('gemini');
+  const [model, setModel] = useState('gemini-2.5-flash');
+  const [baseUrl, setBaseUrl] = useState('');
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [maskedKey, setMaskedKey] = useState('');
   const [savingKey, setSavingKey] = useState(false);
@@ -35,6 +38,9 @@ export default function SettingsPrivacyPage() {
     if (keyRes.ok) {
       const kd = await keyRes.json();
       setMaskedKey(kd.maskedKey || '');
+      if (kd.provider) setProvider(kd.provider);
+      if (kd.model) setModel(kd.model);
+      if (kd.baseUrl) setBaseUrl(kd.baseUrl);
       if (kd.configured) setAiConfigured(true);
     }
   };
@@ -43,6 +49,26 @@ export default function SettingsPrivacyPage() {
     loadStatus();
   }, []);
 
+  const handleProviderChange = (p: 'gemini' | 'openai' | 'groq' | 'openrouter' | 'custom') => {
+    setProvider(p);
+    if (p === 'gemini') {
+      setModel('gemini-2.5-flash');
+      setBaseUrl('');
+    } else if (p === 'openai') {
+      setModel('gpt-4o-mini');
+      setBaseUrl('https://api.openai.com/v1');
+    } else if (p === 'groq') {
+      setModel('llama-3.3-70b-versatile');
+      setBaseUrl('https://api.groq.com/openai/v1');
+    } else if (p === 'openrouter') {
+      setModel('deepseek/deepseek-chat');
+      setBaseUrl('https://openrouter.ai/api/v1');
+    } else if (p === 'custom') {
+      setModel('default');
+      setBaseUrl('https://api.deepseek.com/v1');
+    }
+  };
+
   const handleSaveApiKey = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingKey(true);
@@ -50,16 +76,21 @@ export default function SettingsPrivacyPage() {
       const res = await fetch('/api/settings/ai-key', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: apiKeyInput }),
+        body: JSON.stringify({
+          provider,
+          apiKey: apiKeyInput,
+          model,
+          baseUrl,
+        }),
       });
       const d = await res.json();
       if (res.ok) {
-        setMaskedKey(d.maskedKey || '');
+        setMaskedKey(d.maskedKey || (apiKeyInput ? `${apiKeyInput.slice(0, 4)}...${apiKeyInput.slice(-4)}` : ''));
         setAiConfigured(d.configured);
         setApiKeyInput('');
-        setToast('Gemini API key saved & active for Photo Vision & AI Dietitian!');
+        setToast(`AI Provider (${provider}) configured and active!`);
       } else {
-        setToast(d.error || 'Failed to save key');
+        setToast(d.error || 'Failed to save configuration');
       }
     } finally {
       setSavingKey(false);
@@ -128,7 +159,7 @@ export default function SettingsPrivacyPage() {
         </div>
       )}
 
-      {/* PASTE AI KEY SECTION */}
+      {/* PASTE AI KEY SECTION - MULTI PROVIDER SUPPORT */}
       <section className="tactile-card-white p-6 space-y-4 border-2 border-[#FB923C]/30">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -137,10 +168,10 @@ export default function SettingsPrivacyPage() {
             </div>
             <div>
               <h2 className="font-display text-lg font-bold text-[#1B1B1E]">
-                Google Gemini AI Key (Photo Vision &amp; Dietitian)
+                Connect AI API (Gemini, OpenAI, Groq, OpenRouter, Custom)
               </h2>
               <p className="text-xs text-[#554337]">
-                Paste your API key here or in <code className="bg-[#F2EFE9] px-1 rounded">.env.local</code>
+                Use any AI API provider for the AI Dietitian Chat and Food Photo Scanner
               </p>
             </div>
           </div>
@@ -150,27 +181,87 @@ export default function SettingsPrivacyPage() {
               aiConfigured ? 'bg-[#DCFCE7] text-[#14532D]' : 'bg-[#FFEDD5] text-[#7C2D12]'
             }`}
           >
-            {aiConfigured ? 'Active' : 'Missing Key'}
+            {aiConfigured ? `Active (${provider})` : 'No Key Configured'}
           </span>
         </div>
 
         {maskedKey && (
           <p className="text-xs font-semibold text-[#006C4B]">
-            Current Active Key: <code className="bg-[#DCFCE7] px-2 py-0.5 rounded">{maskedKey}</code>
+            Current Active Key: <code className="bg-[#DCFCE7] px-2 py-0.5 rounded">{maskedKey}</code> • Provider: <strong className="uppercase">{provider}</strong> • Model: <code>{model}</code>
           </p>
         )}
 
-        <form onSubmit={handleSaveApiKey} className="space-y-3">
+        <form onSubmit={handleSaveApiKey} className="space-y-3.5">
+          {/* Provider selector */}
           <div>
             <label className="text-xs font-semibold text-[#554337] block mb-1">
-              Paste your Google Gemini API Key:
+              Select AI Provider:
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {[
+                { id: 'gemini', label: 'Google Gemini' },
+                { id: 'openai', label: 'OpenAI (ChatGPT)' },
+                { id: 'groq', label: 'Groq (Free/Fast)' },
+                { id: 'openrouter', label: 'OpenRouter' },
+                { id: 'custom', label: 'Custom Website' },
+              ].map((p) => (
+                <button
+                  type="button"
+                  key={p.id}
+                  onClick={() => handleProviderChange(p.id as any)}
+                  className={`py-2 px-2 text-xs font-bold rounded-xl border transition-all cursor-pointer text-center ${
+                    provider === p.id
+                      ? 'bg-[#FB923C] text-white border-[#FB923C] shadow-xs'
+                      : 'bg-[#FAF8F5] text-[#554337] border-[#E4E0D8] hover:bg-[#F2EFE9]'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Base URL if custom or openrouter */}
+          {(provider === 'custom' || provider === 'openrouter') && (
+            <div>
+              <label className="text-xs font-semibold text-[#554337] block mb-1">
+                API Base URL (e.g. https://api.deepseek.com/v1, https://api.together.xyz/v1, or https://openrouter.ai/api/v1):
+              </label>
+              <input
+                type="text"
+                value={baseUrl}
+                onChange={(e) => setBaseUrl(e.target.value)}
+                placeholder="https://api.openai.com/v1"
+                className="tactile-input w-full px-4 py-2.5 text-xs font-mono"
+              />
+            </div>
+          )}
+
+          {/* Model Name */}
+          <div>
+            <label className="text-xs font-semibold text-[#554337] block mb-1">
+              Model Name:
+            </label>
+            <input
+              type="text"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder={provider === 'gemini' ? 'gemini-2.5-flash' : provider === 'groq' ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini'}
+              className="tactile-input w-full px-4 py-2.5 text-xs font-mono"
+            />
+          </div>
+
+          {/* API Key */}
+          <div>
+            <label className="text-xs font-semibold text-[#554337] block mb-1">
+              Paste your {provider === 'gemini' ? 'Google Gemini' : provider === 'openai' ? 'OpenAI' : provider === 'groq' ? 'Groq' : provider === 'openrouter' ? 'OpenRouter' : 'Website'} API Key:
             </label>
             <div className="flex gap-2">
               <input
-                type="text"
+                type="password"
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
-                placeholder="AIzaSy..."
+                placeholder={provider === 'gemini' ? 'AIzaSy...' : 'sk-... or gsk_...'}
                 className="tactile-input flex-1 px-4 py-2.5 text-xs font-mono"
               />
               <button
@@ -183,18 +274,14 @@ export default function SettingsPrivacyPage() {
             </div>
           </div>
 
-          <p className="text-[11px] text-[#71717A] leading-relaxed">
-            Need a key? Get one 100% free from Google at{' '}
-            <a
-              href="https://aistudio.google.com/apikey"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#944A00] font-bold underline"
-            >
-              aistudio.google.com/apikey
-            </a>
-            . Your key is kept secure server-side and never exposed to the public browser.
-          </p>
+          <div className="text-[11px] text-[#71717A] leading-relaxed bg-[#F7F4EF] p-3 rounded-xl space-y-1">
+            <p><strong>Where to get keys:</strong></p>
+            <p>• <strong>Google Gemini (Free):</strong> <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">aistudio.google.com/apikey</a></p>
+            <p>• <strong>Groq (Free &amp; Ultra-fast):</strong> <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">console.groq.com/keys</a></p>
+            <p>• <strong>OpenAI:</strong> <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">platform.openai.com/api-keys</a></p>
+            <p>• <strong>OpenRouter:</strong> <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">openrouter.ai/keys</a></p>
+            <p className="pt-1">Your key is stored securely server-side and never exposed to the client browser.</p>
+          </div>
         </form>
       </section>
 
