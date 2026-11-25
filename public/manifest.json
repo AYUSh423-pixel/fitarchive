@@ -1,16 +1,54 @@
 {
-  "name": "NutriFit AI — Personal Dietitian & Transformation",
+  "name": "NutriFit AI – Personal Dietitian & Transformation",
   "short_name": "NutriFit AI",
   "description": "Personal AI-powered pure-vegetarian Indian dietitian, food scanner, and body transformation tracker.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#F7F4EF",
   "theme_color": "#FB923C",
+  "categories": ["health", "fitness", "food"],
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64",
-      "type": "image/x-icon"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "NutriFit AI Home Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Food Diary",
+      "short_name": "Diary",
+      "url": "/diary",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "AI Dietitian",
+      "short_name": "AI Coach",
+      "url": "/coach",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

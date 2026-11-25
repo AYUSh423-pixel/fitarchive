@@ -21,6 +21,13 @@ export const metadata: Metadata = {
   description:
     'Warm, beginner-friendly personal AI dietitian for pure-vegetarian Indian nutrition, meal scanning, workouts, and body transformation.',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
 };
 
 export const viewport: Viewport = {
