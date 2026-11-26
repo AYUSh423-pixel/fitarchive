@@ -8,49 +8,79 @@ import {
 } from '@/lib/auth';
 import { DEFAULT_USER_ID, readDatabase, updateDatabase } from '@/lib/db/local-store';
 import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
+import { authRateLimiter, applyRateLimit, getClientKey } from '@/lib/rate-limit';
+import { validateRequest, authActionSchema } from '@/lib/validation';
+import { logger, generateRequestId } from '@/lib/logger';
 
 export async function GET() {
-  const session = await getServerSession();
-  if (!session) {
-    return NextResponse.json({ authenticated: false, email: null, onboardingCompleted: false, name: null });
-  }
-
-  // If Supabase is connected and it's not the default local mock user
-  if (isSupabaseEnabled() && supabaseAdmin && session.userId !== DEFAULT_USER_ID) {
-    const { data: profile } = await supabaseAdmin
-      .from('user_profiles')
-      .select('name, email, onboarding_completed')
-      .eq('id', session.userId)
-      .single();
-
-    if (profile) {
-      return NextResponse.json({
-        authenticated: true,
-        email: session.email,
-        onboardingCompleted: Boolean(profile.onboarding_completed),
-        name: profile.name,
-      });
+  const requestId = generateRequestId();
+  try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ authenticated: false, email: null, onboardingCompleted: false, name: null });
     }
-  }
 
-  const db = readDatabase();
-  return NextResponse.json({
-    authenticated: Boolean(session.userId === db.auth.userId || session.userId),
-    email: session.email ?? db.auth.email,
-    onboardingCompleted: db.profile.onboardingCompleted,
-    name: db.profile.name,
-  });
+    // If Supabase is connected and it's not the default local mock user
+    if (isSupabaseEnabled() && supabaseAdmin && session.userId !== DEFAULT_USER_ID) {
+      const { data: profile } = await supabaseAdmin
+        .from('user_profiles')
+        .select('name, email, onboarding_completed')
+        .eq('id', session.userId)
+        .single();
+
+      if (profile) {
+        return NextResponse.json({
+          authenticated: true,
+          email: session.email,
+          onboardingCompleted: Boolean(profile.onboarding_completed),
+          name: profile.name,
+        });
+      }
+    }
+
+    const db = readDatabase();
+    return NextResponse.json({
+      authenticated: Boolean(session.userId === db.auth.userId || session.userId),
+      email: session.email ?? db.auth.email,
+      onboardingCompleted: db.profile.onboardingCompleted,
+      name: db.profile.name,
+    });
+  } catch (err) {
+    logger.error('Auth GET error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
+  const requestId = generateRequestId();
+  const clientKey = getClientKey(req);
+
+  // Apply rate limiting
+  const rateLimitResult = applyRateLimit(req, authRateLimiter, clientKey);
+  if (rateLimitResult && !rateLimitResult.success) {
+    logger.security('Auth rate limit exceeded', { clientKey }, undefined, requestId);
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitResult.headers }
+    );
+  }
+
   try {
-    const body = await req.json();
-    const action = body.action as 'login' | 'quick_personal' | 'signup' | 'logout' | 'change_password';
+    // Validate request body
+    const validation = await validateRequest(req, authActionSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
+    const body = validation.data;
+    const action = body.action;
     const db = readDatabase();
+    const headers = rateLimitResult?.headers || {};
 
     if (action === 'logout') {
       await clearServerSessionCookie();
-      return NextResponse.json({ ok: true, authenticated: false });
+      logger.audit('User logout', {}, undefined, requestId);
+      return NextResponse.json({ ok: true, authenticated: false }, { headers });
     }
 
     if (action === 'quick_personal') {
@@ -59,15 +89,11 @@ export async function POST(req: Request) {
         email: db.auth.email,
         iat: Date.now(),
       });
-      return NextResponse.json({ ok: true, authenticated: true, email: db.auth.email });
+      return NextResponse.json({ ok: true, authenticated: true, email: db.auth.email }, { headers });
     }
 
     if (action === 'login') {
-      const email = String(body.email || '').trim().toLowerCase();
-      const password = String(body.password || '');
-      if (!email || !password) {
-        return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
-      }
+      const { email, password } = body;
 
       // Check Supabase if enabled
       if (isSupabaseEnabled() && supabaseAdmin) {
@@ -89,13 +115,18 @@ export async function POST(req: Request) {
             iat: Date.now(),
           });
 
+          logger.audit('User login', { email, supabase: true }, authData.user.id, requestId);
           return NextResponse.json({
             ok: true,
             authenticated: true,
             email: authData.user.email,
             name: profile?.name || 'User',
             onboardingCompleted: Boolean(profile?.onboarding_completed),
-          });
+          }, { headers });
+        }
+
+        if (authErr) {
+          logger.security('Supabase login failed', { email, error: authErr.message }, undefined, requestId);
         }
       }
 
@@ -106,19 +137,16 @@ export async function POST(req: Request) {
           email: db.auth.email,
           iat: Date.now(),
         });
-        return NextResponse.json({ ok: true, authenticated: true, email: db.auth.email });
+        logger.audit('User login', { email, supabase: false }, db.auth.userId, requestId);
+        return NextResponse.json({ ok: true, authenticated: true, email: db.auth.email }, { headers });
       }
 
-      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+      logger.security('Failed login attempt', { email }, undefined, requestId);
+      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401, headers });
     }
 
     if (action === 'signup') {
-      const email = String(body.email || '').trim().toLowerCase();
-      const password = String(body.password || '');
-      const name = String(body.name || 'New Member').trim();
-      if (!email || password.length < 6) {
-        return NextResponse.json({ error: 'Valid email and password (6+ chars) required.' }, { status: 400 });
-      }
+      const { email, password, name } = body;
 
       // 1. Create in Supabase if configured
       if (isSupabaseEnabled() && supabaseAdmin) {
@@ -132,9 +160,11 @@ export async function POST(req: Request) {
         if (authErr) {
           // If already exists, notify cleanly
           if (authErr.message.includes('already registered')) {
-            return NextResponse.json({ error: 'An account with this email already exists. Please sign in.' }, { status: 400 });
+            logger.security('Signup attempted with existing email', { email }, undefined, requestId);
+            return NextResponse.json({ error: 'An account with this email already exists. Please sign in.' }, { status: 400, headers });
           }
-          return NextResponse.json({ error: authErr.message }, { status: 400 });
+          logger.error('Supabase signup error', { email, error: authErr.message }, undefined, requestId);
+          return NextResponse.json({ error: 'Unable to create account. Please try again.' }, { status: 400, headers });
         }
 
         if (authUser?.user) {
@@ -182,7 +212,8 @@ export async function POST(req: Request) {
             iat: Date.now(),
           });
 
-          return NextResponse.json({ ok: true, authenticated: true, email, onboardingCompleted: false });
+          logger.audit('User signup', { email, supabase: true }, newUserId, requestId);
+          return NextResponse.json({ ok: true, authenticated: true, email, onboardingCompleted: false }, { headers });
         }
       }
 
@@ -201,30 +232,32 @@ export async function POST(req: Request) {
         email,
         iat: Date.now(),
       });
-      return NextResponse.json({ ok: true, authenticated: true, email, onboardingCompleted: false });
+      logger.audit('User signup', { email, supabase: false }, db.auth.userId, requestId);
+      return NextResponse.json({ ok: true, authenticated: true, email, onboardingCompleted: false }, { headers });
     }
 
     if (action === 'change_password') {
       const session = await getServerSession();
-      if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      const newPassword = String(body.newPassword || '');
-      if (newPassword.length < 6) {
-        return NextResponse.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
-      }
+      if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers });
+
+      const { newPassword } = body;
 
       if (isSupabaseEnabled() && supabaseAdmin && session.userId !== DEFAULT_USER_ID) {
         await supabaseAdmin.auth.admin.updateUserById(session.userId, { password: newPassword });
-        return NextResponse.json({ ok: true });
+        logger.audit('Password changed', { supabase: true }, session.userId, requestId);
+        return NextResponse.json({ ok: true }, { headers });
       }
 
       updateDatabase((draft) => {
         draft.auth.passwordHash = hashPassword(newPassword);
       });
-      return NextResponse.json({ ok: true });
+      logger.audit('Password changed', { supabase: false }, session.userId, requestId);
+      return NextResponse.json({ ok: true }, { headers });
     }
 
-    return NextResponse.json({ error: 'Unsupported auth action.' }, { status: 400 });
+    return NextResponse.json({ error: 'Unsupported auth action.' }, { status: 400, headers });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    logger.error('Auth POST error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: rateLimitResult?.headers || {} });
   }
 }

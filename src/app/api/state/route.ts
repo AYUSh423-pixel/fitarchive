@@ -3,51 +3,93 @@ import { requireAuth } from '@/lib/api-guard';
 import { DEFAULT_USER_ID, todayIsoDate, updateDatabase } from '@/lib/db/local-store';
 import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
 import { calculateBmi, calculateBmr, calculateRecommendedTargets, calculateTee } from '@/lib/nutrition-engine';
+import { validateRequest, statePatchSchema } from '@/lib/validation';
+import { logger, generateRequestId } from '@/lib/logger';
+import { apiRateLimiter, applyRateLimit, getClientKey } from '@/lib/rate-limit';
+import type { DietType } from '@/types/nutrifit';
 
 export async function GET(req: Request) {
-  const guard = await requireAuth();
-  if (guard.error) return guard.error;
-  const { db } = guard;
+  const requestId = generateRequestId();
+  const clientKey = getClientKey(req);
 
-  const { searchParams } = new URL(req.url);
-  const date = searchParams.get('date') || todayIsoDate();
+  // Apply rate limiting
+  const rateLimitResult = applyRateLimit(req, apiRateLimiter, clientKey);
+  if (rateLimitResult && !rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitResult.headers }
+    );
+  }
 
-  const dayFoodLogs = db.foodLogs.filter((l) => l.logDate === date);
-  const dayWaterMl = db.waterLogs
-    .filter((w) => w.logDate === date)
-    .reduce((sum, w) => sum + w.amountMl, 0);
-  const dayHabit = db.habitLogs.find((h) => h.logDate === date) ?? null;
+  try {
+    const guard = await requireAuth();
+    if (guard.error) return guard.error;
+    const { db, session } = guard;
 
-  return NextResponse.json({
-    date,
-    profile: db.profile,
-    nutritionTargets: db.nutritionTargets,
-    dayFoodLogs,
-    dayWaterMl,
-    dayHabit,
-    favoriteMeals: db.favoriteMeals,
-    recipes: db.recipes.slice(0, 6),
-    bodyMeasurements: db.bodyMeasurements,
-    bodyScans: db.bodyScans,
-    workoutRoutine: db.workoutRoutine,
-    workoutLogs: db.workoutLogs.slice(0, 10),
-    preferences: db.preferences,
-    aiConfigured: Boolean(process.env.GEMINI_API_KEY || process.env.AI_API_KEY),
-    supabaseConfigured: isSupabaseEnabled(),
-  });
+    const { searchParams } = new URL(req.url);
+    const date = searchParams.get('date') || todayIsoDate();
+
+    const dayFoodLogs = db.foodLogs.filter((l) => l.logDate === date);
+    const dayWaterMl = db.waterLogs
+      .filter((w) => w.logDate === date)
+      .reduce((sum, w) => sum + w.amountMl, 0);
+    const dayHabit = db.habitLogs.find((h) => h.logDate === date) ?? null;
+
+    const headers = rateLimitResult?.headers || {};
+    return NextResponse.json({
+      date,
+      profile: db.profile,
+      nutritionTargets: db.nutritionTargets,
+      dayFoodLogs,
+      dayWaterMl,
+      dayHabit,
+      favoriteMeals: db.favoriteMeals,
+      recipes: db.recipes.slice(0, 6),
+      bodyMeasurements: db.bodyMeasurements,
+      bodyScans: db.bodyScans,
+      workoutRoutine: db.workoutRoutine,
+      workoutLogs: db.workoutLogs.slice(0, 10),
+      preferences: db.preferences,
+      aiConfigured: Boolean(process.env.GEMINI_API_KEY || process.env.AI_API_KEY),
+      supabaseConfigured: isSupabaseEnabled(),
+    }, { headers });
+  } catch (err) {
+    logger.error('State GET error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function PATCH(req: Request) {
-  const guard = await requireAuth();
-  if (guard.error) return guard.error;
+  const requestId = generateRequestId();
+  const clientKey = getClientKey(req);
+
+  // Apply rate limiting
+  const rateLimitResult = applyRateLimit(req, apiRateLimiter, clientKey);
+  if (rateLimitResult && !rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitResult.headers }
+    );
+  }
 
   try {
-    const body = await req.json();
+    const guard = await requireAuth();
+    if (guard.error) return guard.error;
+    const { session } = guard;
+
+    // Validate request body
+    const validation = await validateRequest(req, statePatchSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
+    const body = validation.data;
     const isSupabaseUser = isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID;
+    const headers = rateLimitResult?.headers || {};
 
     if (isSupabaseUser && supabaseAdmin) {
       if (body.profile) {
-        const p = { ...guard.db.profile, ...body.profile };
+        const p = { ...guard.db.profile, ...body.profile } as typeof guard.db.profile;
         const bmi = calculateBmi(Number(p.weightKg), Number(p.heightCm));
         let bmrKcal = p.bmrKcal;
         let teeKcal = p.teeKcal;
@@ -90,6 +132,8 @@ export async function PATCH(req: Request) {
               water_ml: calc.waterMl,
             }, { onConflict: 'user_id' });
         }
+
+        logger.audit('Profile updated', { fields: Object.keys(body.profile) }, session.userId, requestId);
       }
 
       if (body.nutritionTargets) {
@@ -105,6 +149,19 @@ export async function PATCH(req: Request) {
             fat_g: t.fatG,
             water_ml: t.waterMl,
           }, { onConflict: 'user_id' });
+
+        logger.audit('Nutrition targets updated', {}, session.userId, requestId);
+      }
+
+      if (body.preferences) {
+        // Preferences are stored in user_preferences table in Supabase
+        await supabaseAdmin
+          .from('user_preferences')
+          .upsert({
+            user_id: guard.session.userId,
+            ...body.preferences,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
       }
 
       // Re-fetch updated state
@@ -113,13 +170,13 @@ export async function PATCH(req: Request) {
         profile: refreshed.db?.profile,
         nutritionTargets: refreshed.db?.nutritionTargets,
         preferences: refreshed.db?.preferences,
-      });
+      }, { headers });
     }
 
     // Local mode fallback
     const updated = updateDatabase((draft) => {
       if (body.profile) {
-        const p = { ...draft.profile, ...body.profile, updatedAt: new Date().toISOString() };
+        const p = { ...draft.profile, ...body.profile, updatedAt: new Date().toISOString() } as typeof draft.profile;
         p.bmi = calculateBmi(Number(p.weightKg), Number(p.heightCm));
         if (body.recalculateMetabolism) {
           p.bmrKcal = calculateBmr(Number(p.weightKg), Number(p.heightCm), Number(p.age), p.gender);
@@ -163,12 +220,14 @@ export async function PATCH(req: Request) {
       }
     });
 
+    logger.audit('State updated (local)', { fields: Object.keys(body) }, session.userId, requestId);
     return NextResponse.json({
       profile: updated.profile,
       nutritionTargets: updated.nutritionTargets,
       preferences: updated.preferences,
-    });
+    }, { headers });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
+    logger.error('State PATCH error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: rateLimitResult?.headers || {} });
   }
 }

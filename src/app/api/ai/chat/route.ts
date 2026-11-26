@@ -5,34 +5,70 @@ import { updateDatabase, DEFAULT_USER_ID } from '@/lib/db/local-store';
 import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
 import { runDietitianChat } from '@/lib/ai-engine';
 import type { AiMessage } from '@/types/nutrifit';
+import { validateRequest, aiChatSchema } from '@/lib/validation';
+import { logger, generateRequestId } from '@/lib/logger';
+import { aiRateLimiter, applyRateLimit, getClientKey } from '@/lib/rate-limit';
 
-export async function GET() {
-  const guard = await requireAuth();
-  if (guard.error) return guard.error;
+export async function GET(req: Request) {
+  const requestId = generateRequestId();
+  const clientKey = getClientKey(req);
 
-  return NextResponse.json({
-    messages: guard.db.aiConversations,
-    aiConfigured: Boolean(
-      guard.db.aiConfig?.apiKey ||
-      process.env.GEMINI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      process.env.GROQ_API_KEY ||
-      process.env.AI_API_KEY
-    ),
-    provider: guard.db.aiConfig?.provider || 'custom',
-  });
+  const rateLimitResult = applyRateLimit(req, aiRateLimiter, clientKey);
+  if (rateLimitResult && !rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitResult.headers }
+    );
+  }
+
+  try {
+    const guard = await requireAuth();
+    if (guard.error) return guard.error;
+
+    const headers = rateLimitResult?.headers || {};
+    return NextResponse.json({
+      messages: guard.db.aiConversations,
+      aiConfigured: Boolean(
+        guard.db.aiConfig?.apiKey ||
+        process.env.GEMINI_API_KEY ||
+        process.env.OPENAI_API_KEY ||
+        process.env.GROQ_API_KEY ||
+        process.env.AI_API_KEY
+      ),
+      provider: guard.db.aiConfig?.provider || 'custom',
+    }, { headers });
+  } catch (err) {
+    logger.error('AI Chat GET error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
-  const guard = await requireAuth();
-  if (guard.error) return guard.error;
+  const requestId = generateRequestId();
+  const clientKey = getClientKey(req);
+
+  // Apply stricter rate limiting for AI calls
+  const rateLimitResult = applyRateLimit(req, aiRateLimiter, clientKey);
+  if (rateLimitResult && !rateLimitResult.success) {
+    logger.security('AI rate limit exceeded', { clientKey }, undefined, requestId);
+    return NextResponse.json(
+      { error: 'Too many AI requests. Please wait before sending more messages.' },
+      { status: 429, headers: rateLimitResult.headers }
+    );
+  }
 
   try {
-    const body = await req.json();
-    const message = String(body.message || '').trim();
-    if (!message) {
-      return NextResponse.json({ error: 'Message cannot be empty.' }, { status: 400 });
+    const guard = await requireAuth();
+    if (guard.error) return guard.error;
+
+    // Validate request body
+    const validation = await validateRequest(req, aiChatSchema);
+    if (!validation.success) {
+      return validation.response;
     }
+
+    const { message } = validation.data;
+    const headers = rateLimitResult?.headers || {};
 
     const userMsg = {
       id: `msg-${crypto.randomBytes(4).toString('hex')}`,
@@ -70,7 +106,7 @@ export async function POST(req: Request) {
           },
         ]);
       } catch (err) {
-        console.error('Failed to save message to Supabase ai_conversations:', err);
+        logger.error('Failed to save message to Supabase ai_conversations', { error: err }, guard.session.userId, requestId);
       }
     }
 
@@ -79,26 +115,48 @@ export async function POST(req: Request) {
       draft.aiConversations.push(userMsg, assistantMsg);
     });
 
-    return NextResponse.json({ userMsg, assistantMsg });
+    logger.audit('AI chat message', { messageLength: message.length, mode }, guard.session.userId, requestId);
+    return NextResponse.json({ userMsg, assistantMsg }, { headers });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    logger.error('AI Chat POST error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: rateLimitResult?.headers || {} });
   }
 }
 
-export async function DELETE() {
-  const guard = await requireAuth();
-  if (guard.error) return guard.error;
+export async function DELETE(req: Request) {
+  const requestId = generateRequestId();
+  const clientKey = getClientKey(req);
 
-  if (isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID) {
-    try {
-      await supabaseAdmin.from('ai_conversations').delete().eq('user_id', guard.session.userId);
-    } catch (err) {
-      console.error('Failed to clear Supabase ai_conversations:', err);
-    }
+  const rateLimitResult = applyRateLimit(req, aiRateLimiter, clientKey);
+  if (rateLimitResult && !rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitResult.headers }
+    );
   }
 
-  updateDatabase((draft) => {
-    draft.aiConversations = draft.aiConversations.filter((c) => c.userId !== guard.session.userId);
-  });
-  return NextResponse.json({ ok: true });
+  try {
+    const guard = await requireAuth();
+    if (guard.error) return guard.error;
+
+    const headers = rateLimitResult?.headers || {};
+
+    if (isSupabaseEnabled() && supabaseAdmin && guard.session.userId !== DEFAULT_USER_ID) {
+      try {
+        await supabaseAdmin.from('ai_conversations').delete().eq('user_id', guard.session.userId);
+      } catch (err) {
+        logger.error('Failed to clear Supabase ai_conversations', { error: err }, guard.session.userId, requestId);
+      }
+    }
+
+    updateDatabase((draft) => {
+      draft.aiConversations = draft.aiConversations.filter((c) => c.userId !== guard.session.userId);
+    });
+
+    logger.audit('AI conversation cleared', {}, guard.session.userId, requestId);
+    return NextResponse.json({ ok: true }, { headers });
+  } catch (err) {
+    logger.error('AI Chat DELETE error', { error: err }, undefined, requestId);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: rateLimitResult?.headers || {} });
+  }
 }

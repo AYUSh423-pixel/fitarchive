@@ -1,6 +1,7 @@
 export type GoalType = 'lean_athletic' | 'fat_loss' | 'maintenance' | 'muscle_gain';
 export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'gym_4_5_days' | 'athlete';
 export type MealSlot = 'breakfast' | 'lunch' | 'snacks' | 'dinner';
+export type DietType = 'pure_veg_no_egg' | 'vegetarian' | 'eggetarian' | 'non_vegetarian';
 export type FoodUnit =
   | 'g'
   | 'ml'
@@ -27,7 +28,7 @@ export interface UserProfile {
   visceralFatLevel: number;
   bmrKcal: number;
   teeKcal: number;
-  dietType: 'pure_veg_no_egg';
+  dietType: DietType;
   activityLevel: ActivityLevel;
   foodPreference: string;
   goal: GoalType;

@@ -2,7 +2,16 @@ import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
 const COOKIE_NAME = 'nutrifit_session';
-const AUTH_SECRET = process.env.AUTH_SECRET || 'nutrifit-local-dev-secret-change-in-prod-32';
+
+// SECURITY: AUTH_SECRET must be set in production - no fallback allowed
+// Generate with: openssl rand -base64 32
+const AUTH_SECRET = process.env.AUTH_SECRET;
+if (!AUTH_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('AUTH_SECRET environment variable is required in production');
+}
+// Development fallback - NOT for production use
+const DEV_SECRET = 'nutrifit-local-dev-secret-change-in-prod-32';
+const SECRET = AUTH_SECRET || DEV_SECRET;
 
 export interface SessionPayload {
   userId: string;
@@ -25,7 +34,7 @@ export function verifyPassword(password: string, stored: string): boolean {
 
 export function signSessionToken(payload: SessionPayload): string {
   const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const sig = crypto.createHmac('sha256', AUTH_SECRET).update(data).digest('base64url');
+  const sig = crypto.createHmac('sha256', SECRET).update(data).digest('base64url');
   return `${data}.${sig}`;
 }
 
@@ -33,7 +42,7 @@ export function verifySessionToken(token: string): SessionPayload | null {
   const parts = token.split('.');
   if (parts.length !== 2) return null;
   const [data, sig] = parts;
-  const expectedSig = crypto.createHmac('sha256', AUTH_SECRET).update(data).digest('base64url');
+  const expectedSig = crypto.createHmac('sha256', SECRET).update(data).digest('base64url');
   if (sig.length !== expectedSig.length) return null;
   if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))) return null;
   try {
