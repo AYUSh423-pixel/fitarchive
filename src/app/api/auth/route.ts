@@ -163,8 +163,13 @@ export async function POST(req: Request) {
             logger.security('Signup attempted with existing email', { email }, undefined, requestId);
             return NextResponse.json({ error: 'An account with this email already exists. Please sign in.' }, { status: 400, headers });
           }
-          // Log full error for debugging
-          logger.error('Supabase signup error', { email, error: authErr.message, code: authErr.code, details: authErr.details, hint: authErr.hint }, undefined, requestId);
+          // Log full error for debugging (safe access via type casting)
+          const err = authErr as unknown as Record<string, unknown>;
+          const errInfo: Record<string, unknown> = { email, error: authErr.message };
+          if ('code' in err) errInfo.code = err.code;
+          if ('details' in err) errInfo.details = err.details;
+          if ('hint' in err) errInfo.hint = err.hint;
+          logger.error('Supabase signup error', errInfo, undefined, requestId);
           return NextResponse.json({ error: 'Unable to create account. Please try again.' }, { status: 400, headers });
         }
 
