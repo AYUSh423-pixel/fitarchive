@@ -16,10 +16,10 @@ interface DashboardData {
 }
 
 const MEAL_SLOTS: Array<{ key: MealSlot; label: string; icon: React.ReactNode }> = [
-  { key: 'breakfast', label: 'Breakfast', icon: <Sun className="w-4 h-4 text-[#B45309]" /> },
-  { key: 'lunch', label: 'Lunch', icon: <Utensils className="w-4 h-4 text-[#B45309]" /> },
-  { key: 'snacks', label: 'Snack', icon: <Coffee className="w-4 h-4 text-[#B45309]" /> },
-  { key: 'dinner', label: 'Dinner', icon: <Moon className="w-4 h-4 text-[#B45309]" /> },
+  { key: 'breakfast', label: 'Breakfast', icon: <Sun className="w-4 h-4 text-[#c05800]" /> },
+  { key: 'lunch', label: 'Lunch', icon: <Utensils className="w-4 h-4 text-[#c05800]" /> },
+  { key: 'snacks', label: 'Snack', icon: <Coffee className="w-4 h-4 text-[#c05800]" /> },
+  { key: 'dinner', label: 'Dinner', icon: <Moon className="w-4 h-4 text-[#c05800]" /> },
 ];
 
 export default function HomeDashboardPage() {
@@ -75,16 +75,16 @@ export default function HomeDashboardPage() {
       {/* Greeting */}
       <div className="flex items-start justify-between pt-1">
         <div>
-          <p className="text-xs font-bold tracking-widest uppercase text-[#6B5F4E]">
+          <p className="text-xs font-bold tracking-widest uppercase text-[#a08a6a]">
             TODAY · {formattedDate}
           </p>
-          <h2 className="font-display text-[26px] font-bold text-[#1a1a1a] tracking-tight leading-tight mt-0.5">
+          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight mt-0.5">
             {greeting}, {profile.name}
           </h2>
         </div>
         <Link
           href="/profile"
-          className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#B45309] text-lg shadow-sm border border-[#E5E0D8]"
+          className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#c05800] text-lg shadow-sm border border-[#e8e4d0]"
         >
           {profile.name?.charAt(0)?.toUpperCase() ?? 'A'}
         </Link>
@@ -95,39 +95,39 @@ export default function HomeDashboardPage() {
         <CalorieArcGauge consumed={totals.calories} target={target.caloriesKcal} />
 
         {/* Left / Right labels */}
-        <div className="flex justify-between text-xs text-[#9CA3AF] font-medium mt-2 px-1">
+        <div className="flex justify-between text-xs text-[#a08a6a] font-medium mt-2 px-1">
           <span>0</span>
-          <span className="text-[#B45309] font-bold text-sm">{calLeft.toLocaleString()} kcal left</span>
+          <span className="text-[#c05800] font-bold text-sm">{calLeft.toLocaleString()} kcal left</span>
           <span>{target.caloriesKcal.toLocaleString()}</span>
         </div>
 
         {/* Macro chips */}
         <div className="grid grid-cols-3 gap-2.5 mt-4">
-          <div className="bg-[#DCFCE7] rounded-2xl px-3 py-2.5">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-[#166534]">PROTEIN</p>
-            <p className="font-bold text-[#166534] text-sm mt-0.5">
-              {Math.round(totals.proteinG)} <span className="font-normal text-xs text-[#4ADE80]">/{target.proteinG}g</span>
+          <div className="bg-[#f5f2e0] rounded-2xl px-3 py-2.5">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-[#713600]">PROTEIN</p>
+            <p className="font-bold text-[#713600] text-sm mt-0.5">
+              {Math.round(totals.proteinG)} <span className="font-normal text-xs text-[#a08a6a]">/{target.proteinG}g</span>
             </p>
-            <div className="h-1 bg-[#BBF7D0] rounded-full mt-1.5">
-              <div className="h-full bg-[#16A34A] rounded-full" style={{ width: `${Math.min(100, (totals.proteinG / target.proteinG) * 100)}%` }} />
+            <div className="h-1 bg-[#e8e4d0] rounded-full mt-1.5">
+              <div className="h-full bg-[#713600] rounded-full" style={{ width: `${Math.min(100, (totals.proteinG / target.proteinG) * 100)}%` }} />
             </div>
           </div>
-          <div className="bg-[#FEF3C7] rounded-2xl px-3 py-2.5">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-[#92400E]">CARBS</p>
-            <p className="font-bold text-[#92400E] text-sm mt-0.5">
-              {Math.round(totals.carbsG)} <span className="font-normal text-xs text-[#FCD34D]">/{target.carbsG}g</span>
+          <div className="bg-[#fff3e0] rounded-2xl px-3 py-2.5">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-[#c05800]">CARBS</p>
+            <p className="font-bold text-[#c05800] text-sm mt-0.5">
+              {Math.round(totals.carbsG)} <span className="font-normal text-xs text-[#a08a6a]">/{target.carbsG}g</span>
             </p>
-            <div className="h-1 bg-[#FDE68A] rounded-full mt-1.5">
-              <div className="h-full bg-[#D97706] rounded-full" style={{ width: `${Math.min(100, (totals.carbsG / target.carbsG) * 100)}%` }} />
+            <div className="h-1 bg-[#e8e4d0] rounded-full mt-1.5">
+              <div className="h-full bg-[#c05800] rounded-full" style={{ width: `${Math.min(100, (totals.carbsG / target.carbsG) * 100)}%` }} />
             </div>
           </div>
-          <div className="bg-[#EDE9FE] rounded-2xl px-3 py-2.5">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-[#5B21B6]">FATS</p>
-            <p className="font-bold text-[#5B21B6] text-sm mt-0.5">
-              {Math.round(totals.fatG)} <span className="font-normal text-xs text-[#A78BFA]">/{target.fatG}g</span>
+          <div className="bg-[#efebe9] rounded-2xl px-3 py-2.5">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-[#5d4037]">FATS</p>
+            <p className="font-bold text-[#5d4037] text-sm mt-0.5">
+              {Math.round(totals.fatG)} <span className="font-normal text-xs text-[#a08a6a]">/{target.fatG}g</span>
             </p>
-            <div className="h-1 bg-[#DDD6FE] rounded-full mt-1.5">
-              <div className="h-full bg-[#7C3AED] rounded-full" style={{ width: `${Math.min(100, (totals.fatG / target.fatG) * 100)}%` }} />
+            <div className="h-1 bg-[#e8e4d0] rounded-full mt-1.5">
+              <div className="h-full bg-[#5d4037] rounded-full" style={{ width: `${Math.min(100, (totals.fatG / target.fatG) * 100)}%` }} />
             </div>
           </div>
         </div>
@@ -136,13 +136,13 @@ export default function HomeDashboardPage() {
       {/* Log Meal CTA */}
       <button
         onClick={() => { setLogSlot('lunch'); setLogModalOpen(true); }}
-        className="w-full py-4 rounded-[20px] bg-[#B45309] text-white font-bold text-base flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(180,83,9,0.35)] active:scale-[0.98] transition-transform cursor-pointer"
+        className="w-full py-4 rounded-[20px] bg-[#c05800] text-white font-bold text-base flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(192,88,0,0.35)] active:scale-[0.98] transition-transform cursor-pointer"
       >
         <span className="text-lg">+</span> Log meal or snack
       </button>
 
       {/* Meal Slots Quick View */}
-      <div className="bg-white rounded-[20px] shadow-sm overflow-hidden divide-y divide-[#F3F0EB]">
+      <div className="bg-white rounded-[20px] shadow-sm overflow-hidden divide-y divide-[#f0ece0]">
         {MEAL_SLOTS.map((slot) => {
           const slotLogs = dayFoodLogs.filter((l) => l.mealSlot === slot.key);
           const slotCals = slotLogs.reduce((s, l) => s + l.calories, 0);
@@ -150,19 +150,19 @@ export default function HomeDashboardPage() {
             <button
               key={slot.key}
               onClick={() => { setLogSlot(slot.key); setLogModalOpen(true); }}
-              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#FAFAF8] transition-colors cursor-pointer text-left"
+              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#faf9f5] transition-colors cursor-pointer text-left"
             >
-              <div className="w-9 h-9 rounded-full bg-[#FEF3C7] flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#fff3e0] flex items-center justify-center shrink-0">
                 {slot.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[#1a1a1a] text-sm">{slot.label}</p>
-                <p className="text-xs text-[#9CA3AF]">
+                <p className="font-semibold text-[#38240d] text-sm">{slot.label}</p>
+                <p className="text-xs text-[#a08a6a]">
                   {slotLogs.length > 0 ? `${slotCals} kcal` : 'Nothing logged yet'}
                 </p>
               </div>
-              <div className="w-7 h-7 rounded-full border-2 border-[#E5E0D8] flex items-center justify-center shrink-0">
-                <span className="text-[#9CA3AF] text-base leading-none">+</span>
+              <div className="w-7 h-7 rounded-full border-2 border-[#e8e4d0] flex items-center justify-center shrink-0">
+                <span className="text-[#a08a6a] text-base leading-none">+</span>
               </div>
             </button>
           );
@@ -176,12 +176,12 @@ export default function HomeDashboardPage() {
           className="flex items-center justify-between p-4 bg-white rounded-[20px] shadow-sm"
         >
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#B45309]">EVOLT 360 PLAN READY</p>
-            <p className="text-sm font-semibold text-[#1a1a1a] mt-0.5">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#c05800]">EVOLT 360 PLAN READY</p>
+            <p className="text-sm font-semibold text-[#38240d] mt-0.5">
               {profile.weightKg}kg baseline, lean-athletic plan
             </p>
           </div>
-          <ChevronRight className="w-5 h-5 text-[#9CA3AF] shrink-0" />
+          <ChevronRight className="w-5 h-5 text-[#a08a6a] shrink-0" />
         </Link>
       ) : (
         <Link
@@ -189,10 +189,10 @@ export default function HomeDashboardPage() {
           className="flex items-center justify-between p-4 bg-white rounded-[20px] shadow-sm"
         >
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#B45309]">AI COACH</p>
-            <p className="text-sm font-semibold text-[#1a1a1a] mt-0.5">Ask your dietitian anything</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#c05800]">AI COACH</p>
+            <p className="text-sm font-semibold text-[#38240d] mt-0.5">Ask your dietitian anything</p>
           </div>
-          <ArrowRight className="w-5 h-5 text-[#9CA3AF] shrink-0" />
+          <ArrowRight className="w-5 h-5 text-[#a08a6a] shrink-0" />
         </Link>
       )}
 

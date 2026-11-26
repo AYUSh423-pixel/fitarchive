@@ -94,7 +94,7 @@ export default function WorkoutsPage() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer ${
-              tab === t.id ? 'bg-[#1B1B1E] text-white' : 'bg-white text-[#554337] border border-[#E4E0D8]'
+              tab === t.id ? 'bg-[#38240d] text-white' : 'bg-white text-[#713600] border border-[#e8e4d0]'
             }`}
           >
             {t.label}
@@ -103,7 +103,7 @@ export default function WorkoutsPage() {
       </div>
 
       {toast && (
-        <div className="p-3 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2">
           <Check className="w-4 h-4" /> {toast}
         </div>
       )}
@@ -112,8 +112,8 @@ export default function WorkoutsPage() {
         <div className="space-y-4">
           <div className="tactile-card-white p-5">
             <h2 className="font-display text-lg font-bold">Weekly Training Split (4–5 Days + Recovery)</h2>
-            <p className="text-xs text-[#554337] mt-0.5">
-              Tap &ldquo;Start Session&rdquo; on any day to log sets, reps, weight lifted &amp; cardio.
+            <p className="text-xs text-[#713600] mt-0.5">
+              Tap &ldquo;Start Session&rdquo; on any day to log sets, reps, weight lifted & cardio.
             </p>
           </div>
 
@@ -123,21 +123,21 @@ export default function WorkoutsPage() {
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-11 h-11 rounded-2xl flex items-center justify-center font-display font-bold text-xs ${
-                      day.isRestDay ? 'bg-[#F3E8FF] text-[#581C87]' : 'bg-[#FFEDD5] text-[#944A00]'
+                      day.isRestDay ? 'bg-[#efebe9] text-[#5d4037]' : 'bg-[#fff3e0] text-[#c05800]'
                     }`}
                   >
                     {DAY_NAMES[day.dayOfWeek]}
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-sm text-[#1B1B1E]">{day.title}</h3>
-                    <p className="text-xs text-[#554337]">
+                    <h3 className="font-display font-bold text-sm text-[#38240d]">{day.title}</h3>
+                    <p className="text-xs text-[#713600]">
                       {day.focus} • {day.isRestDay ? 'Recovery' : `${day.plannedExercises.length} exercises`}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleLoadRoutineDay(day)}
-                  className="px-3.5 py-2 rounded-full bg-[#FB923C] text-white text-xs font-semibold shrink-0 cursor-pointer"
+                  className="px-3.5 py-2 rounded-full bg-[#c05800] text-white text-xs font-semibold shrink-0 cursor-pointer"
                 >
                   {day.isRestDay ? 'Log Rest' : 'Start Session'}
                 </button>
@@ -148,10 +148,10 @@ export default function WorkoutsPage() {
           {/* Weekly History */}
           <div className="space-y-2.5 pt-2">
             <h3 className="font-display font-bold text-base flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#944A00]" /> Recent Workout History ({logs.length})
+              <Calendar className="w-4 h-4 text-[#c05800]" /> Recent Workout History ({logs.length})
             </h3>
             {logs.length === 0 ? (
-              <div className="tactile-card p-5 text-xs text-[#554337]">
+              <div className="tactile-card p-5 text-xs text-[#713600]">
                 No workouts logged yet. Tap &ldquo;Start Session&rdquo; above to log your first gym workout!
               </div>
             ) : (
@@ -159,13 +159,13 @@ export default function WorkoutsPage() {
                 <div key={l.id} className="tactile-card-white p-4 flex justify-between items-center">
                   <div>
                     <p className="font-display font-bold text-sm">{l.title}</p>
-                    <p className="text-xs text-[#554337]">
+                    <p className="text-xs text-[#713600]">
                       {l.workoutDate} • {l.durationMin} min •{' '}
                       {l.isRestDay ? 'Rest & Recovery' : `${l.exercises.length} exercises`}
                       {l.cardioMinutes ? ` • ${l.cardioMinutes}m cardio` : ''}
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#14532D] text-[11px] font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-[#f5f2e0] text-[#713600] text-[11px] font-bold">
                     Completed
                   </span>
                 </div>
@@ -183,7 +183,7 @@ export default function WorkoutsPage() {
               type="button"
               onClick={() => setIsRestDay((v) => !v)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 cursor-pointer ${
-                isRestDay ? 'bg-[#F3E8FF] text-[#581C87]' : 'bg-[#F5F3F6] text-[#554337]'
+                isRestDay ? 'bg-[#efebe9] text-[#5d4037]' : 'bg-[#f0ece0] text-[#713600]'
               }`}
             >
               <Moon className="w-3.5 h-3.5" /> {isRestDay ? 'Rest Day Mode' : 'Gym Day Mode'}
@@ -204,7 +204,7 @@ export default function WorkoutsPage() {
           {!isRestDay && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#554337]">Exercises (Sets / Reps / Weight kg)</label>
+                <label className="text-xs font-bold text-[#713600]">Exercises (Sets / Reps / Weight kg)</label>
                 <button
                   type="button"
                   onClick={() =>
@@ -213,13 +213,13 @@ export default function WorkoutsPage() {
                       { exerciseName: exercises[0]?.name || 'Dumbbell Curl', sets: 3, reps: 10, weightKg: 10, restSec: 60 },
                     ])
                   }
-                  className="text-xs font-bold text-[#944A00] flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-bold text-[#c05800] flex items-center gap-1 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add Exercise
                 </button>
               </div>
               {loggedExercises.map((ex, idx) => (
-                <div key={idx} className="p-3 rounded-2xl bg-[#F5F3F6] grid grid-cols-12 gap-2 items-center">
+                <div key={idx} className="p-3 rounded-2xl bg-[#f5f2e0] grid grid-cols-12 gap-2 items-center">
                   <select
                     value={ex.exerciseName}
                     onChange={(e) =>
@@ -294,7 +294,7 @@ export default function WorkoutsPage() {
             />
           </div>
 
-          <button type="submit" className="w-full py-3 rounded-full bg-[#FB923C] text-white font-semibold text-sm cursor-pointer">
+          <button type="submit" className="w-full py-3 rounded-full bg-[#c05800] text-white font-semibold text-sm cursor-pointer">
             Save Workout Session
           </button>
         </form>
@@ -303,19 +303,19 @@ export default function WorkoutsPage() {
       {tab === 'prs' && (
         <div className="tactile-card-white p-5 space-y-3">
           <h2 className="font-display text-lg font-bold flex items-center gap-2">
-            <Award className="w-5 h-5 text-[#944A00]" /> Personal Records (Strength Progression)
+            <Award className="w-5 h-5 text-[#c05800]" /> Personal Records (Strength Progression)
           </h2>
           {Object.keys(prs).length === 0 ? (
-            <p className="text-xs text-[#554337]">Log your first gym session to start tracking Personal Records!</p>
+            <p className="text-xs text-[#713600]">Log your first gym session to start tracking Personal Records!</p>
           ) : (
             <div className="space-y-2">
               {Object.entries(prs).map(([name, pr]) => (
-                <div key={name} className="p-3 rounded-2xl bg-[#F5F3F6] flex justify-between items-center">
+                <div key={name} className="p-3 rounded-2xl bg-[#f5f2e0] flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-sm">{name}</p>
-                    <p className="text-xs text-[#554337]">{pr.date}</p>
+                    <p className="text-xs text-[#713600]">{pr.date}</p>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-[#FFEDD5] text-[#944A00] text-xs font-bold">
+                  <span className="px-3 py-1 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold">
                     {pr.weightKg} kg × {pr.reps} reps
                   </span>
                 </div>
@@ -331,14 +331,14 @@ export default function WorkoutsPage() {
             <div key={ex.id} className="tactile-card-white p-4 space-y-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-display font-bold text-sm flex items-center gap-2">
-                  <Dumbbell className="w-4 h-4 text-[#944A00]" /> {ex.name}
+                  <Dumbbell className="w-4 h-4 text-[#c05800]" /> {ex.name}
                 </h3>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#F5F3F6] text-[11px] font-bold text-[#554337]">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#f5f2e0] text-[11px] font-bold text-[#713600]">
                   {ex.muscleGroup}
                 </span>
               </div>
-              <p className="text-xs text-[#554337]">{ex.instructions}</p>
-              <p className="text-[11px] text-[#887365]">Equipment: {ex.equipment}</p>
+              <p className="text-xs text-[#713600]">{ex.instructions}</p>
+              <p className="text-[11px] text-[#a08a6a]">Equipment: {ex.equipment}</p>
             </div>
           ))}
         </div>

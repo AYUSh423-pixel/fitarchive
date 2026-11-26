@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#FB923C',
+  themeColor: '#713600',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -54,7 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }}
         />
       </head>
-      <body className="min-h-full bg-[#E8E4DC] text-[#1a1a1a]">
+      <body className="min-h-full bg-[#fdfbd4] text-[#38240d]">
         <Suspense fallback={<div className="min-h-screen bg-[#F7F4EF]" />}>
           <AppShell>{children}</AppShell>
         </Suspense>

@@ -77,7 +77,7 @@ export default function RecipeDetailsPage() {
     return (
       <div className="tactile-card p-8 text-center max-w-xl mx-auto space-y-3">
         <p className="font-display font-bold text-lg">Recipe not found</p>
-        <Link href="/explore" className="text-sm font-semibold text-[#944A00] underline">
+        <Link href="/explore" className="text-sm font-semibold text-[#c05800] underline">
           Back to Indian Food Explore
         </Link>
       </div>
@@ -96,7 +96,7 @@ export default function RecipeDetailsPage() {
     <div className="max-w-xl mx-auto space-y-5">
       <Link
         href="/explore"
-        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#554337] hover:text-[#1B1B1E]"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#713600] hover:text-[#38240d]"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Explore
       </Link>
@@ -104,43 +104,43 @@ export default function RecipeDetailsPage() {
       <section className="tactile-card-white p-6 space-y-5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-[#006C4B]" />
-            <h1 className="font-display text-2xl font-bold text-[#1B1B1E]">{recipe.name}</h1>
+            <CheckCircle2 className="w-5 h-5 text-[#713600]" />
+            <h1 className="font-display text-2xl font-bold text-[#38240d]">{recipe.name}</h1>
           </div>
         </div>
 
-        <p className="text-sm text-[#554337] leading-relaxed">{recipe.description}</p>
+        <p className="text-sm text-[#713600] leading-relaxed">{recipe.description}</p>
 
         <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-bold flex items-center gap-1">
+          <span className="px-3 py-1 rounded-full bg-[#f5f2e0] text-[#713600] text-xs font-bold flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" /> {recipe.prepTimeMin} mins • {recipe.difficulty}
           </span>
-          <span className="px-3 py-1 rounded-full bg-[#E8DDFF] text-[#482995] text-xs font-bold">
+          <span className="px-3 py-1 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold">
             {recipe.servings} Serving • Pure Veg (No Egg)
           </span>
         </div>
 
         {/* Macro Impact Bar (Matching Stitch Explore Featured Card) */}
-        <div className="space-y-2 pt-2 border-t border-[#F0EDF1]">
+        <div className="space-y-2 pt-2 border-t border-[#f0ece0]">
           <div className="flex items-baseline justify-between">
-            <span className="text-xs font-semibold text-[#554337]">Macro Impact</span>
+            <span className="text-xs font-semibold text-[#713600]">Macro Impact</span>
             <div className="text-right">
-              <span className="font-display text-2xl font-bold text-[#1B1B1E]">
+              <span className="font-display text-2xl font-bold text-[#38240d]">
                 {recipe.caloriesPerServing} kcal
               </span>
-              <span className="block text-xs font-bold text-[#006C4B]">
+              <span className="block text-xs font-bold text-[#713600]">
                 {recipe.proteinPerServing}g Protein
               </span>
             </div>
           </div>
 
-          <div className="w-full h-2.5 rounded-full overflow-hidden flex bg-[#F0EDF1]">
-            <div className="bg-[#006C4B]" style={{ width: `${pPct}%` }} />
-            <div className="bg-[#FB923C]" style={{ width: `${cPct}%` }} />
-            <div className="bg-[#674BB5]" style={{ width: `${fPct}%` }} />
+          <div className="w-full h-2.5 rounded-full overflow-hidden flex bg-[#f0ece0]">
+            <div className="bg-[#713600]" style={{ width: `${pPct}%` }} />
+            <div className="bg-[#c05800]" style={{ width: `${cPct}%` }} />
+            <div className="bg-[#5d4037]" style={{ width: `${fPct}%` }} />
           </div>
 
-          <div className="flex justify-between text-[11px] font-semibold text-[#554337]">
+          <div className="flex justify-between text-[11px] font-semibold text-[#a08a6a]">
             <span>{pPct}% Protein</span>
             <span>{cPct}% Carbs</span>
             <span>{fPct}% Fat</span>
@@ -150,14 +150,14 @@ export default function RecipeDetailsPage() {
         {/* Ingredients Checklist */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-sm text-[#1B1B1E]">Ingredients</h2>
-            <span className="text-xs font-bold text-[#006C4B]">
+            <h2 className="font-display font-bold text-sm text-[#38240d]">Ingredients</h2>
+            <span className="text-xs font-bold text-[#713600]">
               {Object.values(checkedIngredients).filter(Boolean).length} of {recipe.ingredients.length} Ready
             </span>
           </div>
 
           {addedMsg && (
-            <div className="p-2.5 rounded-xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-1.5">
+            <div className="p-2.5 rounded-xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-1.5">
               <ShoppingCart className="w-3.5 h-3.5" /> {addedMsg}
             </div>
           )}
@@ -168,7 +168,7 @@ export default function RecipeDetailsPage() {
               return (
                 <div
                   key={idx}
-                  className="p-3 rounded-2xl bg-[#F5F3F6] flex items-center justify-between gap-2"
+                  className="p-3 rounded-2xl bg-[#f5f2e0] flex items-center justify-between gap-2"
                 >
                   <button
                     type="button"
@@ -180,22 +180,22 @@ export default function RecipeDetailsPage() {
                     <span
                       className={`w-5 h-5 rounded-md flex items-center justify-center border ${
                         checked
-                          ? 'bg-[#006C4B] border-[#006C4B] text-white'
-                          : 'bg-white border-[#887365]'
+                          ? 'bg-[#c05800] border-[#c05800] text-white'
+                          : 'bg-white border-[#e8e4d0]'
                       }`}
                     >
                       {checked && <Check className="w-3.5 h-3.5" />}
                     </span>
-                    <span className="text-xs font-semibold text-[#1B1B1E]">{ing.name}</span>
+                    <span className="text-xs font-semibold text-[#38240d]">{ing.name}</span>
                   </button>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-bold text-[#554337]">{ing.quantity}</span>
+                    <span className="text-xs font-bold text-[#713600]">{ing.quantity}</span>
                     {!checked && (
                       <button
                         type="button"
                         onClick={() => handleAddToGrocery(ing.name, ing.quantity)}
-                        className="text-[11px] font-bold text-[#944A00] flex items-center gap-0.5 cursor-pointer"
+                        className="text-[11px] font-bold text-[#c05800] flex items-center gap-0.5 cursor-pointer"
                       >
                         <Plus className="w-3 h-3" /> Add to list
                       </button>
@@ -208,14 +208,14 @@ export default function RecipeDetailsPage() {
         </div>
 
         {/* Oil / Ghee Transparency Note */}
-        <div className="p-3.5 rounded-2xl bg-[#FFEDD5]/70 text-xs text-[#7C2D12]">
+        <div className="p-3.5 rounded-2xl bg-[#fff3e0] text-xs text-[#a04800]">
           <strong>Cooking Fat Note:</strong> {recipe.oilGheeNotes}
         </div>
 
         {/* Preparation Instructions */}
         <div className="space-y-2">
-          <h2 className="font-display font-bold text-sm text-[#1B1B1E]">Preparation Instructions</h2>
-          <ol className="space-y-2 list-decimal pl-5 text-xs text-[#554337] leading-relaxed">
+          <h2 className="font-display font-bold text-sm text-[#38240d]">Preparation Instructions</h2>
+          <ol className="space-y-2 list-decimal pl-5 text-xs text-[#713600] leading-relaxed">
             {recipe.instructions.map((step, i) => (
               <li key={i}>{step}</li>
             ))}
@@ -224,9 +224,9 @@ export default function RecipeDetailsPage() {
 
         <button
           onClick={handleLogToDiary}
-          className="w-full py-3.5 rounded-full bg-[#1B1B1E] hover:bg-[#303033] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+          className="w-full py-3.5 rounded-full bg-[#38240d] hover:bg-[#4a2f10] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
         >
-          <Utensils className="w-4 h-4 text-[#FB923C]" />
+          <Utensils className="w-4 h-4 text-[#c05800]" />
           <span>Add to Today&apos;s Diary (+{recipe.caloriesPerServing} kcal)</span>
         </button>
       </section>

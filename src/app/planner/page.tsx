@@ -86,19 +86,19 @@ export default function MealPlannerPage() {
       <section className="tactile-card-white p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#006C4B]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#713600]">
               100% Pure Vegetarian • No Eggs
             </span>
-            <h2 className="font-display text-xl font-bold text-[#1B1B1E]">Personalized Meal Planner</h2>
+            <h2 className="font-display text-xl font-bold text-[#38240d]">Personalized Meal Planner</h2>
           </div>
 
-          <div className="flex gap-1.5 bg-[#F2EFE9] p-1 rounded-full">
+          <div className="flex gap-1.5 bg-[#f0ece0] p-1 rounded-full">
             {(['daily', '7_day', '30_day'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setPlanType(t)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer ${
-                  planType === t ? 'bg-[#FB923C] text-white' : 'text-[#554337]'
+                  planType === t ? 'bg-[#c05800] text-white' : 'text-[#713600]'
                 }`}
               >
                 {t === 'daily' ? 'Daily' : t === '7_day' ? '7-Day' : '30-Day'}
@@ -111,7 +111,7 @@ export default function MealPlannerPage() {
           <button
             onClick={() => handleGenerate(false)}
             disabled={generating}
-            className="px-5 py-2.5 rounded-full bg-[#1B1B1E] text-white text-xs font-semibold flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-full bg-[#38240d] text-white text-xs font-semibold flex items-center gap-2 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${generating ? 'animate-spin' : ''}`} />
             <span>{generating ? 'Generating...' : 'Generate Plan'}</span>
@@ -119,14 +119,14 @@ export default function MealPlannerPage() {
           <button
             onClick={() => handleGenerate(true)}
             disabled={generating}
-            className="px-5 py-2.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-bold flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-full bg-[#f5f2e0] text-[#713600] text-xs font-bold flex items-center gap-2 cursor-pointer"
           >
             <ShoppingCart className="w-3.5 h-3.5" />
             <span>Generate Plan + Grocery List</span>
           </button>
           <Link
             href="/grocery"
-            className="px-4 py-2.5 rounded-full bg-[#F5F3F6] text-xs font-semibold text-[#1B1B1E] flex items-center gap-1.5"
+            className="px-4 py-2.5 rounded-full bg-[#f0ece0] text-xs font-semibold text-[#38240d] flex items-center gap-1.5"
           >
             View Grocery List
           </Link>
@@ -134,16 +134,16 @@ export default function MealPlannerPage() {
       </section>
 
       {toast && (
-        <div className="p-3 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2">
           <Check className="w-4 h-4" /> {toast}
         </div>
       )}
 
       {!activePlan ? (
         <div className="tactile-card p-8 text-center space-y-3">
-          <CalendarDays className="w-10 h-10 text-[#944A00] mx-auto" />
+          <CalendarDays className="w-10 h-10 text-[#c05800] mx-auto" />
           <h3 className="font-display font-bold text-lg">No Meal Plan Generated Yet</h3>
-          <p className="text-xs text-[#554337] max-w-md mx-auto">
+          <p className="text-xs text-[#713600] max-w-md mx-auto">
             Click &ldquo;Generate Plan + Grocery List&rdquo; above to create a personalized 1,800 kcal / 130g protein
             Indian vegetarian meal plan with exact homemade quantities.
           </p>
@@ -158,8 +158,8 @@ export default function MealPlannerPage() {
                 onClick={() => setSelectedDayIdx(idx)}
                 className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer ${
                   idx === selectedDayIdx
-                    ? 'bg-[#FB923C] text-white shadow-xs'
-                    : 'bg-white text-[#554337] border border-[#E4E0D8]'
+                    ? 'bg-[#c05800] text-white shadow-xs'
+                    : 'bg-white text-[#713600] border border-[#e8e4d0]'
                 }`}
               >
                 {d.label}
@@ -175,13 +175,13 @@ export default function MealPlannerPage() {
                   <div key={slot} className="tactile-card-white p-5 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#944A00]">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#c05800]">
                           {slot}
                         </span>
-                        <h3 className="font-display font-bold text-base text-[#1B1B1E]">{m.title}</h3>
+                        <h3 className="font-display font-bold text-base text-[#38240d]">{m.title}</h3>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="px-2.5 py-1 rounded-full bg-[#FFEDD5] text-[#944A00] text-xs font-bold">
+                        <span className="px-2.5 py-1 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold">
                           {m.totalCalories} kcal • {m.totalProteinG}g P
                         </span>
                       </div>
@@ -189,8 +189,8 @@ export default function MealPlannerPage() {
 
                     <div className="space-y-1.5">
                       {m.items.map((it, i) => (
-                        <div key={i} className="flex justify-between text-xs text-[#554337] bg-[#F5F3F6] px-3 py-2 rounded-xl">
-                          <span className="font-semibold text-[#1B1B1E]">
+                        <div key={i} className="flex justify-between text-xs text-[#713600] bg-[#f5f2e0] px-3 py-2 rounded-xl">
+                          <span className="font-semibold text-[#38240d]">
                             {it.name} ({it.quantity})
                           </span>
                           <span>
@@ -201,12 +201,12 @@ export default function MealPlannerPage() {
                     </div>
 
                     <div className="flex items-center justify-between pt-1">
-                      <p className="text-[11px] text-[#554337] italic flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-[#944A00]" /> {m.prepNotes}
+                      <p className="text-[11px] text-[#713600] italic flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-[#c05800]" /> {m.prepNotes}
                       </p>
                       <button
                         onClick={() => setSubTarget({ dayNumber: activeDay.dayNumber, slot })}
-                        className="px-3 py-1.5 rounded-full bg-[#F2EFE9] hover:bg-[#EAE7EB] text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
+                        className="px-3 py-1.5 rounded-full bg-[#f0ece0] hover:bg-[#e8e4d0] text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
                       >
                         <ArrowRightLeft className="w-3 h-3" /> Swap Food
                       </button>
@@ -222,20 +222,20 @@ export default function MealPlannerPage() {
       {/* Substitution Modal */}
       {subTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-[#FAF8F5] w-full max-w-md rounded-3xl p-6 space-y-3 shadow-2xl border border-[#E4E0D8]">
+          <div className="bg-white w-full max-w-md rounded-3xl p-6 space-y-3 shadow-2xl border border-[#e8e4d0]">
             <h3 className="font-display font-bold text-lg">Swap {subTarget.slot} (Pure Veg)</h3>
-            <p className="text-xs text-[#554337]">
-              Pick an alternative you enjoy — your daily protein &amp; calorie goals stay balanced:
+            <p className="text-xs text-[#713600]">
+              Pick an alternative you enjoy — your daily protein & calorie goals stay balanced:
             </p>
             <div className="space-y-2">
               {VEG_SUBSTITUTES.map((sub, i) => (
                 <button
                   key={i}
                   onClick={() => handleSubstitute(sub)}
-                  className="w-full text-left p-3 rounded-2xl bg-white border border-[#E4E0D8] hover:border-[#FB923C] flex justify-between items-center cursor-pointer"
+                  className="w-full text-left p-3 rounded-2xl bg-white border border-[#e8e4d0] hover:border-[#c05800] flex justify-between items-center cursor-pointer"
                 >
-                  <span className="text-xs font-semibold text-[#1B1B1E]">{sub.title}</span>
-                  <span className="text-[11px] font-bold text-[#006C4B] shrink-0 ml-2">
+                  <span className="text-xs font-semibold text-[#38240d]">{sub.title}</span>
+                  <span className="text-[11px] font-bold text-[#713600] shrink-0 ml-2">
                     {sub.calories} kcal • {sub.proteinG}g P
                   </span>
                 </button>
@@ -243,7 +243,7 @@ export default function MealPlannerPage() {
             </div>
             <button
               onClick={() => setSubTarget(null)}
-              className="w-full py-2.5 rounded-full bg-[#F2EFE9] text-xs font-semibold cursor-pointer"
+              className="w-full py-2.5 rounded-full bg-[#f0ece0] text-xs font-semibold cursor-pointer"
             >
               Cancel
             </button>

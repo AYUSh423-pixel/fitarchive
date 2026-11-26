@@ -67,21 +67,21 @@ export default function GroceryPage() {
     <div className="max-w-2xl mx-auto space-y-5">
       <section className="tactile-card-white p-5 flex items-center justify-between gap-3">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#944A00]">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#c05800]">
             {activeList?.period || 'Weekly'} Shopping List
           </span>
-          <h2 className="font-display text-xl font-bold text-[#1B1B1E]">Grocery &amp; Budget</h2>
+          <h2 className="font-display text-xl font-bold text-[#38240d]">Grocery & Budget</h2>
         </div>
         <div className="text-right">
-          <p className="text-xs text-[#554337]">Estimated Total</p>
-          <p className="font-display text-2xl font-bold text-[#006C4B] flex items-center justify-end">
+          <p className="text-xs text-[#a08a6a]">Estimated Total</p>
+          <p className="font-display text-2xl font-bold text-[#c05800] flex items-center justify-end">
             <IndianRupee className="w-5 h-5" />
             {totalCost.toLocaleString('en-IN')}
           </p>
         </div>
       </section>
 
-      <div className="p-4 rounded-3xl bg-[#FEF08A]/70 border border-[#FB923C]/30 text-xs text-[#78350F] space-y-1">
+      <div className="p-4 rounded-3xl bg-[#fff3e0] border border-[#ffe0b2] text-xs text-[#a04800] space-y-1">
         <p className="font-bold flex items-center gap-1.5">
           <Sparkles className="w-4 h-4" /> Budget-Friendly Pure-Veg Protein Tips
         </p>
@@ -108,7 +108,7 @@ export default function GroceryPage() {
         />
         <button
           type="submit"
-          className="col-span-3 rounded-2xl bg-[#FB923C] text-white text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+          className="col-span-3 rounded-2xl bg-[#c05800] text-white text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" /> Add
         </button>
@@ -130,24 +130,24 @@ export default function GroceryPage() {
                 <span
                   className={`w-5 h-5 rounded-md flex items-center justify-center border ${
                     item.purchased
-                      ? 'bg-[#006C4B] border-[#006C4B] text-white'
-                      : 'bg-white border-[#887365]'
+                      ? 'bg-[#c05800] border-[#c05800] text-white'
+                      : 'bg-white border-[#e8e4d0]'
                   }`}
                 >
                   {item.purchased && <Check className="w-3.5 h-3.5" />}
                 </span>
                 <div>
-                  <p className={`text-sm font-semibold ${item.purchased ? 'line-through' : ''}`}>
+                  <p className={`text-sm font-semibold ${item.purchased ? 'line-through' : ''} text-[#38240d]`}>
                     {item.name}
                   </p>
-                  <p className="text-xs text-[#554337]">
+                  <p className="text-xs text-[#a08a6a]">
                     {item.quantity} • {item.category}
                   </p>
                 </div>
               </button>
 
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-xs font-bold text-[#554337]">₹</span>
+                <span className="text-xs font-bold text-[#a08a6a]">₹</span>
                 <input
                   type="number"
                   value={item.estimatedCostInr}

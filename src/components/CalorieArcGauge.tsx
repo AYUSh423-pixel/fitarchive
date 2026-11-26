@@ -41,7 +41,7 @@ export function CalorieArcGauge({ consumed, target }: CalorieArcGaugeProps) {
             cx={dot.x}
             cy={dot.y}
             r={6}
-            fill={dot.filled ? (isOver ? '#DC2626' : '#B45309') : '#D6D0C4'}
+            fill={dot.filled ? (isOver ? '#DC2626' : '#c05800') : '#f0ece0'}
             className="transition-all duration-500"
           />
         ))}
@@ -49,17 +49,17 @@ export function CalorieArcGauge({ consumed, target }: CalorieArcGaugeProps) {
 
       {/* Centre content */}
       <div className="absolute bottom-0 inset-x-0 flex flex-col items-center text-center pb-1">
-        <div className="w-9 h-9 rounded-full bg-[#FEF3C7] flex items-center justify-center text-[#B45309] mb-1">
+        <div className="w-9 h-9 rounded-full bg-[#fff3e0] flex items-center justify-center text-[#c05800] mb-1">
           <Zap className="w-4 h-4 fill-current" />
         </div>
-        <span className="text-[10px] font-bold tracking-widest uppercase text-[#6B5F4E]">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">
           CONSUMED
         </span>
         <div className="flex items-baseline gap-1">
-          <span className="font-display text-[36px] leading-none font-bold text-[#1a1a1a] tracking-tight">
+          <span className="font-display text-[36px] leading-none font-bold text-[#38240d] tracking-tight">
             {Math.round(consumed).toLocaleString()}
           </span>
-          <span className="text-sm font-medium text-[#6B5F4E]">kcal</span>
+          <span className="text-sm font-medium text-[#a08a6a]">kcal</span>
         </div>
       </div>
     </div>

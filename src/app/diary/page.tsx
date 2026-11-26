@@ -27,10 +27,10 @@ function todayStr() {
 }
 
 const MEAL_META: Record<MealSlot, { label: string; icon: React.ReactNode }> = {
-  breakfast: { label: 'Breakfast', icon: <Sun className="w-4 h-4 text-[#B45309]" /> },
-  lunch: { label: 'Lunch', icon: <Utensils className="w-4 h-4 text-[#B45309]" /> },
-  snacks: { label: 'Snack', icon: <Coffee className="w-4 h-4 text-[#B45309]" /> },
-  dinner: { label: 'Dinner', icon: <Moon className="w-4 h-4 text-[#B45309]" /> },
+  breakfast: { label: 'Breakfast', icon: <Sun className="w-4 h-4 text-[#c05800]" /> },
+  lunch: { label: 'Lunch', icon: <Utensils className="w-4 h-4 text-[#c05800]" /> },
+  snacks: { label: 'Snack', icon: <Coffee className="w-4 h-4 text-[#c05800]" /> },
+  dinner: { label: 'Dinner', icon: <Moon className="w-4 h-4 text-[#c05800]" /> },
 };
 const SLOT_ORDER: MealSlot[] = ['breakfast', 'lunch', 'snacks', 'dinner'];
 
@@ -76,16 +76,16 @@ export default function FoodDiaryPage() {
       {/* Header */}
       <div className="flex items-start justify-between pt-1">
         <div>
-          <p className="text-[10px] font-bold tracking-widest uppercase text-[#6B5F4E]">
+          <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">
             {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()}, {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}
           </p>
-          <h2 className="font-display text-[26px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
+          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight">
             Diary
           </h2>
         </div>
         <button
           onClick={() => setSelectedDate(todayStr())}
-          className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-[#6B5F4E] shadow-sm border border-[#E5E0D8]"
+          className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-[#a08a6a] shadow-sm border border-[#e8e4d0]"
         >
           <CalendarDays className="w-5 h-5" />
         </button>
@@ -101,12 +101,12 @@ export default function FoodDiaryPage() {
               onClick={() => setSelectedDate(d.iso)}
               className={`flex flex-col items-center justify-center min-w-[52px] py-2.5 px-2 rounded-[16px] transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-[#1C3A2B] text-white shadow-sm'
-                  : 'bg-white text-[#1a1a1a] shadow-sm'
+                  ? 'bg-[#38240d] text-white shadow-sm'
+                  : 'bg-white text-[#38240d] shadow-sm'
               }`}
             >
-              <span className={`text-[10px] font-bold uppercase ${isActive ? 'text-white/70' : 'text-[#9CA3AF]'}`}>{d.dayName}</span>
-              <span className={`font-bold text-lg leading-tight ${isActive ? 'text-white' : 'text-[#1a1a1a]'}`}>{d.dayNum}</span>
+              <span className={`text-[10px] font-bold uppercase ${isActive ? 'text-white/70' : 'text-[#a08a6a]'}`}>{d.dayName}</span>
+              <span className={`font-bold text-lg leading-tight ${isActive ? 'text-white' : 'text-[#38240d]'}`}>{d.dayNum}</span>
             </button>
           );
         })}
@@ -116,37 +116,37 @@ export default function FoodDiaryPage() {
       <div className="bg-white rounded-[20px] p-4 shadow-sm">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <p className="text-[10px] text-[#9CA3AF] font-semibold uppercase tracking-wider">EATEN</p>
-            <p className="font-bold text-[28px] text-[#1a1a1a] leading-tight">{Math.round(totals.calories)} <span className="text-sm font-normal text-[#9CA3AF]">kcal</span></p>
+            <p className="text-[10px] text-[#a08a6a] font-semibold uppercase tracking-wider">EATEN</p>
+            <p className="font-bold text-[28px] text-[#38240d] leading-tight">{Math.round(totals.calories)} <span className="text-sm font-normal text-[#a08a6a]">kcal</span></p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-[#9CA3AF] font-semibold uppercase tracking-wider">LEFT OF {calTarget.toLocaleString()}</p>
-            <p className="font-bold text-[28px] text-[#B45309] leading-tight">{calLeft.toLocaleString()}</p>
+            <p className="text-[10px] text-[#a08a6a] font-semibold uppercase tracking-wider">LEFT OF {calTarget.toLocaleString()}</p>
+            <p className="font-bold text-[28px] text-[#c05800] leading-tight">{calLeft.toLocaleString()}</p>
           </div>
         </div>
 
         {/* Dot progress bar */}
         <div className="flex gap-1.5 flex-wrap mb-3">
           {Array.from({ length: DOT_COUNT }, (_, i) => (
-            <div key={i} className={`flex-1 h-2 rounded-full min-w-[8px] ${i < filledDots ? 'bg-[#B45309]' : 'bg-[#EDE9E0]'}`} />
+            <div key={i} className={`flex-1 h-2 rounded-full min-w-[8px] ${i < filledDots ? 'bg-[#c05800]' : 'bg-[#f0ece0]'}`} />
           ))}
         </div>
 
         {/* Macro row */}
         <div className="flex gap-4">
           <div>
-            <p className="text-[10px] font-bold text-[#16A34A] uppercase tracking-wider">PROTEIN</p>
-            <p className="font-semibold text-sm text-[#1a1a1a]">{Math.round(totals.protein)} / {targets?.proteinG ?? 130}g</p>
+            <p className="text-[10px] font-bold text-[#713600] uppercase tracking-wider">PROTEIN</p>
+            <p className="font-semibold text-sm text-[#38240d]">{Math.round(totals.protein)} / {targets?.proteinG ?? 130}g</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold text-[#D97706] uppercase tracking-wider">CARBS</p>
-            <p className="font-semibold text-sm text-[#1a1a1a]">
+            <p className="text-[10px] font-bold text-[#c05800] uppercase tracking-wider">CARBS</p>
+            <p className="font-semibold text-sm text-[#38240d]">
               {Math.round(logs.reduce((s, l) => s + l.carbsG, 0))} / {targets?.carbsG ?? 155}g
             </p>
           </div>
           <div>
-            <p className="text-[10px] font-bold text-[#7C3AED] uppercase tracking-wider">FATS</p>
-            <p className="font-semibold text-sm text-[#1a1a1a]">
+            <p className="text-[10px] font-bold text-[#5d4037] uppercase tracking-wider">FATS</p>
+            <p className="font-semibold text-sm text-[#38240d]">
               {Math.round(logs.reduce((s, l) => s + l.fatG, 0))} / {targets?.fatG ?? 65}g
             </p>
           </div>
@@ -169,26 +169,26 @@ export default function FoodDiaryPage() {
               <div key={slotKey} className="bg-white rounded-[20px] shadow-sm overflow-hidden">
                 {/* Slot header row */}
                 <div className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="w-9 h-9 rounded-full bg-[#FEF3C7] flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-[#fff3e0] flex items-center justify-center shrink-0">
                     {meta.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-[#1a1a1a] text-sm">{meta.label}</p>
-                    <p className="text-xs text-[#9CA3AF]">
+                    <p className="font-semibold text-[#38240d] text-sm">{meta.label}</p>
+                    <p className="text-xs text-[#a08a6a]">
                       {slotLogs.length > 0 ? `${slotCals} kcal` : 'Nothing logged yet'}
                     </p>
                   </div>
                   {/* Camera quick-scan */}
                   <button
                     onClick={() => { setModalSlot(slotKey); setModalOpen(true); }}
-                    className="w-9 h-9 rounded-full border-2 border-[#E5E0D8] flex items-center justify-center text-[#9CA3AF] hover:border-[#B45309] hover:text-[#B45309] transition-colors cursor-pointer"
+                    className="w-9 h-9 rounded-full border-2 border-[#e8e4d0] flex items-center justify-center text-[#a08a6a] hover:border-[#c05800] hover:text-[#c05800] transition-colors cursor-pointer"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
                   {/* + add */}
                   <button
                     onClick={() => { setModalSlot(slotKey); setModalOpen(true); }}
-                    className="w-9 h-9 rounded-full bg-[#B45309] flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform cursor-pointer"
+                    className="w-9 h-9 rounded-full bg-[#c05800] flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform cursor-pointer"
                   >
                     <span className="text-lg leading-none">+</span>
                   </button>
@@ -196,16 +196,16 @@ export default function FoodDiaryPage() {
 
                 {/* Logged food items */}
                 {slotLogs.length > 0 && (
-                  <div className="border-t border-[#F3F0EB] divide-y divide-[#F3F0EB]">
+                  <div className="border-t border-[#f0ece0] divide-y divide-[#f0ece0]">
                     {slotLogs.map((item) => (
                       <div key={item.id} className="flex items-center justify-between px-4 py-2.5">
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-[#1a1a1a] truncate">{item.foodName}</p>
-                          <p className="text-xs text-[#9CA3AF]">
+                          <p className="text-sm font-medium text-[#38240d] truncate">{item.foodName}</p>
+                          <p className="text-xs text-[#a08a6a]">
                             {item.quantity} {item.unit} · {item.proteinG}g protein
                           </p>
                         </div>
-                        <span className="text-sm font-semibold text-[#1a1a1a] shrink-0 ml-3">{item.calories} kcal</span>
+                        <span className="text-sm font-semibold text-[#38240d] shrink-0 ml-3">{item.calories} kcal</span>
                       </div>
                     ))}
                   </div>
@@ -217,7 +217,7 @@ export default function FoodDiaryPage() {
       )}
 
       {statusMsg && (
-        <div className="p-3 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex justify-between">
+        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex justify-between">
           <span>{statusMsg}</span>
           <button onClick={() => setStatusMsg('')} className="underline cursor-pointer">Dismiss</button>
         </div>

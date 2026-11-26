@@ -161,16 +161,16 @@ export function AddCustomFoodModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-xs p-0 sm:p-4">
-      <div className="bg-[#FAF8F5] w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl max-h-[95vh] flex flex-col shadow-2xl border border-[#E4E0D8]">
+      <div className="bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl max-h-[95vh] flex flex-col shadow-2xl border border-[#e8e4d0]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E4E0D8]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e4d0]">
           <div>
-            <h2 className="font-display text-lg font-bold text-[#1B1B1E]">Add Custom Food</h2>
-            <p className="text-xs text-[#554337]">Enter nutrition info per serving</p>
+            <h2 className="font-display text-lg font-bold text-[#38240d]">Add Custom Food</h2>
+            <p className="text-xs text-[#a08a6a]">Enter nutrition info per serving</p>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-[#F2EFE9] flex items-center justify-center text-[#554337]"
+            className="w-9 h-9 rounded-full bg-[#f0ece0] flex items-center justify-center text-[#a08a6a]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -178,19 +178,19 @@ export function AddCustomFoodModal({
 
         {/* Meal Summary Bar (if items exist) */}
         {mealItems.length > 0 && (
-          <div className="px-6 py-3 bg-[#F0FDF4] border-b border-[#E4E0D8]">
+          <div className="px-6 py-3 bg-[#f5f2e0] border-b border-[#e8e4d0]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase text-[#16A34A] tracking-wider">
+              <span className="text-xs font-bold uppercase text-[#c05800] tracking-wider">
                 Current Meal Total ({mealItems.length} items)
               </span>
-              <span className="text-xs font-bold text-[#16A34A]">
+              <span className="text-xs font-bold text-[#c05800]">
                 {Math.round(mealTotals.calories)} kcal • {mealTotals.proteinG.toFixed(1)}g P • {mealTotals.carbsG.toFixed(1)}g C • {mealTotals.fatG.toFixed(1)}g F
               </span>
             </div>
             <div className="flex gap-4 text-xs">
               <div className="flex-1">
-                <p className="text-[#554337] font-semibold">With this item:</p>
-                <p className="font-display font-bold text-[#1B1B1E]">
+                <p className="text-[#a08a6a] font-semibold">With this item:</p>
+                <p className="font-display font-bold text-[#38240d]">
                   {Math.round(combinedTotals.calories)} kcal • {combinedTotals.proteinG.toFixed(1)}g P • {combinedTotals.carbsG.toFixed(1)}g C • {combinedTotals.fatG.toFixed(1)}g F
                 </p>
               </div>
@@ -201,7 +201,7 @@ export function AddCustomFoodModal({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {error && (
-            <div className="p-3 rounded-2xl bg-[#FFDAD6] text-[#93000A] text-xs font-semibold flex items-center gap-2">
+            <div className="p-3 rounded-2xl bg-[#fdf2f0] text-[#a04800] text-xs font-semibold flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5" />
               {error}
             </div>
@@ -210,10 +210,10 @@ export function AddCustomFoodModal({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Basic Info */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#554337]">Basic Info</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#713600]">Basic Info</h3>
               
               <div>
-                <label className="text-xs font-semibold text-[#554337] block mb-1">Food Name *</label>
+                <label className="text-xs font-semibold text-[#713600] block mb-1">Food Name *</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -225,7 +225,7 @@ export function AddCustomFoodModal({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#554337] block mb-1">Regional Name (Optional)</label>
+                <label className="text-xs font-semibold text-[#713600] block mb-1">Regional Name (Optional)</label>
                 <input
                   type="text"
                   value={formData.regionalName}
@@ -236,7 +236,7 @@ export function AddCustomFoodModal({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#554337] block mb-1">Category</label>
+                <label className="text-xs font-semibold text-[#713600] block mb-1">Category</label>
                 <select
                   value={formData.category}
                   onChange={(e) => handleChange('category', e.target.value)}
@@ -249,7 +249,7 @@ export function AddCustomFoodModal({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#554337] block mb-1">Tags (comma-separated)</label>
+                <label className="text-xs font-semibold text-[#713600] block mb-1">Tags (comma-separated)</label>
                 <input
                   type="text"
                   value={formData.tags}
@@ -261,12 +261,12 @@ export function AddCustomFoodModal({
             </div>
 
             {/* Nutrition per Serving */}
-            <div className="space-y-3 pt-2 border-t border-[#E4E0D8]">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#554337]">Nutrition per Serving</h3>
+            <div className="space-y-3 pt-2 border-t border-[#e8e4d0]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#713600]">Nutrition per Serving</h3>
               
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#554337] block mb-1">Calories (kcal) *</label>
+                  <label className="text-xs font-semibold text-[#713600] block mb-1">Calories (kcal) *</label>
                   <input
                     type="number"
                     step="1"
@@ -279,7 +279,7 @@ export function AddCustomFoodModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#006C4B] block mb-1">Protein (g)</label>
+                  <label className="text-xs font-semibold text-[#713600] block mb-1">Protein (g)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -291,7 +291,7 @@ export function AddCustomFoodModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#D97706] block mb-1">Carbs (g)</label>
+                  <label className="text-xs font-semibold text-[#c05800] block mb-1">Carbs (g)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -303,7 +303,7 @@ export function AddCustomFoodModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#7C3AED] block mb-1">Fat (g)</label>
+                  <label className="text-xs font-semibold text-[#5d4037] block mb-1">Fat (g)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -315,7 +315,7 @@ export function AddCustomFoodModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#6B7280] block mb-1">Fiber (g)</label>
+                  <label className="text-xs font-semibold text-[#a08a6a] block mb-1">Fiber (g)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -330,12 +330,12 @@ export function AddCustomFoodModal({
             </div>
 
             {/* Serving Details */}
-            <div className="space-y-3 pt-2 border-t border-[#E4E0D8]">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#554337]">Serving Details</h3>
+            <div className="space-y-3 pt-2 border-t border-[#e8e4d0]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#713600]">Serving Details</h3>
               
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#554337] block mb-1">Serving Size *</label>
+                  <label className="text-xs font-semibold text-[#713600] block mb-1">Serving Size *</label>
                   <input
                     type="number"
                     step="0.25"
@@ -348,7 +348,7 @@ export function AddCustomFoodModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#554337] block mb-1">Serving Unit *</label>
+                  <label className="text-xs font-semibold text-[#713600] block mb-1">Serving Unit *</label>
                   <select
                     value={formData.servingUnit}
                     onChange={(e) => handleChange('servingUnit', e.target.value)}
@@ -361,7 +361,7 @@ export function AddCustomFoodModal({
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#554337] block mb-1">Weight per Serving (g) *</label>
+                  <label className="text-xs font-semibold text-[#713600] block mb-1">Weight per Serving (g) *</label>
                   <input
                     type="number"
                     step="1"
@@ -374,7 +374,7 @@ export function AddCustomFoodModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#554337] block mb-1">State</label>
+                  <label className="text-xs font-semibold text-[#713600] block mb-1">State</label>
                   <select
                     value={formData.state}
                     onChange={(e) => handleChange('state', e.target.value as 'raw' | 'cooked' | 'packaged')}
@@ -386,7 +386,7 @@ export function AddCustomFoodModal({
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs font-semibold text-[#944A00] block mb-1">Oil/Ghee Included in Serving (g)</label>
+                  <label className="text-xs font-semibold text-[#c05800] block mb-1">Oil/Ghee Included in Serving (g)</label>
                   <input
                     type="number"
                     step="0.5"
@@ -401,31 +401,31 @@ export function AddCustomFoodModal({
             </div>
 
             {/* Preview Card */}
-            <div className="p-4 rounded-2xl bg-[#F5F3F6] border border-[#E4E0D8]">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#554337] mb-3">Preview (per serving)</h4>
+            <div className="p-4 rounded-2xl bg-[#f5f2e0] border border-[#e8e4d0]">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#713600] mb-3">Preview (per serving)</h4>
               <div className="grid grid-cols-4 gap-2 text-center">
                 <div className="p-2 rounded-xl bg-white">
-                  <p className="text-[10px] font-bold uppercase text-[#944A00]">Calories</p>
-                  <p className="font-display font-bold text-base text-[#944A00]">{previewCalories}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#713600]">Calories</p>
+                  <p className="font-display font-bold text-base text-[#38240d]">{previewCalories}</p>
                 </div>
                 <div className="p-2 rounded-xl bg-white">
-                  <p className="text-[10px] font-bold uppercase text-[#006C4B]">Protein</p>
-                  <p className="font-display font-bold text-base text-[#006C4B]">{previewProtein.toFixed(1)}g</p>
+                  <p className="text-[10px] font-bold uppercase text-[#713600]">Protein</p>
+                  <p className="font-display font-bold text-base text-[#713600]">{previewProtein.toFixed(1)}g</p>
                 </div>
                 <div className="p-2 rounded-xl bg-white">
-                  <p className="text-[10px] font-bold uppercase text-[#D97706]">Carbs</p>
-                  <p className="font-display font-bold text-base text-[#D97706]">{previewCarbs.toFixed(1)}g</p>
+                  <p className="text-[10px] font-bold uppercase text-[#c05800]">Carbs</p>
+                  <p className="font-display font-bold text-base text-[#c05800]">{previewCarbs.toFixed(1)}g</p>
                 </div>
                 <div className="p-2 rounded-xl bg-white">
-                  <p className="text-[10px] font-bold uppercase text-[#7C3AED]">Fat</p>
-                  <p className="font-display font-bold text-base text-[#7C3AED]">{previewFat.toFixed(1)}g</p>
+                  <p className="text-[10px] font-bold uppercase text-[#5d4037]">Fat</p>
+                  <p className="font-display font-bold text-base text-[#5d4037]">{previewFat.toFixed(1)}g</p>
                 </div>
               </div>
             </div>
 
             {/* Quick Fill Buttons */}
-            <div className="pt-2 border-t border-[#E4E0D8]">
-              <p className="text-xs text-[#554337] mb-2">Quick fill from common Indian foods:</p>
+            <div className="pt-2 border-t border-[#e8e4d0]">
+              <p className="text-xs text-[#a08a6a] mb-2">Quick fill from common Indian foods:</p>
               <div className="flex flex-wrap gap-2">
                 {[
                   { name: 'Roti (1 pc)', calories: 85, protein: 3, carbs: 17.5, fat: 0.5, weight: 30, unit: 'piece' as FoodUnit },
@@ -450,7 +450,7 @@ export function AddCustomFoodModal({
                         servingSize: '1',
                       }));
                     }}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F2EFE9] text-[#554337] hover:bg-[#E8E0D4] transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#f0ece0] text-[#713600] hover:bg-[#e8e4d0] transition-colors cursor-pointer"
                   >
                     {preset.name}
                   </button>
@@ -462,7 +462,7 @@ export function AddCustomFoodModal({
             <button
               type="submit"
               disabled={saving}
-              className="w-full py-3 rounded-full bg-[#FB923C] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+              className="w-full py-3 rounded-full bg-[#c05800] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               <span>{saving ? 'Adding...' : 'Add Food to Database'}</span>

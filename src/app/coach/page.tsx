@@ -57,12 +57,12 @@ export default function AiDietitianPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-5 pt-1 shrink-0">
         <div>
-          <p className="text-[10px] font-bold tracking-widest uppercase text-[#6B5F4E]">YOUR COACH</p>
-          <h2 className="font-display text-[26px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
+          <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">YOUR COACH</p>
+          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight">
             AI Dietitian
           </h2>
         </div>
-        <Link href="/profile" className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#B45309] text-lg shadow-sm border border-[#E5E0D8]">
+        <Link href="/profile" className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#c05800] text-lg shadow-sm border border-[#e8e4d0]">
           A
         </Link>
       </div>
@@ -72,18 +72,18 @@ export default function AiDietitianPage() {
         {!hasMessages && (
           <>
             <div className="bg-white rounded-[18px] p-4 shadow-sm max-w-[85%]">
-              <p className="text-[#1a1a1a] text-sm leading-relaxed">
+              <p className="text-[#38240d] text-sm leading-relaxed">
                 Hi! I can help you reach 130g protein on a pure-veg, no-egg day. What should we work on?
               </p>
             </div>
 
             <div className="mt-5 space-y-2">
-              <p className="text-[10px] font-bold tracking-widest uppercase text-[#9CA3AF] px-1">TRY ASKING</p>
+              <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a] px-1">TRY ASKING</p>
               {QUICK_PROMPTS.map((p) => (
                 <button
                   key={p}
                   onClick={() => sendMessage(p)}
-                  className="w-full text-left bg-white rounded-2xl px-4 py-3.5 text-sm text-[#1a1a1a] font-medium shadow-sm hover:bg-[#FAFAF8] active:scale-[0.98] transition-all cursor-pointer border border-[#F0EBE3]"
+                  className="w-full text-left bg-white rounded-2xl px-4 py-3.5 text-sm text-[#38240d] font-medium shadow-sm hover:bg-[#faf9f5] active:scale-[0.98] transition-all cursor-pointer border border-[#e8e4d0]"
                 >
                   {p}
                 </button>
@@ -95,15 +95,15 @@ export default function AiDietitianPage() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-[#FEF3C7] flex items-center justify-center mr-2 mt-1 shrink-0 text-[#B45309] text-[10px] font-bold">
+              <div className="w-7 h-7 rounded-full bg-[#fff3e0] flex items-center justify-center mr-2 mt-1 shrink-0 text-[#c05800] text-[10px] font-bold">
                 AI
               </div>
             )}
             <div
               className={`max-w-[80%] rounded-[18px] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === 'user'
-                  ? 'bg-[#B45309] text-white rounded-br-sm'
-                  : 'bg-white text-[#1a1a1a] shadow-sm rounded-bl-sm'
+                  ? 'bg-[#c05800] text-white rounded-br-sm'
+                  : 'bg-white text-[#38240d] shadow-sm rounded-bl-sm'
               }`}
             >
               {msg.content}
@@ -113,10 +113,10 @@ export default function AiDietitianPage() {
 
         {sending && (
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#FEF3C7] flex items-center justify-center text-[#B45309] text-[10px] font-bold">AI</div>
+            <div className="w-7 h-7 rounded-full bg-[#fff3e0] flex items-center justify-center text-[#c05800] text-[10px] font-bold">AI</div>
             <div className="bg-white rounded-[18px] px-4 py-3 shadow-sm flex gap-1 items-center">
               {[0, 1, 2].map((i) => (
-                <span key={i} className="w-2 h-2 rounded-full bg-[#D6D0C4] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                <span key={i} className="w-2 h-2 rounded-full bg-[#e8e4d0] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
               ))}
             </div>
           </div>
@@ -132,12 +132,12 @@ export default function AiDietitianPage() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
           placeholder="Ask your dietitian…"
-          className="flex-1 bg-white rounded-full px-5 py-3.5 text-sm text-[#1a1a1a] placeholder-[#9CA3AF] border border-[#E5E0D8] focus:outline-none focus:border-[#B45309] shadow-sm"
+          className="flex-1 bg-white rounded-full px-5 py-3.5 text-sm text-[#38240d] placeholder-[#a08a6a] border border-[#e8e4d0] focus:outline-none focus:border-[#c05800] shadow-sm"
         />
         <button
           onClick={() => sendMessage(input)}
           disabled={!input.trim() || sending}
-          className="w-12 h-12 rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(180,83,9,0.4)] disabled:opacity-40 active:scale-95 transition-transform cursor-pointer"
+          className="w-12 h-12 rounded-full bg-[#c05800] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(192,88,0,0.4)] disabled:opacity-40 active:scale-95 transition-transform cursor-pointer"
         >
           <Send className="w-5 h-5" />
         </button>

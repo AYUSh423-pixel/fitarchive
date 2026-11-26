@@ -154,23 +154,23 @@ export default function SettingsPrivacyPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-5">
       {toast && (
-        <div className="p-3 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2">
           <Check className="w-4 h-4" /> {toast}
         </div>
       )}
 
       {/* PASTE AI KEY SECTION - MULTI PROVIDER SUPPORT */}
-      <section className="tactile-card-white p-6 space-y-4 border-2 border-[#FB923C]/30">
+      <section className="tactile-card-white p-6 space-y-4 border-2 border-[#c05800]/30">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#FFEDD5] text-[#944A00] flex items-center justify-center shadow-xs">
+            <div className="w-11 h-11 rounded-2xl bg-[#fff3e0] text-[#c05800] flex items-center justify-center shadow-xs">
               <Key className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-display text-lg font-bold text-[#1B1B1E]">
+              <h2 className="font-display text-lg font-bold text-[#38240d]">
                 Connect AI API (Gemini, OpenAI, Groq, OpenRouter, Custom)
               </h2>
-              <p className="text-xs text-[#554337]">
+              <p className="text-xs text-[#a08a6a]">
                 Use any AI API provider for the AI Dietitian Chat and Food Photo Scanner
               </p>
             </div>
@@ -178,7 +178,7 @@ export default function SettingsPrivacyPage() {
 
           <span
             className={`px-3 py-1 rounded-full text-xs font-bold ${
-              aiConfigured ? 'bg-[#DCFCE7] text-[#14532D]' : 'bg-[#FFEDD5] text-[#7C2D12]'
+              aiConfigured ? 'bg-[#f5f2e0] text-[#713600]' : 'bg-[#fff3e0] text-[#c05800]'
             }`}
           >
             {aiConfigured ? `Active (${provider})` : 'No Key Configured'}
@@ -186,15 +186,15 @@ export default function SettingsPrivacyPage() {
         </div>
 
         {maskedKey && (
-          <p className="text-xs font-semibold text-[#006C4B]">
-            Current Active Key: <code className="bg-[#DCFCE7] px-2 py-0.5 rounded">{maskedKey}</code> • Provider: <strong className="uppercase">{provider}</strong> • Model: <code>{model}</code>
+          <p className="text-xs font-semibold text-[#c05800]">
+            Current Active Key: <code className="bg-[#f5f2e0] px-2 py-0.5 rounded">{maskedKey}</code> • Provider: <strong className="uppercase">{provider}</strong> • Model: <code>{model}</code>
           </p>
         )}
 
         <form onSubmit={handleSaveApiKey} className="space-y-3.5">
           {/* Provider selector */}
           <div>
-            <label className="text-xs font-semibold text-[#554337] block mb-1">
+            <label className="text-xs font-semibold text-[#713600] block mb-1">
               Select AI Provider:
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -211,8 +211,8 @@ export default function SettingsPrivacyPage() {
                   onClick={() => handleProviderChange(p.id as any)}
                   className={`py-2 px-2 text-xs font-bold rounded-xl border transition-all cursor-pointer text-center ${
                     provider === p.id
-                      ? 'bg-[#FB923C] text-white border-[#FB923C] shadow-xs'
-                      : 'bg-[#FAF8F5] text-[#554337] border-[#E4E0D8] hover:bg-[#F2EFE9]'
+                      ? 'bg-[#c05800] text-white border-[#c05800] shadow-xs'
+                      : 'bg-[#f5f2e0] text-[#713600] border-[#e8e4d0] hover:bg-[#e8e4d0]'
                   }`}
                 >
                   {p.label}
@@ -224,7 +224,7 @@ export default function SettingsPrivacyPage() {
           {/* Custom Base URL if custom or openrouter */}
           {(provider === 'custom' || provider === 'openrouter') && (
             <div>
-              <label className="text-xs font-semibold text-[#554337] block mb-1">
+              <label className="text-xs font-semibold text-[#713600] block mb-1">
                 API Base URL (e.g. https://api.deepseek.com/v1, https://api.together.xyz/v1, or https://openrouter.ai/api/v1):
               </label>
               <input
@@ -239,7 +239,7 @@ export default function SettingsPrivacyPage() {
 
           {/* Model Name */}
           <div>
-            <label className="text-xs font-semibold text-[#554337] block mb-1">
+            <label className="text-xs font-semibold text-[#713600] block mb-1">
               Model Name:
             </label>
             <input
@@ -253,7 +253,7 @@ export default function SettingsPrivacyPage() {
 
           {/* API Key */}
           <div>
-            <label className="text-xs font-semibold text-[#554337] block mb-1">
+            <label className="text-xs font-semibold text-[#713600] block mb-1">
               Paste your {provider === 'gemini' ? 'Google Gemini' : provider === 'openai' ? 'OpenAI' : provider === 'groq' ? 'Groq' : provider === 'openrouter' ? 'OpenRouter' : 'Website'} API Key:
             </label>
             <div className="flex gap-2">
@@ -267,19 +267,19 @@ export default function SettingsPrivacyPage() {
               <button
                 type="submit"
                 disabled={!apiKeyInput.trim() || savingKey}
-                className="px-5 py-2.5 rounded-full bg-[#FB923C] hover:bg-[#f97316] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+                className="px-5 py-2.5 rounded-full bg-[#c05800] hover:bg-[#a04800] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
               >
                 {savingKey ? 'Saving...' : 'Save AI Key'}
               </button>
             </div>
           </div>
 
-          <div className="text-[11px] text-[#71717A] leading-relaxed bg-[#F7F4EF] p-3 rounded-xl space-y-1">
+          <div className="text-[11px] text-[#a08a6a] leading-relaxed bg-[#f5f2e0] p-3 rounded-xl space-y-1">
             <p><strong>Where to get keys:</strong></p>
-            <p>• <strong>Google Gemini (Free):</strong> <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">aistudio.google.com/apikey</a></p>
-            <p>• <strong>Groq (Free &amp; Ultra-fast):</strong> <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">console.groq.com/keys</a></p>
-            <p>• <strong>OpenAI:</strong> <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">platform.openai.com/api-keys</a></p>
-            <p>• <strong>OpenRouter:</strong> <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-[#944A00] font-bold underline">openrouter.ai/keys</a></p>
+            <p>• <strong>Google Gemini (Free):</strong> <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#c05800] font-bold underline">aistudio.google.com/apikey</a></p>
+            <p>• <strong>Groq (Free & Ultra-fast):</strong> <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[#c05800] font-bold underline">console.groq.com/keys</a></p>
+            <p>• <strong>OpenAI:</strong> <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-[#c05800] font-bold underline">platform.openai.com/api-keys</a></p>
+            <p>• <strong>OpenRouter:</strong> <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-[#c05800] font-bold underline">openrouter.ai/keys</a></p>
             <p className="pt-1">Your key is stored securely server-side and never exposed to the client browser.</p>
           </div>
         </form>
@@ -288,31 +288,31 @@ export default function SettingsPrivacyPage() {
       {/* ANDROID APK DOWNLOAD & INSTALL GUIDE */}
       <section className="tactile-card-white p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center">
+          <div className="w-11 h-11 rounded-2xl bg-[#fff3e0] text-[#c05800] flex items-center justify-center">
             <Smartphone className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-display text-lg font-bold text-[#1B1B1E]">
-              Download / Install as Mobile App (APK &amp; PWA)
+            <h2 className="font-display text-lg font-bold text-[#38240d]">
+              Download / Install as Mobile App (APK & PWA)
             </h2>
-            <p className="text-xs text-[#554337]">How to run NutriFit as an installed app on your phone</p>
+            <p className="text-xs text-[#a08a6a]">How to run NutriFit as an installed app on your phone</p>
           </div>
         </div>
 
-        <div className="space-y-3 text-xs text-[#554337] leading-relaxed">
-          <div className="p-3.5 rounded-2xl bg-[#F5F3F6] space-y-1">
-            <p className="font-bold text-[#1B1B1E]">Option 1: Instant Phone Install (PWA — Works on Android &amp; iOS)</p>
+        <div className="space-y-3 text-xs text-[#a08a6a] leading-relaxed">
+          <div className="p-3.5 rounded-2xl bg-[#f5f2e0] space-y-1">
+            <p className="font-bold text-[#38240d]">Option 1: Instant Phone Install (PWA — Works on Android & iOS)</p>
             <p>1. Open this website in Chrome on your phone.</p>
             <p>2. Tap the browser menu (<strong>⋮</strong> on Android or <strong>Share</strong> on iPhone) and select <strong>&ldquo;Add to Home Screen&rdquo;</strong> / <strong>&ldquo;Install App&rdquo;</strong>.</p>
             <p>3. It installs directly to your app drawer with the NutriFit logo and runs fullscreen.</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-[#F5F3F6] space-y-1">
-            <p className="font-bold text-[#1B1B1E]">Option 2: Generate Signed Android APK File</p>
-            <p>To generate a standalone <code className="bg-[#E4E0D8] px-1 rounded">.apk</code> file to install on any Android phone:</p>
+          <div className="p-3.5 rounded-2xl bg-[#f5f2e0] space-y-1">
+            <p className="font-bold text-[#38240d]">Option 2: Generate Signed Android APK File</p>
+            <p>To generate a standalone <code className="bg-[#e8e4d0] px-1 rounded">.apk</code> file to install on any Android phone:</p>
             <p>1. Host or deploy your app (e.g. 1-click on Vercel free).</p>
             <p>2. Go to <strong>PWABuilder.com</strong> (by Microsoft), paste your app URL.</p>
-            <p>3. Click <strong>&ldquo;Package for Android&rdquo;</strong> &rarr; Download the compiled <code className="bg-[#E4E0D8] px-1 rounded">.apk</code>!</p>
+            <p>3. Click <strong>&ldquo;Package for Android&rdquo;</strong> &rarr; Download the compiled <code className="bg-[#e8e4d0] px-1 rounded">.apk</code>!</p>
           </div>
         </div>
       </section>
@@ -320,22 +320,22 @@ export default function SettingsPrivacyPage() {
       {/* System & Integration Status */}
       <section className="tactile-card-white p-6 space-y-3">
         <h2 className="font-display text-lg font-bold flex items-center gap-2">
-          <Database className="w-5 h-5 text-[#944A00]" /> Backend &amp; Storage Status
+          <Database className="w-5 h-5 text-[#c05800]" /> Backend & Storage Status
         </h2>
         <div className="grid sm:grid-cols-2 gap-3 text-xs">
-          <div className="p-3.5 rounded-2xl bg-[#F5F3F6] space-y-1">
-            <p className="font-bold text-[#1B1B1E] flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-[#FB923C]" /> AI Engine
+          <div className="p-3.5 rounded-2xl bg-[#f5f2e0] space-y-1">
+            <p className="font-bold text-[#38240d] flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#c05800]" /> AI Engine
             </p>
-            <p className="text-[#554337]">
+            <p className="text-[#a08a6a]">
               {aiConfigured
                 ? 'Live Gemini Vision & Dietitian active.'
                 : 'Local Smart Fallback active.'}
             </p>
           </div>
-          <div className="p-3.5 rounded-2xl bg-[#F5F3F6] space-y-1">
-            <p className="font-bold text-[#1B1B1E]">Database Storage</p>
-            <p className="text-[#554337]">
+          <div className="p-3.5 rounded-2xl bg-[#f5f2e0] space-y-1">
+            <p className="font-bold text-[#38240d]">Database Storage</p>
+            <p className="text-[#a08a6a]">
               {supabaseConfigured
                 ? 'Supabase PostgreSQL + RLS connected.'
                 : 'Local encrypted server-side JSON store (./data/nutrifit-db.json).'}
@@ -347,7 +347,7 @@ export default function SettingsPrivacyPage() {
       {/* Privacy & Security */}
       <section className="tactile-card-white p-6 space-y-4">
         <h2 className="font-display text-lg font-bold flex items-center gap-2">
-          <Shield className="w-5 h-5 text-[#006C4B]" /> Privacy &amp; Account Security
+          <Shield className="w-5 h-5 text-[#c05800]" /> Privacy & Account Security
         </h2>
 
         <form onSubmit={handleChangePassword} className="flex gap-2">
@@ -359,14 +359,14 @@ export default function SettingsPrivacyPage() {
             placeholder="New password (6+ chars)"
             className="tactile-input flex-1 px-3.5 py-2 text-sm"
           />
-          <button type="submit" className="px-4 py-2 rounded-full bg-[#1B1B1E] text-white text-xs font-semibold cursor-pointer">
+          <button type="submit" className="px-4 py-2 rounded-full bg-[#38240d] text-white text-xs font-semibold cursor-pointer">
             Update Password
           </button>
         </form>
 
         <button
           onClick={handleLogout}
-          className="px-4 py-2.5 rounded-full bg-[#F5F3F6] hover:bg-[#EAE7EB] text-xs font-semibold flex items-center gap-2 cursor-pointer"
+          className="px-4 py-2.5 rounded-full bg-[#f5f2e0] hover:bg-[#e8e4d0] text-xs font-semibold text-[#713600] flex items-center gap-2 cursor-pointer"
         >
           <LogOut className="w-4 h-4" /> Sign Out of Session
         </button>
@@ -374,23 +374,23 @@ export default function SettingsPrivacyPage() {
 
       {/* Backups & Data Export */}
       <section className="tactile-card-white p-6 space-y-4">
-        <h2 className="font-display text-lg font-bold">Backups, Export &amp; Account Reset</h2>
+        <h2 className="font-display text-lg font-bold">Backups, Export & Account Reset</h2>
         <div className="flex flex-wrap gap-2.5">
           <a
             href="/api/account"
-            className="px-4 py-2.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-bold flex items-center gap-1.5"
+            className="px-4 py-2.5 rounded-full bg-[#f5f2e0] text-[#713600] text-xs font-bold flex items-center gap-1.5"
           >
             <Download className="w-4 h-4" /> Export Full JSON Backup
           </a>
-          <label className="px-4 py-2.5 rounded-full bg-[#E0F2FE] text-[#0369A1] text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+          <label className="px-4 py-2.5 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold flex items-center gap-1.5 cursor-pointer">
             <Upload className="w-4 h-4" /> Restore Backup
             <input type="file" accept="application/json" onChange={handleImportBackup} className="hidden" />
           </label>
           <button
             onClick={handleDeleteAccount}
-            className="px-4 py-2.5 rounded-full bg-[#FFDAD6] text-[#93000A] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2.5 rounded-full bg-[#fee2e2] text-[#dc2626] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
-            <Trash2 className="w-4 h-4" /> Delete &amp; Reset Account
+            <Trash2 className="w-4 h-4" /> Delete & Reset Account
           </button>
         </div>
       </section>

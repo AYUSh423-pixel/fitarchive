@@ -62,23 +62,23 @@ export default function HabitsPage() {
       <section className="tactile-card-white p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center">
+            <div className="w-11 h-11 rounded-full bg-[#fff3e0] text-[#c05800] flex items-center justify-center">
               <Droplets className="w-5 h-5" />
             </div>
             <div>
               <h2 className="font-display text-lg font-bold">Water Intake</h2>
-              <p className="text-xs text-[#554337]">
+              <p className="text-xs text-[#713600]">
                 {(waterMl / 1000).toFixed(2)}L / {(waterTargetMl / 1000).toFixed(1)}L ({waterPct}%)
               </p>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full bg-[#E0F2FE] text-[#0369A1] text-xs font-bold">
+          <span className="px-3 py-1 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold">
             {waterMl} ml
           </span>
         </div>
 
-        <div className="w-full h-3 rounded-full bg-[#F0EDF1] overflow-hidden">
-          <div className="h-full bg-[#38BDF8] rounded-full transition-all" style={{ width: `${waterPct}%` }} />
+        <div className="w-full h-3 rounded-full bg-[#f0ece0] overflow-hidden">
+          <div className="h-full bg-[#c05800] rounded-full transition-all" style={{ width: `${waterPct}%` }} />
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -86,7 +86,7 @@ export default function HabitsPage() {
             <button
               key={amt}
               onClick={() => addWater(amt)}
-              className="px-4 py-2 rounded-full bg-[#E0F2FE] hover:bg-[#bae6fd] text-[#0369A1] text-xs font-bold flex items-center gap-1 cursor-pointer"
+              className="px-4 py-2 rounded-full bg-[#fff3e0] hover:bg-[#ffe0b2] text-[#c05800] text-xs font-bold flex items-center gap-1 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> {amt} ml
             </button>
@@ -95,37 +95,37 @@ export default function HabitsPage() {
       </section>
 
       {/* Consistency Score */}
-      <section className="rounded-3xl p-5 bg-[#DCFCE7]/70 border border-[#34D399]/40 flex items-center justify-between gap-4">
+      <section className="rounded-3xl p-5 bg-[#f5f2e0] border border-[#e8e4d0] flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-[#14532D] flex items-center gap-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#713600] flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5" /> Daily Consistency Score
           </p>
-          <p className="text-xs text-[#14532D]/85 mt-1">
+          <p className="text-xs text-[#713600]/85 mt-1">
             Progress comes from showing up most days—never perfection. Missed days never reset your journey.
           </p>
         </div>
         <div className="w-16 h-16 rounded-full bg-white flex flex-col items-center justify-center shrink-0 shadow-xs">
-          <span className="font-display text-xl font-bold text-[#006C4B]">
+          <span className="font-display text-xl font-bold text-[#c05800]">
             {habit?.consistencyScore ?? 0}
           </span>
-          <span className="text-[10px] font-bold text-[#554337]">/ 100</span>
+          <span className="text-[10px] font-bold text-[#a08a6a]">/ 100</span>
         </div>
       </section>
 
       {toast && (
-        <div className="p-3 rounded-2xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2">
           <Check className="w-4 h-4" /> {toast}
         </div>
       )}
 
       {/* Daily Habits Form */}
       <form onSubmit={saveHabits} className="tactile-card-white p-6 space-y-4">
-        <h3 className="font-display text-lg font-bold">Log Sleep, Steps &amp; Check-in</h3>
+        <h3 className="font-display text-lg font-bold">Log Sleep, Steps & Check-in</h3>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-[#554337] flex items-center gap-1.5 mb-1">
-              <Moon className="w-3.5 h-3.5 text-[#674BB5]" /> Sleep Duration (hours)
+            <label className="text-xs font-semibold text-[#713600] flex items-center gap-1.5 mb-1">
+              <Moon className="w-3.5 h-3.5 text-[#c05800]" /> Sleep Duration (hours)
             </label>
             <input
               type="number"
@@ -139,8 +139,8 @@ export default function HabitsPage() {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#554337] flex items-center gap-1.5 mb-1">
-              <Footprints className="w-3.5 h-3.5 text-[#944A00]" /> Daily Steps (manual entry)
+            <label className="text-xs font-semibold text-[#713600] flex items-center gap-1.5 mb-1">
+              <Footprints className="w-3.5 h-3.5 text-[#c05800]" /> Daily Steps (manual entry)
             </label>
             <input
               type="number"
@@ -153,21 +153,21 @@ export default function HabitsPage() {
           </div>
         </div>
 
-        <label className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#F5F3F6] cursor-pointer">
+        <label className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#f5f2e0] cursor-pointer">
           <input
             type="checkbox"
             checked={workoutCompleted}
             onChange={(e) => setWorkoutCompleted(e.target.checked)}
-            className="w-4 h-4 accent-[#006C4B]"
+            className="w-4 h-4 accent-[#c05800]"
           />
-          <span className="text-sm font-semibold text-[#1B1B1E]">
+          <span className="text-sm font-semibold text-[#38240d]">
             Completed today&apos;s gym workout or active recovery walk
           </span>
         </label>
 
         <button
           type="submit"
-          className="w-full py-3 rounded-full bg-[#FB923C] text-white font-semibold text-sm cursor-pointer"
+          className="w-full py-3 rounded-full bg-[#c05800] text-white font-semibold text-sm cursor-pointer"
         >
           Save Daily Habits
         </button>

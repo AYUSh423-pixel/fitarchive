@@ -251,18 +251,18 @@ export default function MealScannerPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleRetake}
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#E5E0D8]"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#e8e4d0]"
             >
-              <X className="w-5 h-5 text-[#6B5F4E]" />
+              <X className="w-5 h-5 text-[#a08a6a]" />
             </button>
             <div>
-              <h2 className="font-display font-bold text-xl text-[#1a1a1a]">{scanResult.dishTitle}</h2>
-              <p className="text-xs text-[#9CA3AF]">{scanResult.cuisineLabel}</p>
+              <h2 className="font-display font-bold text-xl text-[#38240d]">{scanResult.dishTitle}</h2>
+              <p className="text-xs text-[#a08a6a]">{scanResult.cuisineLabel}</p>
             </div>
           </div>
           <button
             onClick={handleRetake}
-            className="px-3.5 py-1.5 rounded-full bg-white border border-[#E5E0D8] text-xs font-semibold text-[#B45309] flex items-center gap-1.5 shadow-sm cursor-pointer"
+            className="px-3.5 py-1.5 rounded-full bg-white border border-[#e8e4d0] text-xs font-semibold text-[#c05800] flex items-center gap-1.5 shadow-sm cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" /> Retake
           </button>
@@ -271,18 +271,18 @@ export default function MealScannerPage() {
         {/* Totals */}
         <div className="bg-white rounded-[20px] p-4 shadow-sm flex items-center justify-between">
           <div className="text-center flex-1">
-            <p className="font-bold text-2xl text-[#1a1a1a]">{Math.round(totalCals)}</p>
-            <p className="text-xs text-[#9CA3AF]">kcal</p>
+            <p className="font-bold text-2xl text-[#38240d]">{Math.round(totalCals)}</p>
+            <p className="text-xs text-[#a08a6a]">kcal</p>
           </div>
-          <div className="w-px h-10 bg-[#F0EBE3]" />
+          <div className="w-px h-10 bg-[#f0ece0]" />
           <div className="text-center flex-1">
-            <p className="font-bold text-2xl text-[#16A34A]">{Math.round(totalPro)}g</p>
-            <p className="text-xs text-[#9CA3AF]">protein</p>
+            <p className="font-bold text-2xl text-[#713600]">{Math.round(totalPro)}g</p>
+            <p className="text-xs text-[#a08a6a]">protein</p>
           </div>
-          <div className="w-px h-10 bg-[#F0EBE3]" />
+          <div className="w-px h-10 bg-[#f0ece0]" />
           <div className="text-center flex-1">
-            <p className="font-bold text-2xl text-[#D97706]">{Math.round(items.reduce((s, i) => s + i.carbsG, 0))}g</p>
-            <p className="text-xs text-[#9CA3AF]">carbs</p>
+            <p className="font-bold text-2xl text-[#c05800]">{Math.round(items.reduce((s, i) => s + i.carbsG, 0))}g</p>
+            <p className="text-xs text-[#a08a6a]">carbs</p>
           </div>
         </div>
 
@@ -292,8 +292,8 @@ export default function MealScannerPage() {
             <div key={item.tempId} className="bg-white rounded-[16px] p-3.5 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-[#1a1a1a]">{item.name}</p>
-                  <p className="text-xs text-[#9CA3AF]">
+                  <p className="font-semibold text-sm text-[#38240d]">{item.name}</p>
+                  <p className="text-xs text-[#a08a6a]">
                     {item.weightGrams}g · {item.calories} kcal · {item.proteinG}g P
                   </p>
                 </div>
@@ -306,7 +306,7 @@ export default function MealScannerPage() {
                         )
                       )
                     }
-                    className="w-7 h-7 rounded-full bg-[#F3F0EB] flex items-center justify-center cursor-pointer"
+                    className="w-7 h-7 rounded-full bg-[#f0ece0] flex items-center justify-center cursor-pointer"
                   >
                     <Minus className="w-3 h-3" />
                   </button>
@@ -317,15 +317,15 @@ export default function MealScannerPage() {
                         prev.map((it, i) => (i === idx ? { ...it, quantity: +(it.quantity + 0.5).toFixed(1) } : it))
                       )
                     }
-                    className="w-7 h-7 rounded-full bg-[#F3F0EB] flex items-center justify-center cursor-pointer"
+                    className="w-7 h-7 rounded-full bg-[#f0ece0] flex items-center justify-center cursor-pointer"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => setItems((prev) => prev.filter((_, i) => i !== idx))}
-                    className="w-7 h-7 rounded-full bg-[#FEE2E2] flex items-center justify-center cursor-pointer"
+                    className="w-7 h-7 rounded-full bg-[#fee2e2] flex items-center justify-center cursor-pointer"
                   >
-                    <Trash2 className="w-3 h-3 text-[#DC2626]" />
+                    <Trash2 className="w-3 h-3 text-[#dc2626]" />
                   </button>
                 </div>
               </div>
@@ -335,14 +335,14 @@ export default function MealScannerPage() {
 
         {/* Meal slot */}
         <div className="bg-white rounded-[20px] p-4 shadow-sm">
-          <p className="text-xs font-bold text-[#6B5F4E] uppercase tracking-wider mb-2.5">Log to meal slot</p>
+          <p className="text-xs font-bold text-[#a08a6a] uppercase tracking-wider mb-2.5">Log to meal slot</p>
           <div className="grid grid-cols-4 gap-2">
             {(['breakfast', 'lunch', 'snacks', 'dinner'] as MealSlot[]).map((s) => (
               <button
                 key={s}
                 onClick={() => setMealSlot(s)}
                 className={`py-2 rounded-[12px] text-xs font-semibold capitalize transition-colors cursor-pointer ${
-                  mealSlot === s ? 'bg-[#B45309] text-white' : 'bg-[#F3F0EB] text-[#6B5F4E] hover:bg-[#EDE9E0]'
+                  mealSlot === s ? 'bg-[#c05800] text-white' : 'bg-[#f0ece0] text-[#a08a6a] hover:bg-[#e8e4d0]'
                 }`}
               >
                 {s === 'snacks' ? 'Snack' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -356,7 +356,7 @@ export default function MealScannerPage() {
         <button
           onClick={handleSave}
           disabled={saving || items.length === 0}
-          className="w-full py-4 rounded-[20px] bg-[#B45309] text-white font-bold text-base shadow-[0_4px_16px_rgba(180,83,9,0.35)] disabled:opacity-50 active:scale-[0.98] transition-transform cursor-pointer"
+          className="w-full py-4 rounded-[20px] bg-[#c05800] text-white font-bold text-base shadow-[0_4px_16px_rgba(192,88,0,0.35)] disabled:opacity-50 active:scale-[0.98] transition-transform cursor-pointer"
         >
           {saving ? 'Saving…' : `Save ${items.length} item${items.length !== 1 ? 's' : ''} to ${mealSlot}`}
         </button>
@@ -372,35 +372,35 @@ export default function MealScannerPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleRetake}
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#E5E0D8]"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#e8e4d0]"
             >
-              <X className="w-5 h-5 text-[#6B5F4E]" />
+              <X className="w-5 h-5 text-[#a08a6a]" />
             </button>
             <div>
-              <h2 className="font-display font-bold text-xl text-[#1a1a1a]">{scanResult.dishTitle}</h2>
-              <p className="text-xs text-[#9CA3AF]">{scanResult.cuisineLabel}</p>
+              <h2 className="font-display font-bold text-xl text-[#38240d]">{scanResult.dishTitle}</h2>
+              <p className="text-xs text-[#a08a6a]">{scanResult.cuisineLabel}</p>
             </div>
           </div>
           <button
             onClick={handleRetake}
-            className="px-3.5 py-1.5 rounded-full bg-white border border-[#E5E0D8] text-xs font-semibold text-[#B45309] flex items-center gap-1.5 shadow-sm cursor-pointer"
+            className="px-3.5 py-1.5 rounded-full bg-white border border-[#e8e4d0] text-xs font-semibold text-[#c05800] flex items-center gap-1.5 shadow-sm cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" /> Retake
           </button>
         </div>
 
         <div className="bg-white rounded-[20px] p-4 shadow-sm">
-          <p className="text-sm text-[#1a1a1a] mb-3">{scanResult.disclaimer}</p>
+          <p className="text-sm text-[#38240d] mb-3">{scanResult.disclaimer}</p>
           <div className="space-y-2">
             {scanResult.clarifyingQuestions.map((q, i) => (
-              <div key={i} className="bg-[#FEF3C7] border border-[#FCD34D] rounded-xl p-3">
-                <p className="text-sm text-[#92400E]">💡 {q}</p>
+              <div key={i} className="bg-[#fff3e0] border border-[#ffe0b2] rounded-xl p-3">
+                <p className="text-sm text-[#c05800]">💡 {q}</p>
               </div>
             ))}
           </div>
           <button
             onClick={handleRetake}
-            className="w-full mt-4 py-3 rounded-[16px] bg-[#B45309] text-white font-bold cursor-pointer"
+            className="w-full mt-4 py-3 rounded-[16px] bg-[#c05800] text-white font-bold cursor-pointer"
           >
             Retake Photo / Add Description
           </button>
@@ -411,7 +411,7 @@ export default function MealScannerPage() {
 
   // --- Live Camera & Scanning view (dark background matching design) ---
   return (
-    <div className="min-h-screen bg-[#0D1F18] flex flex-col pb-8">
+    <div className="min-h-screen bg-[#38240d] flex flex-col pb-8">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-6 pb-3">
         <button
@@ -497,7 +497,7 @@ export default function MealScannerPage() {
                 else startCamera();
               }}
               className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
-                scanMode === mode ? 'bg-white text-[#0D1F18]' : 'bg-white/15 text-white'
+                scanMode === mode ? 'bg-white text-[#38240d]' : 'bg-white/15 text-white'
               }`}
             >
               {mode}
@@ -539,7 +539,7 @@ export default function MealScannerPage() {
             <button
               onClick={() => analyzePhoto(imageBase64, mimeType, hintText)}
               disabled={analyzing}
-              className="w-full py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full py-3.5 px-5 rounded-full bg-[#c05800] hover:bg-[#a04800] text-white font-bold text-sm shadow-[0_4px_20px_rgba(192,88,0,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               {analyzing ? (
                 <CalmLoader size={72} text="Analyzing Meal…" />
@@ -562,7 +562,7 @@ export default function MealScannerPage() {
             <button
               onClick={() => analyzePhoto('', 'text/plain', hintText)}
               disabled={analyzing}
-              className="w-full py-3.5 px-5 rounded-full bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-sm shadow-[0_4px_20px_rgba(180,83,9,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full py-3.5 px-5 rounded-full bg-[#c05800] hover:bg-[#a04800] text-white font-bold text-sm shadow-[0_4px_20px_rgba(192,88,0,0.6)] flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               {analyzing ? (
                 <CalmLoader size={72} text="Analyzing Description…" />
@@ -585,12 +585,12 @@ export default function MealScannerPage() {
             onClick={handleCaptureSnapshot}
             disabled={analyzing || !cameraActive}
             aria-label={cameraActive ? "Snap photo and analyze" : "Start camera"}
-            className="w-[72px] h-[72px] rounded-full bg-[#B45309] border-4 border-white/80 shadow-[0_0_24px_rgba(180,83,9,0.7)] flex items-center justify-center active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+            className="w-[72px] h-[72px] rounded-full bg-[#c05800] border-4 border-white/80 shadow-[0_0_24px_rgba(192,88,0,0.7)] flex items-center justify-center active:scale-95 transition-all cursor-pointer disabled:opacity-50"
           >
             {analyzing ? (
               <CalmLoaderCompact size={56} />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-[#B45309] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-[#c05800] flex items-center justify-center">
                 <Camera className="w-7 h-7 text-white stroke-[2.2]" />
               </div>
             )}

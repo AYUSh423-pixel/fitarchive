@@ -333,16 +333,16 @@ export function FoodLogModal({
   return (
     <>
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-xs p-0 sm:p-4">
-      <div className="bg-[#FAF8F5] w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl border border-[#E4E0D8]">
+      <div className="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl border border-[#e8e4d0]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E4E0D8]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e4d0]">
           <div>
-            <h2 className="font-display text-lg font-bold text-[#1B1B1E]">Log Pure-Veg Meal</h2>
-            <p className="text-xs text-[#554337]">Search Indian foods or speak naturally</p>
+            <h2 className="font-display text-lg font-bold text-[#38240d]">Log Pure-Veg Meal</h2>
+            <p className="text-xs text-[#a08a6a]">Search Indian foods or speak naturally</p>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-[#F2EFE9] flex items-center justify-center text-[#554337]"
+            className="w-9 h-9 rounded-full bg-[#f0ece0] flex items-center justify-center text-[#a08a6a]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -350,13 +350,13 @@ export function FoodLogModal({
 
         {/* Meal Slot + Mode Switch */}
         <div className="px-6 pt-3 pb-2 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex gap-1.5 bg-[#F2EFE9] p-1 rounded-full">
+          <div className="flex gap-1.5 bg-[#f0ece0] p-1 rounded-full">
             {(['breakfast', 'lunch', 'snacks', 'dinner'] as MealSlot[]).map((slot) => (
               <button
                 key={slot}
                 onClick={() => setMealSlot(slot)}
                 className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer ${
-                  mealSlot === slot ? 'bg-[#FB923C] text-white shadow-xs' : 'text-[#554337]'
+                  mealSlot === slot ? 'bg-[#c05800] text-white shadow-xs' : 'text-[#713600]'
                 }`}
               >
                 {slot}
@@ -364,11 +364,11 @@ export function FoodLogModal({
             ))}
           </div>
 
-          <div className="flex gap-1.5 bg-[#F2EFE9] p-1 rounded-full">
+          <div className="flex gap-1.5 bg-[#f0ece0] p-1 rounded-full">
             <button
               onClick={() => setMode('manual')}
               className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${
-                mode === 'manual' ? 'bg-[#1B1B1E] text-white' : 'text-[#554337]'
+                mode === 'manual' ? 'bg-[#38240d] text-white' : 'text-[#713600]'
               }`}
             >
               Manual
@@ -376,7 +376,7 @@ export function FoodLogModal({
             <button
               onClick={() => setMode('voice')}
               className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer ${
-                mode === 'voice' ? 'bg-[#1B1B1E] text-white' : 'text-[#554337]'
+                mode === 'voice' ? 'bg-[#38240d] text-white' : 'text-[#713600]'
               }`}
             >
               <Mic className="w-3 h-3" /> Voice
@@ -387,14 +387,14 @@ export function FoodLogModal({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-3 space-y-4">
           {error && (
-            <div className="p-3 rounded-2xl bg-[#FFDAD6] text-[#93000A] text-xs font-semibold">{error}</div>
+            <div className="p-3 rounded-2xl bg-[#fee2e2] text-[#dc2626] text-xs font-semibold">{error}</div>
           )}
 
           {mode === 'manual' ? (
             <>
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-[#887365] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-[#a08a6a] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={query}
@@ -406,7 +406,7 @@ export function FoodLogModal({
                 <button
                   type="button"
                   onClick={() => setShowGuide((v) => !v)}
-                  className="px-3 py-2.5 rounded-2xl bg-[#E0F2FE] text-[#0369A1] text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
+                  className="px-3 py-2.5 rounded-2xl bg-[#fff3e0] text-[#c05800] text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
                   Portion Guide
@@ -414,7 +414,7 @@ export function FoodLogModal({
               </div>
 
               {showGuide && (
-                <div className="p-3.5 rounded-2xl bg-[#E0F2FE]/70 border border-[#38BDF8]/30 text-xs text-[#0C4A6E] space-y-1">
+                <div className="p-3.5 rounded-2xl bg-[#fff3e0] border border-[#ffe0b2] text-xs text-[#a04800] space-y-1">
                   <p className="font-bold">Beginner Indian Portion Guide:</p>
                   <p>• 1 Standard Katori / Bowl = ~150 ml / 150–180g cooked dal or sabzi</p>
                   <p>• 1 Homemade Phulka Roti = ~30g (~85 kcal without ghee)</p>
@@ -427,15 +427,15 @@ export function FoodLogModal({
                 <div className="tactile-card-white p-4 space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#f5f2e0] text-[#713600]">
                         {selectedFood.state} • {selectedFood.confidence}
                       </span>
-                      <h3 className="font-display font-bold text-base mt-1">{selectedFood.name}</h3>
-                      <p className="text-xs text-[#554337]">Source: {selectedFood.source}</p>
+                      <h3 className="font-display font-bold text-base mt-1 text-[#38240d]">{selectedFood.name}</h3>
+                      <p className="text-xs text-[#a08a6a]">Source: {selectedFood.source}</p>
                     </div>
                     <button
                       onClick={() => setSelectedFood(null)}
-                      className="text-xs font-semibold text-[#944A00] underline cursor-pointer"
+                      className="text-xs font-semibold text-[#c05800] underline cursor-pointer"
                     >
                       Change
                     </button>
@@ -443,7 +443,7 @@ export function FoodLogModal({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-semibold text-[#554337] block mb-1">Quantity</label>
+                      <label className="text-xs font-semibold text-[#713600] block mb-1">Quantity</label>
                       <input
                         type="number"
                         step="0.25"
@@ -454,7 +454,7 @@ export function FoodLogModal({
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-[#554337] block mb-1">Unit</label>
+                      <label className="text-xs font-semibold text-[#713600] block mb-1">Unit</label>
                       <select
                         value={unit}
                         onChange={(e) => setUnit(e.target.value as FoodUnit)}
@@ -470,7 +470,7 @@ export function FoodLogModal({
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-[#554337] block mb-1.5">
+                    <label className="text-xs font-semibold text-[#713600] block mb-1.5">
                       Extra Ghee / Cooking Oil added? ({extraGheeTsp} tsp = +{extraGheeTsp * 45} kcal)
                     </label>
                     <div className="flex gap-2">
@@ -481,8 +481,8 @@ export function FoodLogModal({
                           onClick={() => setExtraGheeTsp(tsp)}
                           className={`px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${
                             extraGheeTsp === tsp
-                              ? 'bg-[#FFEDD5] text-[#944A00] border border-[#FB923C]'
-                              : 'bg-[#F2EFE9] text-[#554337]'
+                              ? 'bg-[#fff3e0] text-[#c05800] border border-[#c05800]'
+                              : 'bg-[#f0ece0] text-[#713600]'
                           }`}
                         >
                           {tsp === 0 ? 'None' : `+${tsp} tsp`}
@@ -491,28 +491,28 @@ export function FoodLogModal({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-2 p-3 rounded-2xl bg-[#F5F3F6] text-center">
+                  <div className="grid grid-cols-4 gap-2 p-3 rounded-2xl bg-[#f5f2e0] text-center">
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-[#554337]">Calories</p>
-                      <p className="font-display font-bold text-base">
+                      <p className="text-[10px] font-bold uppercase text-[#713600]">Calories</p>
+                      <p className="font-display font-bold text-base text-[#38240d]">
                         {Math.round(selectedFood.calories * previewMult + extraGheeTsp * 45)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-[#006C4B]">Protein</p>
-                      <p className="font-display font-bold text-base text-[#006C4B]">
+                      <p className="text-[10px] font-bold uppercase text-[#713600]">Protein</p>
+                      <p className="font-display font-bold text-base text-[#713600]">
                         {(selectedFood.proteinG * previewMult).toFixed(1)}g
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-[#674BB5]">Carbs</p>
-                      <p className="font-display font-bold text-base text-[#674BB5]">
+                      <p className="text-[10px] font-bold uppercase text-[#c05800]">Carbs</p>
+                      <p className="font-display font-bold text-base text-[#c05800]">
                         {(selectedFood.carbsG * previewMult).toFixed(1)}g
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-[#944A00]">Fat</p>
-                      <p className="font-display font-bold text-base text-[#944A00]">
+                      <p className="text-[10px] font-bold uppercase text-[#5d4037]">Fat</p>
+                      <p className="font-display font-bold text-base text-[#5d4037]">
                         {(selectedFood.fatG * previewMult + extraGheeTsp * 5).toFixed(1)}g
                       </p>
                     </div>
@@ -521,7 +521,7 @@ export function FoodLogModal({
                   <button
                     onClick={handleSaveManual}
                     disabled={saving}
-                    className="w-full py-3 rounded-full bg-[#FB923C] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    className="w-full py-3 rounded-full bg-[#c05800] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <Check className="w-4 h-4" />
                     <span>{saving ? 'Saving...' : `Add to ${mealSlot}`}</span>
@@ -533,40 +533,40 @@ export function FoodLogModal({
                     <button
                       key={food.id}
                       onClick={() => handleSelectFood(food)}
-                      className="w-full text-left p-3.5 rounded-2xl bg-white border border-[#E4E0D8]/80 hover:border-[#FB923C] flex items-center justify-between transition-all cursor-pointer"
+                      className="w-full text-left p-3.5 rounded-2xl bg-white border border-[#e8e4d0]/80 hover:border-[#c05800] flex items-center justify-between transition-all cursor-pointer"
                     >
                       <div>
-                        <p className="font-semibold text-sm text-[#1B1B1E]">{food.name}</p>
-                        <p className="text-xs text-[#554337]">
+                        <p className="font-semibold text-sm text-[#38240d]">{food.name}</p>
+                        <p className="text-xs text-[#a08a6a]">
                           {food.servingSize} {food.servingUnit} ({food.weightGrams}g) • P: {food.proteinG}g • C:{' '}
                           {food.carbsG}g • F: {food.fatG}g
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-bold text-[#944A00] bg-[#FFEDD5] px-2.5 py-1 rounded-full">
+                        <span className="text-xs font-bold text-[#c05800] bg-[#fff3e0] px-2.5 py-1 rounded-full">
                           {food.calories} kcal
                         </span>
-                        <Plus className="w-4 h-4 text-[#554337]" />
+                        <Plus className="w-4 h-4 text-[#a08a6a]" />
                       </div>
                     </button>
                   ))}
                   {/* Add Custom Food Button */}
                   <button
                     onClick={() => setShowCustomFood(true)}
-                    className="w-full text-left p-3.5 rounded-2xl bg-[#F0FDF4] border-2 border-dashed border-[#86EFAC] flex items-center justify-center gap-2 transition-all cursor-pointer hover:border-[#16A34A]"
+                    className="w-full text-left p-3.5 rounded-2xl bg-[#f5f2e0] border-2 border-dashed border-[#c05800] flex items-center justify-center gap-2 transition-all cursor-pointer hover:border-[#a04800]"
                   >
-                    <PlusCircle className="w-4 h-4 text-[#16A34A]" />
-                    <span className="font-semibold text-sm text-[#16A34A]">Add Custom Food</span>
+                    <PlusCircle className="w-4 h-4 text-[#c05800]" />
+                    <span className="font-semibold text-sm text-[#c05800]">Add Custom Food</span>
                   </button>
                 </div>
               )}
             </>
           ) : (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-white border border-[#E4E0D8] space-y-3">
-                <p className="text-xs text-[#554337]">
+              <div className="p-4 rounded-2xl bg-white border border-[#e8e4d0] space-y-3">
+                <p className="text-xs text-[#a08a6a]">
                   Tap the mic and say something like:{' '}
-                  <strong className="text-[#1B1B1E]">
+                  <strong className="text-[#38240d]">
                     &ldquo;I ate two rotis, one bowl of dal and 100 grams of paneer&rdquo;
                   </strong>
                 </p>
@@ -575,7 +575,7 @@ export function FoodLogModal({
                     type="button"
                     onClick={handleStartVoice}
                     className={`px-4 py-2.5 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${
-                      listening ? 'bg-[#BA1A1A] text-white animate-pulse' : 'bg-[#FB923C] text-white'
+                      listening ? 'bg-[#dc2626] text-white animate-pulse' : 'bg-[#c05800] text-white'
                     }`}
                   >
                     {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -585,7 +585,7 @@ export function FoodLogModal({
                     type="button"
                     onClick={handleParseVoice}
                     disabled={!transcript.trim() || saving}
-                    className="px-4 py-2.5 rounded-full bg-[#1B1B1E] text-white text-xs font-semibold cursor-pointer"
+                    className="px-4 py-2.5 rounded-full bg-[#38240d] text-white text-xs font-semibold cursor-pointer"
                   >
                     Parse Meal
                   </button>
@@ -600,7 +600,7 @@ export function FoodLogModal({
               </div>
 
               {voiceQuestions.length > 0 && (
-                <div className="p-3 rounded-2xl bg-[#FFEDD5] text-[#7C2D12] text-xs space-y-1">
+                <div className="p-3 rounded-2xl bg-[#fff3e0] text-[#a04800] text-xs space-y-1">
                   <p className="font-bold">Quick Clarifications:</p>
                   {voiceQuestions.map((q, i) => (
                     <p key={i}>• {q}</p>
@@ -613,19 +613,19 @@ export function FoodLogModal({
                   {voiceItems.map((it, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-2xl bg-white border border-[#E4E0D8] flex items-center justify-between gap-2"
+                      className="p-3 rounded-2xl bg-white border border-[#e8e4d0] flex items-center justify-between gap-2"
                     >
                       <div>
-                        <p className="font-semibold text-sm">{it.name}</p>
-                        <p className="text-xs text-[#554337]">
+                        <p className="font-semibold text-sm text-[#38240d]">{it.name}</p>
+                        <p className="text-xs text-[#a08a6a]">
                           {it.quantity} {it.unit} ({it.weightGrams}g) • P: {it.proteinG}g
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#944A00]">{it.calories} kcal</span>
+                        <span className="text-xs font-bold text-[#c05800]">{it.calories} kcal</span>
                         <button
                           onClick={() => setVoiceItems((prev) => prev.filter((_, i) => i !== idx))}
-                          className="text-xs text-[#BA1A1A] font-semibold cursor-pointer"
+                          className="text-xs text-[#dc2626] font-semibold cursor-pointer"
                         >
                           Remove
                         </button>
@@ -635,25 +635,25 @@ export function FoodLogModal({
                   <button
                     onClick={handleSaveVoiceItems}
                     disabled={saving}
-                    className="w-full py-3 rounded-full bg-[#006C4B] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3 rounded-full bg-[#713600] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Check className="w-4 h-4" />
-                    <span>Confirm &amp; Log {voiceItems.length} Items</span>
+                    <span>Confirm & Log {voiceItems.length} Items</span>
                   </button>
                 </div>
               )}
 
               {/* Meal Summary */}
               {mealItems.length > 0 && (
-                <div className="pt-4 border-t border-[#E4E0D8]">
+                <div className="pt-4 border-t border-[#e8e4d0]">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-sm text-[#1B1B1E] flex items-center gap-2">
-                      <Calculator className="w-4 h-4 text-[#FB923C]" />
+                    <h3 className="font-semibold text-sm text-[#38240d] flex items-center gap-2">
+                      <Calculator className="w-4 h-4 text-[#c05800]" />
                       Meal Summary ({mealItems.length} items)
                     </h3>
                     <button
                       onClick={handleClearMeal}
-                      className="text-xs text-[#BA1A1A] font-semibold flex items-center gap-1 cursor-pointer"
+                      className="text-xs text-[#dc2626] font-semibold flex items-center gap-1 cursor-pointer"
                     >
                       <Trash2 className="w-3 h-3" />
                       Clear All
@@ -663,21 +663,21 @@ export function FoodLogModal({
                     {mealItems.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-3 rounded-2xl bg-white border border-[#E4E0D8] flex items-center justify-between gap-2"
+                        className="p-3 rounded-2xl bg-white border border-[#e8e4d0] flex items-center justify-between gap-2"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm truncate">{item.food.name}</p>
-                          <p className="text-xs text-[#554337]">
+                          <p className="font-semibold text-sm truncate text-[#38240d]">{item.food.name}</p>
+                          <p className="text-xs text-[#a08a6a]">
                             {item.quantity} {item.unit} ({item.weightGrams}g) • P: {item.proteinG}g • C: {item.carbsG}g • F: {item.fatG}g
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs font-bold text-[#944A00] bg-[#FFEDD5] px-2.5 py-1 rounded-full">
+                          <span className="text-xs font-bold text-[#c05800] bg-[#fff3e0] px-2.5 py-1 rounded-full">
                             {item.calories} kcal
                           </span>
                           <button
                             onClick={() => handleRemoveMealItem(idx)}
-                            className="text-xs text-[#BA1A1A] font-semibold cursor-pointer"
+                            className="text-xs text-[#dc2626] font-semibold cursor-pointer"
                           >
                             Remove
                           </button>
@@ -685,34 +685,34 @@ export function FoodLogModal({
                       </div>
                     ))}
                   </div>
-                  <div className="p-3 rounded-2xl bg-[#F5F3F6] border border-[#E4E0D8]">
+                  <div className="p-3 rounded-2xl bg-[#f5f2e0] border border-[#e8e4d0]">
                     <div className="grid grid-cols-4 gap-2 text-center mb-2">
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-[#944A00]">Total Calories</p>
-                        <p className="font-display font-bold text-lg text-[#944A00]">
+                        <p className="text-[10px] font-bold uppercase text-[#713600]">Total Calories</p>
+                        <p className="font-display font-bold text-lg text-[#38240d]">
                           {mealItems.reduce((s, i) => s + i.calories, 0)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-[#006C4B]">Total Protein</p>
-                        <p className="font-display font-bold text-lg text-[#006C4B]">
+                        <p className="text-[10px] font-bold uppercase text-[#713600]">Total Protein</p>
+                        <p className="font-display font-bold text-lg text-[#713600]">
                           {mealItems.reduce((s, i) => s + i.proteinG, 0).toFixed(1)}g
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-[#674BB5]">Total Carbs</p>
-                        <p className="font-display font-bold text-lg text-[#674BB5]">
+                        <p className="text-[10px] font-bold uppercase text-[#c05800]">Total Carbs</p>
+                        <p className="font-display font-bold text-lg text-[#c05800]">
                           {mealItems.reduce((s, i) => s + i.carbsG, 0).toFixed(1)}g
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-[#944A00]">Total Fat</p>
-                        <p className="font-display font-bold text-lg text-[#944A00]">
+                        <p className="text-[10px] font-bold uppercase text-[#5d4037]">Total Fat</p>
+                        <p className="font-display font-bold text-lg text-[#5d4037]">
                           {mealItems.reduce((s, i) => s + i.fatG, 0).toFixed(1)}g
                         </p>
                       </div>
                     </div>
-                    <div className="text-center text-xs text-[#554337]">
+                    <div className="text-center text-xs text-[#a08a6a]">
                       Total weight: {mealItems.reduce((s, i) => s + i.weightGrams, 0)}g • Oil/Ghee: {mealItems.reduce((s, i) => s + i.oilGheeGrams, 0).toFixed(1)}g
                     </div>
                   </div>

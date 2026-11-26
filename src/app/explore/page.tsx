@@ -6,21 +6,21 @@ import Link from 'next/link';
 import type { FoodItem, Recipe } from '@/types/nutrifit';
 
 const FOOD_CATEGORIES = [
-  { label: 'Dal', color: '#DCFCE7', textColor: '#166534' },
-  { label: 'Sabzi', color: '#FEF3C7', textColor: '#92400E' },
-  { label: 'Roti & rice', color: '#FEF3C7', textColor: '#78350F' },
-  { label: 'Paneer', color: '#DBEAFE', textColor: '#1E40AF' },
-  { label: 'Snacks', color: '#EDE9FE', textColor: '#5B21B6' },
-  { label: 'Sweets', color: '#FCE7F3', textColor: '#9D174D' },
+  { label: 'Dal', color: '#f5f2e0', textColor: '#713600' },
+  { label: 'Sabzi', color: '#fff3e0', textColor: '#c05800' },
+  { label: 'Roti & rice', color: '#fff3e0', textColor: '#a04800' },
+  { label: 'Paneer', color: '#efebe9', textColor: '#5d4037' },
+  { label: 'Snacks', color: '#f5f2e0', textColor: '#713600' },
+  { label: 'Sweets', color: '#ffe0b2', textColor: '#c05800' },
 ];
 
 const TOOLS = [
-  { label: 'Meal planner', icon: <CalendarDays className="w-5 h-5 text-[#B45309]" />, href: '/planner' },
-  { label: 'Gym & workouts', icon: <Dumbbell className="w-5 h-5 text-[#B45309]" />, href: '/workouts' },
-  { label: 'Transformation', icon: <TrendingUp className="w-5 h-5 text-[#B45309]" />, href: '/progress' },
-  { label: 'Water & habits', icon: <Droplets className="w-5 h-5 text-[#B45309]" />, href: '/habits' },
-  { label: 'Grocery & budget', icon: <ShoppingCart className="w-5 h-5 text-[#B45309]" />, href: '/grocery' },
-  { label: 'Analytics', icon: <BarChart3 className="w-5 h-5 text-[#B45309]" />, href: '/analytics' },
+  { label: 'Meal planner', icon: <CalendarDays className="w-5 h-5 text-[#c05800]" />, href: '/planner' },
+  { label: 'Gym & workouts', icon: <Dumbbell className="w-5 h-5 text-[#c05800]" />, href: '/workouts' },
+  { label: 'Transformation', icon: <TrendingUp className="w-5 h-5 text-[#c05800]" />, href: '/progress' },
+  { label: 'Water & habits', icon: <Droplets className="w-5 h-5 text-[#c05800]" />, href: '/habits' },
+  { label: 'Grocery & budget', icon: <ShoppingCart className="w-5 h-5 text-[#c05800]" />, href: '/grocery' },
+  { label: 'Analytics', icon: <BarChart3 className="w-5 h-5 text-[#c05800]" />, href: '/analytics' },
 ];
 
 const FILTER_CHIPS = ['All', 'Dal', 'Sabzi', 'Roti & rice', 'Paneer'];
@@ -54,24 +54,24 @@ export default function IndianFoodExplorePage() {
       {/* Header */}
       <div className="flex items-start justify-between pt-1">
         <div>
-          <p className="text-[10px] font-bold tracking-widest uppercase text-[#6B5F4E]">FOOD DATABASE & TOOLS</p>
-          <h2 className="font-display text-[26px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
+          <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">FOOD DATABASE & TOOLS</p>
+          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight">
             Explore
           </h2>
         </div>
-        <Link href="/profile" className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#B45309] text-lg shadow-sm border border-[#E5E0D8]">
+        <Link href="/profile" className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#c05800] text-lg shadow-sm border border-[#e8e4d0]">
           A
         </Link>
       </div>
 
       {/* Search bar */}
-      <div className="flex items-center gap-3 bg-white rounded-[16px] px-4 py-3 shadow-sm border border-[#F0EBE3]">
-        <Search className="w-5 h-5 text-[#9CA3AF] shrink-0" />
+      <div className="flex items-center gap-3 bg-white rounded-[16px] px-4 py-3 shadow-sm border border-[#e8e4d0]">
+        <Search className="w-5 h-5 text-[#a08a6a] shrink-0" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search dal, paneer, roti…"
-          className="flex-1 bg-transparent text-sm text-[#1a1a1a] placeholder-[#9CA3AF] focus:outline-none"
+          className="flex-1 bg-transparent text-sm text-[#38240d] placeholder-[#a08a6a] focus:outline-none"
         />
       </div>
 
@@ -83,8 +83,8 @@ export default function IndianFoodExplorePage() {
             onClick={() => setActiveFilter(chip)}
             className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
               activeFilter === chip
-                ? 'bg-[#1C3A2B] text-white'
-                : 'bg-white text-[#1a1a1a] border border-[#E5E0D8] shadow-sm hover:border-[#B45309]'
+                ? 'bg-[#38240d] text-white'
+                : 'bg-white text-[#38240d] border border-[#e8e4d0] shadow-sm hover:border-[#c05800]'
             }`}
           >
             {chip}
@@ -95,17 +95,17 @@ export default function IndianFoodExplorePage() {
       {/* Food search results */}
       {query || activeFilter !== 'All' ? (
         <div>
-          <h3 className="font-bold text-[#1a1a1a] text-base mb-3">
+          <h3 className="font-bold text-[#38240d] text-base mb-3">
             {loading ? 'Searching…' : `${foods.length} results`}
           </h3>
           <div className="space-y-2">
             {foods.slice(0, 20).map((food) => (
               <div key={food.id} className="bg-white rounded-[16px] p-3.5 shadow-sm flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-semibold text-sm text-[#1a1a1a] truncate">{food.name}</p>
-                  <p className="text-xs text-[#9CA3AF]">{food.calories} kcal · {food.proteinG}g P · {food.weightGrams}g serving</p>
+                  <p className="font-semibold text-sm text-[#38240d] truncate">{food.name}</p>
+                  <p className="text-xs text-[#a08a6a]">{food.calories} kcal · {food.proteinG}g P · {food.weightGrams}g serving</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-[#9CA3AF] shrink-0" />
+                <ChevronRight className="w-4 h-4 text-[#a08a6a] shrink-0" />
               </div>
             ))}
           </div>
@@ -114,7 +114,7 @@ export default function IndianFoodExplorePage() {
         <>
           {/* Indian food database categories */}
           <div>
-            <h3 className="font-bold text-[#1a1a1a] text-base mb-3">Indian food database</h3>
+            <h3 className="font-bold text-[#38240d] text-base mb-3">Indian food database</h3>
             <div className="grid grid-cols-3 gap-2.5">
               {FOOD_CATEGORIES.map((cat) => (
                 <button
@@ -132,18 +132,18 @@ export default function IndianFoodExplorePage() {
 
           {/* Plan & fitness tools */}
           <div>
-            <h3 className="font-bold text-[#1a1a1a] text-base mb-3">Plan &amp; fitness</h3>
+            <h3 className="font-bold text-[#38240d] text-base mb-3">Plan & fitness</h3>
             <div className="grid grid-cols-2 gap-2.5">
               {TOOLS.map((tool) => (
                 <Link
                   key={tool.label}
                   href={tool.href}
-                  className="bg-white rounded-[16px] p-4 shadow-sm flex flex-col gap-2.5 hover:bg-[#FAFAF8] active:scale-[0.97] transition-transform"
+                  className="bg-white rounded-[16px] p-4 shadow-sm flex flex-col gap-2.5 hover:bg-[#faf9f5] active:scale-[0.97] transition-transform"
                 >
-                  <div className="w-9 h-9 rounded-full bg-[#FEF3C7] flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-full bg-[#fff3e0] flex items-center justify-center">
                     {tool.icon}
                   </div>
-                  <p className="font-semibold text-sm text-[#1a1a1a]">{tool.label}</p>
+                  <p className="font-semibold text-sm text-[#38240d]">{tool.label}</p>
                 </Link>
               ))}
             </div>

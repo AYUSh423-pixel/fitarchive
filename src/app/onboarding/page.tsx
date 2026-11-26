@@ -137,43 +137,43 @@ export default function OnboardingPage() {
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <span className="px-3 py-1 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-bold">
+        <span className="px-3 py-1 rounded-full bg-[#f5f2e0] text-[#713600] text-xs font-bold">
           Step {step} of 3
         </span>
-        <span className="text-xs font-semibold text-[#554337]">Personalized Health Setup</span>
+        <span className="text-xs font-semibold text-[#a08a6a]">Personalized Health Setup</span>
       </div>
 
       {step === 1 && (
         <section className="tactile-card-white p-6 space-y-5">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#FB923C] text-white flex items-center justify-center shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-[#713600] text-white flex items-center justify-center shadow-md">
               <Leaf className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#944A00]">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#c05800]">
                 Smart Onboarding
               </span>
-              <h1 className="font-display text-2xl font-bold">Welcome, {profile.name}!</h1>
+              <h1 className="font-display text-2xl font-bold text-[#38240d]">Welcome, {profile.name}!</h1>
             </div>
           </div>
 
-          <p className="text-sm text-[#554337] leading-relaxed">
+          <p className="text-sm text-[#713600] leading-relaxed">
             NutriFit AI is your personal Indian vegetarian dietitian. You do not need any calorie counting experience.
           </p>
 
           {/* BMI / EVOLT REPORT SCANNER BOX */}
-          <div className="p-5 rounded-2xl bg-[#FFEDD5]/40 border-2 border-dashed border-[#FB923C]/50 space-y-3">
+          <div className="p-5 rounded-2xl bg-[#fff3e0] border-2 border-dashed border-[#c05800]/50 space-y-3">
             <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#944A00]" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#944A00]">
+              <FileText className="w-5 h-5 text-[#c05800]" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#c05800]">
                 Have an EVOLT 360, InBody or BMI Report?
               </h3>
             </div>
-            <p className="text-xs text-[#554337] leading-relaxed">
+            <p className="text-xs text-[#713600] leading-relaxed">
               Upload your scan file (or scan printout text) to auto-fill your weight, height, body fat, and muscle stats automatically.
             </p>
 
-            <label className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white border border-[#FB923C] text-[#944A00] text-xs font-bold hover:bg-[#FFEDD5]/60 transition-colors cursor-pointer shadow-xs">
+            <label className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white border border-[#c05800] text-[#c05800] text-xs font-bold hover:bg-[#fff3e0] transition-colors cursor-pointer shadow-xs">
               <Upload className="w-4 h-4" />
               <span>{scanParsing ? 'Scanning Report...' : scanFileName ? `Uploaded: ${scanFileName}` : 'Upload EVOLT 360 / BMI Report'}</span>
               <input
@@ -185,15 +185,15 @@ export default function OnboardingPage() {
             </label>
 
             {scanSuccess && (
-              <div className="p-3 rounded-xl bg-[#DCFCE7] text-[#14532D] text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#16A34A]" />
+              <div className="p-3 rounded-xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#c05800]" />
                 <span>{scanSuccess}</span>
               </div>
             )}
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#F5F3F6] space-y-1.5 text-xs text-[#554337]">
-            <p className="font-bold text-[#1B1B1E]">Current Starting Baseline:</p>
+          <div className="p-4 rounded-2xl bg-[#f5f2e0] space-y-1.5 text-xs text-[#713600]">
+            <p className="font-bold text-[#38240d]">Current Starting Baseline:</p>
             <p>• Age: {profile.age} yrs • Height: {profile.heightCm} cm • Weight: {profile.weightKg} kg</p>
             <p>• BMI: {profile.bmi || calculateBmi(profile.weightKg, profile.heightCm)} • Body Fat: {profile.bodyFatPct || 25}% • Muscle: {profile.skeletalMuscleMassKg || 28} kg</p>
             <p>• Diet: Pure Vegetarian (No Eggs) • Homemade Indian Food Focus</p>
@@ -201,9 +201,9 @@ export default function OnboardingPage() {
 
           <button
             onClick={() => setStep(2)}
-            className="w-full py-3.5 rounded-full bg-[#FB923C] hover:bg-[#f97316] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.99]"
+            className="w-full py-3.5 rounded-full bg-[#c05800] hover:bg-[#a04800] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.99]"
           >
-            <span>Verify &amp; Adjust Details</span>
+            <span>Verify & Adjust Details</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </section>
@@ -211,14 +211,14 @@ export default function OnboardingPage() {
 
       {step === 2 && (
         <section className="tactile-card-white p-6 space-y-4">
-          <h2 className="font-display text-xl font-bold">Confirm Your Starting Measurements</h2>
-          <p className="text-xs text-[#554337]">
+          <h2 className="font-display text-xl font-bold text-[#38240d]">Confirm Your Starting Measurements</h2>
+          <p className="text-xs text-[#a08a6a]">
             Adjust any value below. Your calorie and macro targets will recalculate automatically.
           </p>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <label className="text-xs font-semibold block mb-1">Full Name</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Full Name</label>
               <input
                 value={profile.name}
                 onChange={(e) => setProfile({ ...profile, name: e.target.value })}
@@ -226,7 +226,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold block mb-1">Age (years)</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Age (years)</label>
               <input
                 type="number"
                 value={profile.age}
@@ -235,7 +235,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold block mb-1">Gender</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Gender</label>
               <select
                 value={profile.gender}
                 onChange={(e) => setProfile({ ...profile, gender: e.target.value as any })}
@@ -247,7 +247,7 @@ export default function OnboardingPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold block mb-1">Weight (kg)</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Weight (kg)</label>
               <input
                 type="number"
                 step="0.1"
@@ -264,7 +264,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold block mb-1">Height (cm)</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Height (cm)</label>
               <input
                 type="number"
                 value={profile.heightCm}
@@ -280,7 +280,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold block mb-1">Body Fat % (Optional)</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Body Fat % (Optional)</label>
               <input
                 type="number"
                 step="0.1"
@@ -291,7 +291,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold block mb-1">Waist (cm)</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Waist (cm)</label>
               <input
                 type="number"
                 step="0.1"
@@ -302,7 +302,7 @@ export default function OnboardingPage() {
               />
             </div>
             <div className="col-span-2">
-              <label className="text-xs font-semibold block mb-1">Primary Body Goal</label>
+              <label className="text-xs font-semibold block mb-1 text-[#713600]">Primary Body Goal</label>
               <select
                 value={profile.goal}
                 onChange={(e) => setProfile({ ...profile, goal: e.target.value as any })}
@@ -311,26 +311,26 @@ export default function OnboardingPage() {
                 <option value="lean_athletic">Lean Athletic Physique (Lose Fat + Build Muscle)</option>
                 <option value="fat_loss">Fat Loss</option>
                 <option value="muscle_gain">Muscle Gain</option>
-                <option value="maintenance">Maintenance &amp; Health</option>
+                <option value="maintenance">Maintenance & Health</option>
               </select>
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#F5F2EB] flex items-center justify-between text-xs">
-            <span className="font-semibold text-[#554337]">Calculated BMI:</span>
-            <span className="font-bold text-[#1B1B1E] text-sm">{calculateBmi(profile.weightKg, profile.heightCm)}</span>
+          <div className="p-3 rounded-2xl bg-[#f5f2e0] flex items-center justify-between text-xs">
+            <span className="font-semibold text-[#713600]">Calculated BMI:</span>
+            <span className="font-bold text-[#38240d] text-sm">{calculateBmi(profile.weightKg, profile.heightCm)}</span>
           </div>
 
           <div className="flex gap-2 pt-2">
             <button
               onClick={() => setStep(1)}
-              className="px-5 py-3 rounded-full bg-[#F2EFE9] text-xs font-bold cursor-pointer hover:bg-[#E4E0D8] transition-colors"
+              className="px-5 py-3 rounded-full bg-[#f0ece0] text-xs font-bold text-[#713600] cursor-pointer hover:bg-[#e8e4d0] transition-colors"
             >
               Back
             </button>
             <button
               onClick={() => setStep(3)}
-              className="flex-1 py-3 rounded-full bg-[#FB923C] hover:bg-[#f97316] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all"
+              className="flex-1 py-3 rounded-full bg-[#c05800] hover:bg-[#a04800] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all"
             >
               <span>See My Daily Blueprint</span>
               <ArrowRight className="w-4 h-4" />
@@ -341,34 +341,34 @@ export default function OnboardingPage() {
 
       {step === 3 && (
         <section className="tactile-card-white p-6 space-y-4">
-          <div className="flex items-center gap-2 text-[#006C4B]">
+          <div className="flex items-center gap-2 text-[#c05800]">
             <Sparkles className="w-5 h-5" />
             <span className="text-xs font-bold uppercase tracking-wider">Your Personalized Targets</span>
           </div>
-          <h2 className="font-display text-xl font-bold">Daily Nutrition Targets for {profile.name}</h2>
+          <h2 className="font-display text-xl font-bold text-[#38240d]">Daily Nutrition Targets for {profile.name}</h2>
           <div className="grid grid-cols-2 gap-3 text-center">
-            <div className="p-4 rounded-2xl bg-[#FFEDD5]">
-              <p className="text-xs font-bold text-[#7C2D12]">Calories Target</p>
-              <p className="font-display text-2xl font-bold text-[#944A00]">
+            <div className="p-4 rounded-2xl bg-[#fff3e0]">
+              <p className="text-xs font-bold text-[#c05800]">Calories Target</p>
+              <p className="font-display text-2xl font-bold text-[#38240d]">
                 ~{Math.round(calculateTee(calculateBmr(profile.weightKg, profile.heightCm, profile.age, profile.gender), profile.activityLevel) * (profile.goal === 'fat_loss' || profile.goal === 'lean_athletic' ? 0.8 : 1.05))} kcal
               </p>
             </div>
-            <div className="p-4 rounded-2xl bg-[#DCFCE7]">
-              <p className="text-xs font-bold text-[#14532D]">Protein Target</p>
-              <p className="font-display text-2xl font-bold text-[#006C4B]">
+            <div className="p-4 rounded-2xl bg-[#f5f2e0]">
+              <p className="text-xs font-bold text-[#713600]">Protein Target</p>
+              <p className="font-display text-2xl font-bold text-[#38240d]">
                 ~{Math.round(profile.weightKg * (profile.goal === 'muscle_gain' || profile.goal === 'lean_athletic' ? 1.8 : 1.4))} g
               </p>
             </div>
           </div>
-          <p className="text-xs text-[#554337] leading-relaxed">
-            These are customized for your weight of <strong>{profile.weightKg} kg</strong>, calculated BMI, and pure vegetarian lifestyle.
+          <p className="text-xs text-[#a08a6a] leading-relaxed">
+            These are customized for your weight of <strong className="text-[#38240d]">{profile.weightKg} kg</strong>, calculated BMI, and pure vegetarian lifestyle.
           </p>
           <button
             onClick={handleFinish}
             disabled={saving}
-            className="w-full py-3.5 rounded-full bg-[#1B1B1E] hover:bg-[#333] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.99]"
+            className="w-full py-3.5 rounded-full bg-[#38240d] hover:bg-[#4a2f10] text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.99]"
           >
-            <CheckCircle2 className="w-4 h-4 text-[#34D399]" />
+            <CheckCircle2 className="w-4 h-4" />
             <span>{saving ? 'Setting Up...' : 'Enter My Dashboard'}</span>
           </button>
         </section>
