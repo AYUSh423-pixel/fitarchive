@@ -152,6 +152,11 @@ export default function MealScannerPage() {
       if (scanResultData && Array.isArray(scanResultData.items) && scanResultData.items.length > 0) {
         setScanResult(scanResultData);
         setItems(scanResultData.items.map((it, i) => ({ ...it, tempId: `t${i}` })));
+        
+        // Show warning if using local estimates
+        if (scanResultData.mode === 'local_estimate') {
+          setError('⚠️ AI vision unavailable (add GEMINI_API_KEY to .env.local for live photo analysis). Showing local estimates - please review and adjust each item before saving.');
+        }
       } else {
         throw new Error('Could not identify food items. Please add a brief description below and try again.');
       }

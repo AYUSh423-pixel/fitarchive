@@ -185,7 +185,28 @@ export async function analyzeFoodPhoto(
   hintText?: string,
   config?: AiConfig
 ): Promise<PhotoScanResult> {
-  const { provider, apiKey, model, baseUrl } = resolveAiCredentials(config);
+  // For vision analysis, prioritize Gemini if available
+  const geminiApiKey = config?.apiKey || process.env.GEMINI_API_KEY || '';
+  const geminiModel = config?.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  
+  let provider, apiKey, model, baseUrl;
+  
+  if (geminiApiKey) {
+    // Use Gemini for vision analysis
+    provider = 'gemini';
+    apiKey = geminiApiKey;
+    model = geminiModel;
+    baseUrl = ''; // Not used for Gemini
+    console.log('[analyzeFoodPhoto] Using Gemini for vision analysis');
+  } else {
+    // Fall back to configured provider
+    const resolved = resolveAiCredentials(config);
+    provider = resolved.provider;
+    apiKey = resolved.apiKey;
+    model = resolved.model;
+    baseUrl = resolved.baseUrl;
+    console.log('[analyzeFoodPhoto] Using fallback provider:', provider);
+  }
 
   console.log('[analyzeFoodPhoto] Resolved credentials:', { provider, model, baseUrl, hasApiKey: !!apiKey, apiKeyPrefix: apiKey?.substring(0, 10) });
 
@@ -290,6 +311,11 @@ Respond ONLY in this exact JSON shape:
             mimeType
           );
           console.log('[Vidhyantra] Response received:', jsonText ? 'Success' : 'Empty/Null response');
+          
+          // If Vidhyantra returns empty or error, log it clearly
+          if (!jsonText) {
+            console.warn('[Vidhyantra] Vision analysis returned empty response. This may indicate the Vidhyantra model does not support image analysis. Falling back to local estimates.');
+          }
         } catch (err) {
           console.error('[Vidhyantra] Analysis error:', err);
           jsonText = null;
