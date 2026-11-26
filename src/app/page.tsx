@@ -72,24 +72,6 @@ export default function HomeDashboardPage() {
 
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
-      {/* Greeting */}
-      <div className="flex items-start justify-between pt-1">
-        <div>
-          <p className="text-xs font-bold tracking-widest uppercase text-[#a08a6a]">
-            TODAY · {formattedDate}
-          </p>
-          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight mt-0.5">
-            {greeting}, {profile.name}
-          </h2>
-        </div>
-        <Link
-          href="/profile"
-          className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#c05800] text-lg shadow-sm border border-[#e8e4d0]"
-        >
-          {profile.name?.charAt(0)?.toUpperCase() ?? 'A'}
-        </Link>
-      </div>
-
       {/* Calorie Arc Card */}
       <div className="bg-white rounded-[20px] p-5 shadow-sm">
         <CalorieArcGauge consumed={totals.calories} target={target.caloriesKcal} />

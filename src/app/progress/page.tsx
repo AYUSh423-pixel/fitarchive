@@ -94,24 +94,13 @@ export default function ProgressPage() {
 
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="flex items-start justify-between pt-1">
-        <div>
-          <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">
-            BODY TRANSFORMATION
-          </p>
-          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight">
-            Progress
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setPhotoModalOpen(true)}
-            className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#a08a6a] shadow-sm border border-[#e8e4d0]"
-          >
-            <Camera className="w-5 h-5" />
-          </button>
-        </div>
+      <div className="flex justify-end pt-1">
+        <button
+          onClick={() => setPhotoModalOpen(true)}
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#a08a6a] shadow-sm border border-[#e8e4d0]"
+        >
+          <Camera className="w-5 h-5" />
+        </button>
       </div>
 
       {toast && (

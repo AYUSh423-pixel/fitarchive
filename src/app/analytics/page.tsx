@@ -47,9 +47,6 @@ export default function AnalyticsPage() {
     <div className="max-w-3xl mx-auto space-y-5">
       <div className="tactile-card-white p-5 flex items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-xl font-bold flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-[#c05800]" /> Analytics & Reports
-          </h2>
           <p className="text-xs text-[#a08a6a]">
             Real-time trends from your logged meals, workouts & body scans
           </p>

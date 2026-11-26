@@ -73,16 +73,11 @@ export default function FoodDiaryPage() {
 
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="flex items-start justify-between pt-1">
-        <div>
-          <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">
-            {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()}, {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}
-          </p>
-          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight">
-            Diary
-          </h2>
-        </div>
+      {/* Week date strip */}
+      <div className="flex items-center justify-between pt-1">
+        <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">
+          {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()}, {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}
+        </p>
         <button
           onClick={() => setSelectedDate(todayStr())}
           className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-[#a08a6a] shadow-sm border border-[#e8e4d0]"
@@ -90,7 +85,6 @@ export default function FoodDiaryPage() {
           <CalendarDays className="w-5 h-5" />
         </button>
       </div>
-
       {/* Week date strip */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {days.map((d) => {

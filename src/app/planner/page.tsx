@@ -103,7 +103,6 @@ export default function MealPlannerPage() {
             <Badge variant="secondary" size="xs" className="mb-2">
               100% Pure Vegetarian • No Eggs
             </Badge>
-            <h2 className="font-display text-xl font-bold text-[#38240d]">Personalized Meal Planner</h2>
           </div>
 
           <div className="bg-[#f0ece0] p-1 rounded-full" role="radiogroup" aria-label="Plan duration">

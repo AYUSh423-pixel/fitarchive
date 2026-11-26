@@ -54,19 +54,6 @@ export default function AiDietitianPage() {
 
   return (
     <div className="flex flex-col max-w-2xl mx-auto" style={{ height: 'calc(100dvh - 9rem)' }}>
-      {/* Header */}
-      <div className="flex items-start justify-between mb-5 pt-1 shrink-0">
-        <div>
-          <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">YOUR COACH</p>
-          <h2 className="font-display text-[26px] font-bold text-[#38240d] tracking-tight leading-tight">
-            AI Dietitian
-          </h2>
-        </div>
-        <Link href="/profile" className="w-11 h-11 rounded-full bg-white flex items-center justify-center font-bold text-[#c05800] text-lg shadow-sm border border-[#e8e4d0]">
-          A
-        </Link>
-      </div>
-
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto space-y-3 pb-3 no-scrollbar">
         {!hasMessages && (

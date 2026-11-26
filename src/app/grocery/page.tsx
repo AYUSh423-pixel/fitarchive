@@ -70,7 +70,6 @@ export default function GroceryPage() {
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#c05800]">
             {activeList?.period || 'Weekly'} Shopping List
           </span>
-          <h2 className="font-display text-xl font-bold text-[#38240d]">Grocery & Budget</h2>
         </div>
         <div className="text-right">
           <p className="text-xs text-[#a08a6a]">Estimated Total</p>
