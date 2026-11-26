@@ -462,13 +462,15 @@ export default function MealScannerPage() {
             </>
           )}
 
-          {/* Overlay viewfinder guidelines */}
+          {/* Overlay viewfinder guidelines with animated scanline */}
           {cameraActive && !imagePreview && (
-            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-between p-4">
-              <span className="text-[11px] font-semibold text-white/80 bg-black/40 backdrop-blur-xs px-3 py-1 rounded-full">
+            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-between p-4 overflow-hidden">
+              <span className="text-[11px] font-semibold text-white/90 bg-black/50 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10">
                 Center your plate
               </span>
-              <div className="w-48 h-48 rounded-full border border-white/25 border-dashed" />
+              <div className="w-48 h-48 rounded-full border-2 border-white/30 border-dashed relative overflow-hidden">
+                <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#F59E0B] to-transparent animate-scan-line shadow-[0_0_8px_#F59E0B]" />
+              </div>
               <div />
             </div>
           )}

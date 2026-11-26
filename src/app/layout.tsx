@@ -9,12 +9,14 @@ const epilogue = Epilogue({
   variable: '--font-epilogue',
   subsets: ['latin'],
   weight: ['500', '600', '700'],
+  display: 'swap',
 });
 
 const manrope = Manrope({
   variable: '--font-manrope',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -29,12 +31,19 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'NutriFit AI',
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#713600',
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#B45309',
   viewportFit: 'cover',
 };
 
@@ -56,8 +65,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }}
         />
       </head>
-      <body className="min-h-full bg-[#fdfbd4] text-[#38240d]">
-        <Suspense fallback={<div className="min-h-screen bg-[#F7F4EF]" />}>
+      <body className="min-h-full bg-[#F6F4EE] text-[#1C1917] selection:bg-[#FEF3C7] selection:text-[#B45309]">
+        <Suspense fallback={<div className="min-h-screen bg-[#F6F4EE]" />}>
           <ToastProvider>
             <AppShell>{children}</AppShell>
           </ToastProvider>

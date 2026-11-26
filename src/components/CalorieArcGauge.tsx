@@ -7,7 +7,7 @@ interface CalorieArcGaugeProps {
   target: number;
 }
 
-// 18 dots spread across a 180° arc (like the design)
+// 18 dots spread across a 180° arc matching the reference minimalist design
 const DOT_COUNT = 18;
 
 export function CalorieArcGauge({ consumed, target }: CalorieArcGaugeProps) {
@@ -40,26 +40,30 @@ export function CalorieArcGauge({ consumed, target }: CalorieArcGaugeProps) {
             key={i}
             cx={dot.x}
             cy={dot.y}
-            r={6}
-            fill={dot.filled ? (isOver ? '#DC2626' : '#c05800') : '#f0ece0'}
-            className="transition-all duration-500"
+            r={5.5}
+            fill={dot.filled ? (isOver ? '#DC2626' : '#B45309') : '#E7E3D8'}
+            className="animate-pop-in origin-center transition-colors duration-500"
+            style={{
+              animationDelay: `${i * 30}ms`,
+              animationFillMode: 'both',
+            }}
           />
         ))}
       </svg>
 
-      {/* Centre content */}
-      <div className="absolute bottom-0 inset-x-0 flex flex-col items-center text-center pb-1">
-        <div className="w-9 h-9 rounded-full bg-[#fff3e0] flex items-center justify-center text-[#c05800] mb-1">
+      {/* Centre content with micro-bounce entrance */}
+      <div className="absolute bottom-0 inset-x-0 flex flex-col items-center text-center pb-1 animate-scale-in">
+        <div className="w-9 h-9 rounded-full bg-[#FFF7ED] border border-[#FED7AA]/50 flex items-center justify-center text-[#B45309] mb-1.5 shadow-sm">
           <Zap className="w-4 h-4 fill-current" />
         </div>
-        <span className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a]">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-[#8C827A]">
           CONSUMED
         </span>
-        <div className="flex items-baseline gap-1">
-          <span className="font-display text-[36px] leading-none font-bold text-[#38240d] tracking-tight">
+        <div className="flex items-baseline gap-1 mt-0.5">
+          <span className="font-display text-[38px] leading-none font-bold text-[#1C1917] tracking-tight">
             {Math.round(consumed).toLocaleString()}
           </span>
-          <span className="text-sm font-medium text-[#a08a6a]">kcal</span>
+          <span className="text-xs font-semibold text-[#8C827A]">kcal</span>
         </div>
       </div>
     </div>

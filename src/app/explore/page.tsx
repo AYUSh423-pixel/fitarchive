@@ -6,21 +6,21 @@ import Link from 'next/link';
 import type { FoodItem, Recipe, MealSlot } from '@/types/nutrifit';
 
 const FOOD_CATEGORIES = [
-  { label: 'Dal', color: '#f5f2e0', textColor: '#713600' },
-  { label: 'Sabzi', color: '#fff3e0', textColor: '#c05800' },
-  { label: 'Roti & rice', color: '#fff3e0', textColor: '#a04800' },
-  { label: 'Paneer', color: '#efebe9', textColor: '#5d4037' },
-  { label: 'Snacks', color: '#f5f2e0', textColor: '#713600' },
-  { label: 'Sweets', color: '#ffe0b2', textColor: '#c05800' },
+  { label: 'Dal', color: '#FAF8F5', textColor: '#B45309' },
+  { label: 'Sabzi', color: '#FAF8F5', textColor: '#D97706' },
+  { label: 'Roti & rice', color: '#FAF8F5', textColor: '#B45309' },
+  { label: 'Paneer', color: '#FAF8F5', textColor: '#78716C' },
+  { label: 'Snacks', color: '#FAF8F5', textColor: '#B45309' },
+  { label: 'Sweets', color: '#FAF8F5', textColor: '#D97706' },
 ];
 
 const TOOLS = [
-  { label: 'Meal planner', icon: <CalendarDays className="w-5 h-5 text-[#c05800]" />, href: '/planner' },
-  { label: 'Gym & workouts', icon: <Dumbbell className="w-5 h-5 text-[#c05800]" />, href: '/workouts' },
-  { label: 'Transformation', icon: <TrendingUp className="w-5 h-5 text-[#c05800]" />, href: '/progress' },
-  { label: 'Water & habits', icon: <Droplets className="w-5 h-5 text-[#c05800]" />, href: '/habits' },
-  { label: 'Grocery & budget', icon: <ShoppingCart className="w-5 h-5 text-[#c05800]" />, href: '/grocery' },
-  { label: 'Analytics', icon: <BarChart3 className="w-5 h-5 text-[#c05800]" />, href: '/analytics' },
+  { label: 'Meal planner', icon: <CalendarDays className="w-5 h-5 text-[#B45309]" />, href: '/planner' },
+  { label: 'Gym & workouts', icon: <Dumbbell className="w-5 h-5 text-[#B45309]" />, href: '/workouts' },
+  { label: 'Transformation', icon: <TrendingUp className="w-5 h-5 text-[#B45309]" />, href: '/progress' },
+  { label: 'Water & habits', icon: <Droplets className="w-5 h-5 text-[#B45309]" />, href: '/habits' },
+  { label: 'Grocery & budget', icon: <ShoppingCart className="w-5 h-5 text-[#B45309]" />, href: '/grocery' },
+  { label: 'Analytics', icon: <BarChart3 className="w-5 h-5 text-[#B45309]" />, href: '/analytics' },
 ];
 
 const FILTER_CHIPS = ['All', 'Dal', 'Sabzi', 'Roti & rice', 'Paneer'];
@@ -86,28 +86,28 @@ export default function IndianFoodExplorePage() {
   };
 
   return (
-    <div className="space-y-5 max-w-2xl mx-auto">
+    <div className="space-y-5 max-w-2xl mx-auto pb-6">
       {/* Search bar */}
-      <div className="flex items-center gap-3 bg-white rounded-[16px] px-4 py-3 shadow-sm border border-[#e8e4d0]">
-        <Search className="w-5 h-5 text-[#a08a6a] shrink-0" />
+      <div className="flex items-center gap-3 card-minimal px-4 py-3 shadow-xs animate-fade-in focus-within:ring-2 focus-within:ring-[#B45309]/20 focus-within:border-[#B45309] transition-all">
+        <Search className="w-5 h-5 text-[#8C827A] shrink-0" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search dal, paneer, roti…"
-          className="flex-1 bg-transparent text-sm text-[#38240d] placeholder-[#a08a6a] focus:outline-none"
+          className="flex-1 bg-transparent text-sm text-[#1C1917] placeholder-[#8C827A] focus:outline-none"
         />
       </div>
 
       {/* Filter chips */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar animate-fade-in">
         {FILTER_CHIPS.map((chip) => (
           <button
             key={chip}
             onClick={() => setActiveFilter(chip)}
-            className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
+            className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer tactile-press-sm ${
               activeFilter === chip
-                ? 'bg-[#38240d] text-white'
-                : 'bg-white text-[#38240d] border border-[#e8e4d0] shadow-sm hover:border-[#c05800]'
+                ? 'bg-[#1C1917] text-white shadow-xs'
+                : 'bg-white text-[#1C1917] border border-[#E7E3D8] hover:border-[#B45309]/40'
             }`}
           >
             {chip}
@@ -117,8 +117,8 @@ export default function IndianFoodExplorePage() {
 
       {/* Food search results / categories */}
       {query || activeFilter !== 'All' ? (
-        <div>
-          <h3 className="font-bold text-[#38240d] text-base mb-3">
+        <div className="animate-fade-in-up">
+          <h3 className="font-bold text-[#1C1917] text-sm uppercase tracking-wider mb-3">
             {loading ? 'Searching…' : `${foods.length} results`}
           </h3>
           <div className="space-y-2">
@@ -126,53 +126,52 @@ export default function IndianFoodExplorePage() {
               <button
                 key={food.id}
                 onClick={() => setSelectedFood(food)}
-                className="bg-white rounded-[16px] p-3.5 shadow-sm flex items-center justify-between gap-3 text-left w-full cursor-pointer hover:bg-[#faf9f5] transition-colors"
+                className="card-minimal p-3.5 flex items-center justify-between gap-3 text-left w-full cursor-pointer hover:bg-[#FAF9F6] transition-colors tactile-press-sm"
               >
                 <div className="min-w-0">
-                  <p className="font-semibold text-sm text-[#38240d] truncate">{food.name}</p>
-                  <p className="text-xs text-[#a08a6a]">{food.calories} kcal · {food.proteinG}g P · {food.weightGrams}g serving</p>
+                  <p className="font-semibold text-sm text-[#1C1917] truncate">{food.name}</p>
+                  <p className="text-xs text-[#8C827A]">{food.calories} kcal · {food.proteinG}g P · {food.weightGrams}g serving</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-[#a08a6a] shrink-0" />
+                <ChevronRight className="w-4 h-4 text-[#8C827A] shrink-0" />
               </button>
             ))}
           </div>
         </div>
       ) : (
         <>
-          {/* Indian food database categories - single column ascending */}
-          <div>
-            <h3 className="font-bold text-[#38240d] text-base mb-3">Indian food database</h3>
-            <div className="space-y-2.5">
+          {/* Indian food database categories */}
+          <div className="animate-fade-in-up">
+            <h3 className="font-bold text-[#1C1917] text-base mb-3">Indian food database</h3>
+            <div className="grid grid-cols-2 gap-2.5">
               {FOOD_CATEGORIES.map((cat) => (
                 <button
                   key={cat.label}
                   onClick={() => setActiveFilter(cat.label)}
-                  className="rounded-[16px] p-4 text-left w-full cursor-pointer active:scale-[0.97] transition-transform flex items-center gap-3"
-                  style={{ backgroundColor: cat.color }}
+                  className="card-minimal p-3.5 text-left w-full cursor-pointer tactile-press flex items-center justify-between hover:border-[#B45309]/30 transition-all"
                 >
-                  <div className="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center">
-                    <ChevronRight className="w-5 h-5" style={{ color: cat.textColor }} />
+                  <p className="font-bold text-sm text-[#1C1917]">{cat.label}</p>
+                  <div className="w-7 h-7 rounded-full bg-[#FFF7ED] flex items-center justify-center">
+                    <ChevronRight className="w-4 h-4 text-[#B45309]" />
                   </div>
-                  <p className="font-bold text-base" style={{ color: cat.textColor }}>{cat.label}</p>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Plan & fitness tools - single column ascending */}
-          <div>
-            <h3 className="font-bold text-[#38240d] text-base mb-3">Plan & fitness</h3>
-            <div className="space-y-2.5">
+          {/* Plan & fitness tools */}
+          <div className="animate-fade-in-up">
+            <h3 className="font-bold text-[#1C1917] text-base mb-3">Plan & fitness</h3>
+            <div className="grid grid-cols-2 gap-2.5">
               {TOOLS.map((tool) => (
                 <Link
                   key={tool.label}
                   href={tool.href}
-                  className="bg-white rounded-[16px] p-4 shadow-sm flex items-center gap-3 hover:bg-[#faf9f5] active:scale-[0.97] transition-transform w-full"
+                  className="card-minimal p-3.5 flex items-center gap-3 hover:bg-[#FAF9F6] tactile-press w-full transition-all"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#fff3e0] flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-[#FFF7ED] border border-[#FED7AA]/40 flex items-center justify-center shrink-0">
                     {tool.icon}
                   </div>
-                  <p className="font-semibold text-base text-[#38240d]">{tool.label}</p>
+                  <p className="font-semibold text-xs text-[#1C1917]">{tool.label}</p>
                 </Link>
               ))}
             </div>

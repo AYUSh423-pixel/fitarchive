@@ -53,44 +53,48 @@ export default function AiDietitianPage() {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="flex flex-col max-w-2xl mx-auto" style={{ height: 'calc(100dvh - 9rem)' }}>
+    <div className="flex flex-col max-w-2xl mx-auto" style={{ height: 'calc(100dvh - 8.5rem)' }}>
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto space-y-3 pb-3 no-scrollbar">
         {!hasMessages && (
-          <>
-            <div className="bg-white rounded-[18px] p-4 shadow-sm max-w-[85%]">
-              <p className="text-[#38240d] text-sm leading-relaxed">
-                Hi! I can help you reach 130g protein on a pure-veg, no-egg day. What should we work on?
+          <div className="space-y-4 animate-fade-in">
+            <div className="card-minimal p-4 max-w-[90%]">
+              <p className="text-[#1C1917] text-sm leading-relaxed">
+                Namaste! I am your AI Indian Dietitian. I can help you reach your protein and calorie goals with 100% pure vegetarian, satvik, or Jain options. What would you like to plan today?
               </p>
             </div>
 
-            <div className="mt-5 space-y-2">
-              <p className="text-[10px] font-bold tracking-widest uppercase text-[#a08a6a] px-1">TRY ASKING</p>
-              {QUICK_PROMPTS.map((p) => (
+            <div className="mt-4 space-y-2">
+              <p className="text-[10px] font-bold tracking-widest uppercase text-[#8C827A] px-1">TRY ASKING</p>
+              {QUICK_PROMPTS.map((p, idx) => (
                 <button
                   key={p}
                   onClick={() => sendMessage(p)}
-                  className="w-full text-left bg-white rounded-2xl px-4 py-3.5 text-sm text-[#38240d] font-medium shadow-sm hover:bg-[#faf9f5] active:scale-[0.98] transition-all cursor-pointer border border-[#e8e4d0]"
+                  className="w-full text-left card-minimal px-4 py-3 text-sm text-[#1C1917] font-medium tactile-press hover:border-[#B45309]/50 transition-all cursor-pointer animate-fade-in-up"
+                  style={{ animationDelay: `${idx * 80}ms` }}
                 >
                   {p}
                 </button>
               ))}
             </div>
-          </>
+          </div>
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div
+            key={msg.id}
+            className={`flex animate-scale-in ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-[#fff3e0] flex items-center justify-center mr-2 mt-1 shrink-0 text-[#c05800] text-[10px] font-bold">
+              <div className="w-7 h-7 rounded-full bg-[#FFF7ED] border border-[#FED7AA] flex items-center justify-center mr-2 mt-1 shrink-0 text-[#B45309] text-[10px] font-bold shadow-xs">
                 AI
               </div>
             )}
             <div
-              className={`max-w-[80%] rounded-[18px] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[82%] rounded-[18px] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === 'user'
-                  ? 'bg-[#c05800] text-white rounded-br-sm'
-                  : 'bg-white text-[#38240d] shadow-sm rounded-bl-sm'
+                  ? 'bg-[#B45309] text-white rounded-br-xs shadow-sm'
+                  : 'card-minimal text-[#1C1917] rounded-bl-xs'
               }`}
             >
               {msg.content}
@@ -99,11 +103,17 @@ export default function AiDietitianPage() {
         ))}
 
         {sending && (
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#fff3e0] flex items-center justify-center text-[#c05800] text-[10px] font-bold">AI</div>
-            <div className="bg-white rounded-[18px] px-4 py-3 shadow-sm flex gap-1 items-center">
+          <div className="flex items-center gap-2 animate-fade-in">
+            <div className="w-7 h-7 rounded-full bg-[#FFF7ED] border border-[#FED7AA] flex items-center justify-center text-[#B45309] text-[10px] font-bold">
+              AI
+            </div>
+            <div className="card-minimal px-4 py-3 flex gap-1.5 items-center">
               {[0, 1, 2].map((i) => (
-                <span key={i} className="w-2 h-2 rounded-full bg-[#e8e4d0] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                <span
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-[#B45309]/60 animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
               ))}
             </div>
           </div>
@@ -112,21 +122,22 @@ export default function AiDietitianPage() {
       </div>
 
       {/* Input */}
-      <div className="flex gap-2 items-center pt-3 shrink-0">
+      <div className="flex gap-2 items-center pt-2 shrink-0">
         <input
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
           placeholder="Ask your dietitian…"
-          className="flex-1 bg-white rounded-full px-5 py-3.5 text-sm text-[#38240d] placeholder-[#a08a6a] border border-[#e8e4d0] focus:outline-none focus:border-[#c05800] shadow-sm"
+          className="flex-1 bg-white rounded-full px-5 py-3 text-sm text-[#1C1917] placeholder-[#8C827A] border border-[#E7E3D8] focus:outline-none focus:border-[#B45309] focus:ring-2 focus:ring-[#B45309]/15 shadow-sm transition-all"
         />
         <button
           onClick={() => sendMessage(input)}
           disabled={!input.trim() || sending}
-          className="w-12 h-12 rounded-full bg-[#c05800] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(192,88,0,0.4)] disabled:opacity-40 active:scale-95 transition-transform cursor-pointer"
+          className="w-11 h-11 rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(180,83,9,0.3)] disabled:opacity-40 tactile-press transition-all cursor-pointer shrink-0"
+          title="Send"
         >
-          <Send className="w-5 h-5" />
+          <Send className="w-4 h-4" />
         </button>
       </div>
     </div>
