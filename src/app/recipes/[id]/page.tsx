@@ -5,6 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Check, CheckCircle2, Clock, Plus, ShoppingCart, Utensils } from 'lucide-react';
 import type { Recipe } from '@/types/nutrifit';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Progress } from '@/components/ui/Progress';
+import { SkeletonRecipeCard } from '@/components/ui/Skeleton';
 
 export default function RecipeDetailsPage() {
   const params = useParams();
@@ -70,17 +75,17 @@ export default function RecipeDetailsPage() {
   };
 
   if (loading) {
-    return <div className="h-72 rounded-3xl bg-white animate-pulse max-w-xl mx-auto" />;
+    return <SkeletonRecipeCard />;
   }
 
   if (!recipe) {
     return (
-      <div className="tactile-card p-8 text-center max-w-xl mx-auto space-y-3">
+      <Card variant="default" padding="xl" className="text-center max-w-xl mx-auto space-y-3">
         <p className="font-display font-bold text-lg">Recipe not found</p>
         <Link href="/explore" className="text-sm font-semibold text-[#c05800] underline">
           Back to Indian Food Explore
         </Link>
-      </div>
+      </Card>
     );
   }
 
@@ -92,8 +97,10 @@ export default function RecipeDetailsPage() {
   const cPct = Math.round(((recipe.carbsPerServing * 4) / macroCal) * 100);
   const fPct = Math.max(0, 100 - pPct - cPct);
 
+  const checkedCount = Object.values(checkedIngredients).filter(Boolean).length;
+
   return (
-    <div className="max-w-xl mx-auto space-y-5">
+    <div className="max-w-xl mx-auto space-y-5 pb-20">
       <Link
         href="/explore"
         className="inline-flex items-center gap-1.5 text-xs font-bold text-[#713600] hover:text-[#38240d]"
@@ -101,7 +108,7 @@ export default function RecipeDetailsPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Explore
       </Link>
 
-      <section className="tactile-card-white p-6 space-y-5">
+      <Card variant="white" padding="lg" className="space-y-6">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-[#713600]" />
@@ -112,16 +119,16 @@ export default function RecipeDetailsPage() {
         <p className="text-sm text-[#713600] leading-relaxed">{recipe.description}</p>
 
         <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full bg-[#f5f2e0] text-[#713600] text-xs font-bold flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> {recipe.prepTimeMin} mins • {recipe.difficulty}
-          </span>
-          <span className="px-3 py-1 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold">
+          <Badge variant="default" size="sm" leftIcon={<Clock className="w-3.5 h-3.5" />}>
+            {recipe.prepTimeMin} mins • {recipe.difficulty}
+          </Badge>
+          <Badge variant="secondary" size="sm">
             {recipe.servings} Serving • Pure Veg (No Egg)
-          </span>
+          </Badge>
         </div>
 
-        {/* Macro Impact Bar (Matching Stitch Explore Featured Card) */}
-        <div className="space-y-2 pt-2 border-t border-[#f0ece0]">
+        {/* Macro Impact Bar */}
+        <div className="space-y-3 pt-3 border-t border-[#f0ece0]">
           <div className="flex items-baseline justify-between">
             <span className="text-xs font-semibold text-[#713600]">Macro Impact</span>
             <div className="text-right">
@@ -148,16 +155,16 @@ export default function RecipeDetailsPage() {
         </div>
 
         {/* Ingredients Checklist */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-display font-bold text-sm text-[#38240d]">Ingredients</h2>
             <span className="text-xs font-bold text-[#713600]">
-              {Object.values(checkedIngredients).filter(Boolean).length} of {recipe.ingredients.length} Ready
+              {checkedCount} of {recipe.ingredients.length} Ready
             </span>
           </div>
 
           {addedMsg && (
-            <div className="p-2.5 rounded-xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-1.5">
+            <div className="p-2.5 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-1.5 animate-in slide-in-from-top-2 duration-200">
               <ShoppingCart className="w-3.5 h-3.5" /> {addedMsg}
             </div>
           )}
@@ -168,20 +175,20 @@ export default function RecipeDetailsPage() {
               return (
                 <div
                   key={idx}
-                  className="p-3 rounded-2xl bg-[#f5f2e0] flex items-center justify-between gap-2"
+                  className="p-3 rounded-2xl bg-[#f5f2e0] flex items-center justify-between gap-2 transition-colors hover:bg-[#e8e4d0]"
                 >
                   <button
                     type="button"
                     onClick={() =>
                       setCheckedIngredients((prev) => ({ ...prev, [idx]: !prev[idx] }))
                     }
-                    className="flex items-center gap-2.5 text-left cursor-pointer"
+                    className="flex items-center gap-2.5 text-left cursor-pointer flex-1"
                   >
                     <span
-                      className={`w-5 h-5 rounded-md flex items-center justify-center border ${
+                      className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
                         checked
                           ? 'bg-[#c05800] border-[#c05800] text-white'
-                          : 'bg-white border-[#e8e4d0]'
+                          : 'bg-white border-[#e8e4d0] hover:border-[#c05800]'
                       }`}
                     >
                       {checked && <Check className="w-3.5 h-3.5" />}
@@ -192,13 +199,15 @@ export default function RecipeDetailsPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs font-bold text-[#713600]">{ing.quantity}</span>
                     {!checked && (
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        leftIcon={<Plus className="w-3 h-3" />}
                         onClick={() => handleAddToGrocery(ing.name, ing.quantity)}
-                        className="text-[11px] font-bold text-[#c05800] flex items-center gap-0.5 cursor-pointer"
+                        className="text-[#c05800]"
                       >
-                        <Plus className="w-3 h-3" /> Add to list
-                      </button>
+                        Add to list
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -208,28 +217,29 @@ export default function RecipeDetailsPage() {
         </div>
 
         {/* Oil / Ghee Transparency Note */}
-        <div className="p-3.5 rounded-2xl bg-[#fff3e0] text-xs text-[#a04800]">
+        <div className="p-4 rounded-2xl bg-[#fff3e0] text-xs text-[#a04800] border border-[#ffe0b2]">
           <strong>Cooking Fat Note:</strong> {recipe.oilGheeNotes}
         </div>
 
         {/* Preparation Instructions */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h2 className="font-display font-bold text-sm text-[#38240d]">Preparation Instructions</h2>
-          <ol className="space-y-2 list-decimal pl-5 text-xs text-[#713600] leading-relaxed">
+          <ol className="space-y-3 list-decimal pl-5 text-xs text-[#713600] leading-relaxed">
             {recipe.instructions.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i} className="relative pl-2">{step}</li>
             ))}
           </ol>
         </div>
 
-        <button
+        <Button
           onClick={handleLogToDiary}
-          className="w-full py-3.5 rounded-full bg-[#38240d] hover:bg-[#4a2f10] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+          className="w-full"
+          size="lg"
+          leftIcon={<Utensils className="w-4 h-4 text-[#c05800]" />}
         >
-          <Utensils className="w-4 h-4 text-[#c05800]" />
-          <span>Add to Today&apos;s Diary (+{recipe.caloriesPerServing} kcal)</span>
-        </button>
-      </section>
+          Add to Today's Diary (+{recipe.caloriesPerServing} kcal)
+        </Button>
+      </Card>
     </div>
   );
 }

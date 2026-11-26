@@ -4,6 +4,12 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CalendarDays, Check, RefreshCw, ShoppingCart, Sparkles, ArrowRightLeft } from 'lucide-react';
 import type { MealPlan, MealSlot } from '@/types/nutrifit';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Badge } from '@/components/ui/Badge';
+import { Modal } from '@/components/ui/Modal';
+import { SkeletonMealCard } from '@/components/ui/Skeleton';
 
 const VEG_SUBSTITUTES: Array<{ title: string; calories: number; proteinG: number }> = [
   { title: '150g Grilled Low-Fat Paneer Tikka + Salad', calories: 345, proteinG: 30 },
@@ -20,6 +26,7 @@ export default function MealPlannerPage() {
   const [generating, setGenerating] = useState(false);
   const [subTarget, setSubTarget] = useState<{ dayNumber: number; slot: MealSlot } | null>(null);
   const [toast, setToast] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const loadPlans = async () => {
     const res = await fetch('/api/meal-plans', { cache: 'no-store' });
@@ -27,6 +34,7 @@ export default function MealPlannerPage() {
       const d = await res.json();
       setPlans(d.mealPlans || []);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -80,87 +88,106 @@ export default function MealPlannerPage() {
   const activePlan = plans[0] || null;
   const activeDay = activePlan?.days?.[selectedDayIdx] || null;
 
+  const planTypeOptions = [
+    { value: 'daily', label: 'Daily' },
+    { value: '7_day', label: '7-Day' },
+    { value: '30_day', label: '30-Day' },
+  ] as const;
+
   return (
-    <div className="max-w-3xl mx-auto space-y-5">
+    <div className="max-w-3xl mx-auto space-y-5 pb-20">
       {/* Generator Controls */}
-      <section className="tactile-card-white p-5 space-y-4">
+      <Card variant="white" padding="lg" className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#713600]">
+            <Badge variant="secondary" size="xs" className="mb-2">
               100% Pure Vegetarian • No Eggs
-            </span>
+            </Badge>
             <h2 className="font-display text-xl font-bold text-[#38240d]">Personalized Meal Planner</h2>
           </div>
 
-          <div className="flex gap-1.5 bg-[#f0ece0] p-1 rounded-full">
-            {(['daily', '7_day', '30_day'] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setPlanType(t)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer ${
-                  planType === t ? 'bg-[#c05800] text-white' : 'text-[#713600]'
-                }`}
+          <div className="bg-[#f0ece0] p-1 rounded-full" role="radiogroup" aria-label="Plan duration">
+            {planTypeOptions.map((option) => (
+              <Chip
+                key={option.value}
+                variant="default"
+                size="xs"
+                selected={planType === option.value}
+                onSelect={() => setPlanType(option.value as 'daily' | '7_day' | '30_day')}
+                role="radio"
+                aria-checked={planType === option.value}
               >
-                {t === 'daily' ? 'Daily' : t === '7_day' ? '7-Day' : '30-Day'}
-              </button>
+                {option.label}
+              </Chip>
             ))}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             onClick={() => handleGenerate(false)}
             disabled={generating}
-            className="px-5 py-2.5 rounded-full bg-[#38240d] text-white text-xs font-semibold flex items-center gap-2 cursor-pointer"
+            isLoading={generating}
+            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            size="sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${generating ? 'animate-spin' : ''}`} />
-            <span>{generating ? 'Generating...' : 'Generate Plan'}</span>
-          </button>
-          <button
+            Generate Plan
+          </Button>
+          <Button
             onClick={() => handleGenerate(true)}
             disabled={generating}
-            className="px-5 py-2.5 rounded-full bg-[#f5f2e0] text-[#713600] text-xs font-bold flex items-center gap-2 cursor-pointer"
+            variant="secondary"
+            leftIcon={<ShoppingCart className="w-3.5 h-3.5" />}
+            size="sm"
           >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            <span>Generate Plan + Grocery List</span>
-          </button>
-          <Link
-            href="/grocery"
-            className="px-4 py-2.5 rounded-full bg-[#f0ece0] text-xs font-semibold text-[#38240d] flex items-center gap-1.5"
-          >
-            View Grocery List
+            Generate Plan + Grocery List
+          </Button>
+          <Link href="/grocery" className="flex items-center">
+            <Button variant="ghost" size="sm" leftIcon={<ShoppingCart className="w-3.5 h-3.5" />}>
+              View Grocery List
+            </Button>
           </Link>
         </div>
-      </section>
+      </Card>
 
       {toast && (
-        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 rounded-2xl bg-[#f5f2e0] text-[#713600] text-xs font-semibold flex items-center gap-2 animate-in slide-in-from-top-2 duration-200">
           <Check className="w-4 h-4" /> {toast}
         </div>
       )}
 
-      {!activePlan ? (
-        <div className="tactile-card p-8 text-center space-y-3">
-          <CalendarDays className="w-10 h-10 text-[#c05800] mx-auto" />
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonMealCard key={i} />
+          ))}
+        </div>
+      ) : !activePlan ? (
+        <Card variant="default" padding="xl" className="text-center space-y-3">
+          <CalendarDays className="w-12 h-12 text-[#c05800] mx-auto" />
           <h3 className="font-display font-bold text-lg">No Meal Plan Generated Yet</h3>
           <p className="text-xs text-[#713600] max-w-md mx-auto">
             Click &ldquo;Generate Plan + Grocery List&rdquo; above to create a personalized 1,800 kcal / 130g protein
             Indian vegetarian meal plan with exact homemade quantities.
           </p>
-        </div>
+        </Card>
       ) : (
         <>
           {/* Day Selector */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1" role="tablist" aria-label="Meal plan days">
             {activePlan.days.map((d, idx) => (
               <button
                 key={d.dayNumber}
                 onClick={() => setSelectedDayIdx(idx)}
-                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer ${
-                  idx === selectedDayIdx
-                    ? 'bg-[#c05800] text-white shadow-xs'
-                    : 'bg-white text-[#713600] border border-[#e8e4d0]'
-                }`}
+                role="tab"
+                aria-selected={idx === selectedDayIdx}
+                className={`
+                  px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-all
+                  ${idx === selectedDayIdx
+                    ? 'bg-[#c05800] text-white shadow-lg shadow-[#c05800]/30'
+                    : 'bg-white text-[#713600] border border-[#e8e4d0] hover:bg-[#f5f2e0]'
+                  }
+                `}
               >
                 {d.label}
               </button>
@@ -168,34 +195,35 @@ export default function MealPlannerPage() {
           </div>
 
           {activeDay && (
-            <div className="space-y-3">
+            <div className="space-y-3" role="tabpanel" aria-label={`Day ${selectedDayIdx + 1} meals`}>
               {(['breakfast', 'lunch', 'snacks', 'dinner'] as MealSlot[]).map((slot) => {
                 const m = activeDay.meals[slot];
                 return (
-                  <div key={slot} className="tactile-card-white p-5 space-y-3">
+                  <Card key={slot} variant="white" padding="lg" className="space-y-4">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#c05800]">
-                          {slot}
-                        </span>
+                        <Badge variant="secondary" size="xs" className="mb-1.5">
+                          {slot.charAt(0).toUpperCase() + slot.slice(1)}
+                        </Badge>
                         <h3 className="font-display font-bold text-base text-[#38240d]">{m.title}</h3>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="px-2.5 py-1 rounded-full bg-[#fff3e0] text-[#c05800] text-xs font-bold">
+                        <Badge variant="secondary" size="sm">
                           {m.totalCalories} kcal • {m.totalProteinG}g P
-                        </span>
+                        </Badge>
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {m.items.map((it, i) => (
-                        <div key={i} className="flex justify-between text-xs text-[#713600] bg-[#f5f2e0] px-3 py-2 rounded-xl">
+                        <div
+                          key={i}
+                          className="flex justify-between text-xs text-[#713600] bg-[#f5f2e0] px-3 py-2 rounded-2xl"
+                        >
                           <span className="font-semibold text-[#38240d]">
                             {it.name} ({it.quantity})
                           </span>
-                          <span>
-                            {it.calories} kcal • {it.proteinG}g P
-                          </span>
+                          <span>{it.calories} kcal • {it.proteinG}g P</span>
                         </div>
                       ))}
                     </div>
@@ -204,14 +232,16 @@ export default function MealPlannerPage() {
                       <p className="text-[11px] text-[#713600] italic flex items-center gap-1">
                         <Sparkles className="w-3 h-3 text-[#c05800]" /> {m.prepNotes}
                       </p>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        leftIcon={<ArrowRightLeft className="w-3 h-3" />}
                         onClick={() => setSubTarget({ dayNumber: activeDay.dayNumber, slot })}
-                        className="px-3 py-1.5 rounded-full bg-[#f0ece0] hover:bg-[#e8e4d0] text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
                       >
-                        <ArrowRightLeft className="w-3 h-3" /> Swap Food
-                      </button>
+                        Swap Food
+                      </Button>
                     </div>
-                  </div>
+                  </Card>
                 );
               })}
             </div>
@@ -220,36 +250,35 @@ export default function MealPlannerPage() {
       )}
 
       {/* Substitution Modal */}
-      {subTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white w-full max-w-md rounded-3xl p-6 space-y-3 shadow-2xl border border-[#e8e4d0]">
-            <h3 className="font-display font-bold text-lg">Swap {subTarget.slot} (Pure Veg)</h3>
-            <p className="text-xs text-[#713600]">
-              Pick an alternative you enjoy — your daily protein & calorie goals stay balanced:
-            </p>
-            <div className="space-y-2">
-              {VEG_SUBSTITUTES.map((sub, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSubstitute(sub)}
-                  className="w-full text-left p-3 rounded-2xl bg-white border border-[#e8e4d0] hover:border-[#c05800] flex justify-between items-center cursor-pointer"
-                >
-                  <span className="text-xs font-semibold text-[#38240d]">{sub.title}</span>
-                  <span className="text-[11px] font-bold text-[#713600] shrink-0 ml-2">
-                    {sub.calories} kcal • {sub.proteinG}g P
-                  </span>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setSubTarget(null)}
-              className="w-full py-2.5 rounded-full bg-[#f0ece0] text-xs font-semibold cursor-pointer"
+      <Modal
+        isOpen={!!subTarget}
+        onClose={() => setSubTarget(null)}
+        title={subTarget ? `Swap ${subTarget.slot.charAt(0).toUpperCase() + subTarget.slot.slice(1)} (Pure Veg)` : 'Swap Meal'}
+        description="Pick an alternative you enjoy — your daily protein & calorie goals stay balanced:"
+        size="md"
+        footer={
+          <Button variant="ghost" size="sm" onClick={() => setSubTarget(null)} className="w-full">
+            Cancel
+          </Button>
+        }
+      >
+        <div className="space-y-2">
+          {VEG_SUBSTITUTES.map((sub, i) => (
+            <Button
+              key={i}
+              variant="outline"
+              size="sm"
+              className="w-full justify-between text-left hover:border-[#c05800] hover:bg-[#fff3e0]"
+              onClick={() => handleSubstitute(sub)}
             >
-              Cancel
-            </button>
-          </div>
+              <span className="text-xs font-semibold text-[#38240d]">{sub.title}</span>
+              <Badge variant="secondary" size="xs">
+                {sub.calories} kcal • {sub.proteinG}g P
+              </Badge>
+            </Button>
+          ))}
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

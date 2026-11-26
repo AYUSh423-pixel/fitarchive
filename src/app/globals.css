@@ -417,3 +417,12 @@ h1, h2, h3, .font-display {
 
 /* Divider */
 .divider-warm { border-color: #e8e4d0; }
+
+/* Safe area utilities */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0);
+}

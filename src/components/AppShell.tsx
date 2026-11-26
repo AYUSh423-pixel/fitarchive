@@ -51,36 +51,13 @@ const ROUTE_TITLES: Record<string, string> = {
   '/settings': 'Settings & Privacy',
 };
 
-const NAV_GROUPS = [
-  {
-    label: 'Daily Nutrition',
-    items: [
-      { href: '/', label: 'Home Dashboard', icon: Home },
-      { href: '/diary', label: 'Food Diary', icon: BookOpen },
-      { href: '/scanner', label: 'AI Meal Scanner', icon: Camera },
-      { href: '/explore', label: 'Indian Food DB', icon: UtensilsCrossed },
-      { href: '/coach', label: 'AI Dietitian', icon: Sparkles },
-    ],
-  },
-  {
-    label: 'Planning & Fitness',
-    items: [
-      { href: '/planner', label: 'Meal Planner', icon: CalendarDays },
-      { href: '/workouts', label: 'Gym & Workouts', icon: Dumbbell },
-      { href: '/progress', label: 'Transformation', icon: Activity },
-      { href: '/habits', label: 'Water & Habits', icon: Droplets },
-      { href: '/grocery', label: 'Grocery & Budget', icon: ShoppingCart },
-    ],
-  },
-  {
-    label: 'Insights & Account',
-    items: [
-      { href: '/analytics', label: 'Analytics', icon: BarChart3 },
-      { href: '/profile', label: 'Body Profile', icon: User },
-      { href: '/onboarding', label: 'Onboarding', icon: Leaf },
-      { href: '/settings', label: 'Settings & Privacy', icon: Settings },
-    ],
-  },
+// Simplified nav items for bottom bar - 5 core destinations
+const BOTTOM_NAV_ITEMS = [
+  { href: '/', label: 'Today', icon: Home },
+  { href: '/diary', label: 'Diary', icon: BookOpen },
+  { href: '/scanner', label: 'Scan', icon: Camera, isCenter: true },
+  { href: '/explore', label: 'Explore', icon: Compass },
+  { href: '/coach', label: 'Coach', icon: Sparkles },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -302,102 +279,134 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const pageTitle =
-    ROUTE_TITLES[pathname] || (pathname.startsWith('/recipes/') ? 'Recipe Details' : 'NutriFit AI');
-
   return (
     <div className="min-h-screen flex bg-[#fdfbd4] text-[#38240d]">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-[#e8e4d0]/80 px-4 py-5 z-40 overflow-y-auto no-scrollbar">
-        <Link href="/" className="flex items-center gap-3 px-2 mb-6">
-          <div className="w-10 h-10 rounded-2xl bg-[#713600] text-white flex items-center justify-center shadow-sm">
-            <Leaf className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="font-display font-bold text-lg leading-tight text-[#38240d]">NutriFit AI</p>
-            <p className="text-[11px] font-semibold text-[#713600]">Pure Veg • Lean Athletic</p>
-          </div>
-        </Link>
+      {/* Main Column - Full width, no sidebar, no top header */}
+      <div className={`flex-1 flex flex-col min-h-screen w-full ${isScannerPage ? 'bg-[#38240d]' : ''}`}>
+        {/* Page Content - Full width with comfortable padding */}
+        <main className={isScannerPage ? "flex-1 w-full" : "flex-1 w-full max-w-2xl mx-auto px-4 sm:px-5 pt-4 pb-28 lg:pb-12"}>
+          {children}
+        </main>
 
-        <nav className="space-y-5 flex-1">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label}>
-              <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-[#a08a6a] mb-1.5">
-                {group.label}
-              </p>
-              <div className="space-y-1">
-                {group.items.map((item) => {
+        {/* Ascending Format Bottom Navigation Bar - Transparent Background */}
+        {!isScannerPage && (
+          <nav
+            aria-label="Primary Mobile Navigation"
+            className="lg:hidden fixed bottom-0 inset-x-0 z-40 flex flex-col items-center pointer-events-none pb-safe"
+          >
+            {/* Tertiary Row - Smallest (Secondary actions) */}
+            <div className="pointer-events-auto flex items-center justify-center gap-4 py-1.5 px-4">
+              <Link
+                href="/planner"
+                aria-label="Meal Planner"
+                className="w-8 h-8 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <CalendarDays className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/workouts"
+                aria-label="Gym & Workouts"
+                className="w-8 h-8 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <Dumbbell className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/progress"
+                aria-label="Body Transformation"
+                className="w-8 h-8 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <Activity className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/habits"
+                aria-label="Water & Habits"
+                className="w-8 h-8 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <Droplets className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/grocery"
+                aria-label="Grocery & Budget"
+                className="w-8 h-8 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <ShoppingCart className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Secondary Row - Medium (Secondary destinations) */}
+            <div className="pointer-events-auto flex items-center justify-center gap-3 py-1 px-4">
+              <Link
+                href="/settings"
+                aria-label="Settings & Privacy"
+                className="w-9 h-9 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <Settings className="w-4.5 h-4.5" />
+              </Link>
+              <Link
+                href="/profile"
+                aria-label="Body Profile"
+                className="w-9 h-9 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <User className="w-4.5 h-4.5" />
+              </Link>
+              <Link
+                href="/analytics"
+                aria-label="Analytics & Reports"
+                className="w-9 h-9 rounded-full bg-transparent text-[#a08a6a] hover:text-[#713600] flex items-center justify-center transition-colors active:scale-90"
+              >
+                <BarChart3 className="w-4.5 h-4.5" />
+              </Link>
+            </div>
+
+            {/* Primary Row - Largest (Core 5 destinations with center FAB) */}
+            <div className="pointer-events-auto w-full max-w-xl mx-auto px-4 pb-safe">
+              <div className="bg-white/80 backdrop-blur-xl rounded-[32px] shadow-[0_-4px_24px_rgba(56,36,13,0.08)] border-t border-[#e8e4d0]/40 p-2 flex items-center justify-between">
+                {BOTTOM_NAV_ITEMS.map((item, index) => {
                   const active = pathname === item.href;
                   const Icon = item.icon;
+                  
+                  if (item.isCenter) {
+                    // Center FAB - Largest, elevated
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-label={item.label}
+                        className="relative z-10 -mt-6"
+                      >
+                        <div className="w-[72px] h-[72px] rounded-full bg-[#713600] text-white flex items-center justify-center shadow-[0_12px_32px_rgba(113,54,0,0.5)] border-[4px] border-white active:scale-[0.95] transition-all">
+                          <Icon className="w-8 h-8 text-white stroke-[2.2]" />
+                        </div>
+                      </Link>
+                    );
+                  }
+                  
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold transition-all ${
+                      className={`flex flex-col items-center flex-1 py-2.5 px-1 rounded-[24px] text-[11px] font-semibold transition-all ${
                         active
-                          ? 'bg-[#f5f2e0] text-[#713600] shadow-xs'
-                          : 'text-[#713600] hover:bg-[#f0ece0] hover:text-[#38240d]'
+                          ? 'text-[#713600] bg-[#f5f2e0]/80'
+                          : 'text-[#a08a6a] hover:text-[#38240d]'
                       }`}
                     >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
+                      <Icon className={`w-5 h-5 mb-0.5 transition-transform ${active ? 'scale-110' : ''}`} />
+                      <span className={active ? 'font-bold' : ''}>{item.label}</span>
                     </Link>
                   );
                 })}
               </div>
             </div>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main Column */}
-      <div className={`flex-1 lg:pl-64 flex flex-col min-h-screen w-full ${isScannerPage ? 'bg-[#38240d]' : ''}`}>
-        {/* Top Header — new clean design, hidden on scanner */}
-        {!isScannerPage && (
-          <header className="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-xl border-b border-[#e8e4d0]/40 px-4 sm:px-6 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => setDrawerOpen(true)}
-                aria-label="Open navigation menu"
-                className="lg:hidden w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#a08a6a] hover:text-[#38240d] shadow-sm"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-              <h1 className="font-display text-lg sm:text-xl font-bold text-[#38240d] tracking-tight">
-                {pageTitle}
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href="/explore"
-                aria-label="Search Indian foods"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#a08a6a] hover:text-[#38240d] shadow-sm transition-colors"
-              >
-                <Search className="w-[18px] h-[18px]" />
-              </Link>
-              <Link
-                href="/profile"
-                aria-label="Body profile"
-                className="w-9 h-9 rounded-full bg-[#713600] text-white flex items-center justify-center shadow-sm font-bold text-sm"
-              >
-                {auth.name ? auth.name.charAt(0).toUpperCase() : <User className="w-[17px] h-[17px]" />}
-              </Link>
-            </div>
-          </header>
+          </nav>
         )}
-
-        {/* Page Content */}
-        <main className={isScannerPage ? "flex-1 w-full" : "flex-1 w-full max-w-2xl mx-auto px-4 sm:px-5 pt-5 pb-36 lg:pb-12"}>
-          {children}
-        </main>
       </div>
 
-      {/* Mobile Slide-Out Menu Drawer for All 15 Screens */}
+      {/* Mobile Slide-Out Menu Drawer (Full Navigation) - Accessible via long-press or swipe */}
       {drawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div className="fixed inset-0 bg-black/30 backdrop-blur-xs" onClick={() => setDrawerOpen(false)} />
-          <div className="relative w-72 max-w-[82vw] bg-white h-full p-5 overflow-y-auto shadow-2xl z-10">
+          <div className="relative w-72 max-w-[82vw] bg-white h-full p-5 overflow-y-auto shadow-2xl z-10 animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-2xl bg-[#713600] text-white flex items-center justify-center">
@@ -412,96 +421,171 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-5">
-              {NAV_GROUPS.map((group) => (
-                <div key={group.label}>
-                  <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-[#a08a6a] mb-1.5">
-                    {group.label}
-                  </p>
-                  <div className="space-y-1">
-                    {group.items.map((item) => {
-                      const active = pathname === item.href;
-                      const Icon = item.icon;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setDrawerOpen(false)}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold ${
-                            active ? 'bg-[#f5f2e0] text-[#713600]' : 'text-[#713600]'
-                          }`}
-                        >
-                          <Icon className="w-4 h-4" />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
+            <nav className="space-y-5">
+              <div>
+                <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-[#a08a6a] mb-1.5">Core</p>
+                <div className="space-y-1">
+                  {BOTTOM_NAV_ITEMS.filter(i => !i.isCenter).map((item) => {
+                    const active = pathname === item.href;
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setDrawerOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold ${
+                          active ? 'bg-[#f5f2e0] text-[#713600]' : 'text-[#713600]'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                  <Link
+                    href="/scanner"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600] bg-[#f5f2e0]"
+                  >
+                    <Camera className="w-4 h-4" />
+                    <span>AI Meal Scanner</span>
+                  </Link>
                 </div>
-              ))}
-            </div>
+              </div>
+              <div>
+                <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-[#a08a6a] mb-1.5">Planning & Fitness</p>
+                <div className="space-y-1">
+                  <Link
+                    href="/planner"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    <span>Meal Planner</span>
+                  </Link>
+                  <Link
+                    href="/workouts"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <Dumbbell className="w-4 h-4" />
+                    <span>Gym & Workouts</span>
+                  </Link>
+                  <Link
+                    href="/progress"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <Activity className="w-4 h-4" />
+                    <span>Transformation</span>
+                  </Link>
+                  <Link
+                    href="/habits"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <Droplets className="w-4 h-4" />
+                    <span>Water & Habits</span>
+                  </Link>
+                  <Link
+                    href="/grocery"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>Grocery & Budget</span>
+                  </Link>
+                </div>
+              </div>
+              <div>
+                <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-[#a08a6a] mb-1.5">Insights & Account</p>
+                <div className="space-y-1">
+                  <Link
+                    href="/analytics"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    <span>Analytics</span>
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Body Profile</span>
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold text-[#713600]"
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span>Settings & Privacy</span>
+                  </Link>
+                </div>
+              </div>
+            </nav>
           </div>
         </div>
       )}
 
-      {/* Mobile Floating Pill Bottom Navigation — Hidden on Scanner Page */}
-      {!isScannerPage && (
-        <nav
-          aria-label="Primary Mobile Navigation"
-          className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none"
-        >
-          <div className="pointer-events-auto bg-white rounded-[28px] px-4 py-2.5 shadow-[0_8px_32px_rgba(56,36,13,0.12)] flex items-center gap-0 w-full max-w-sm">
-            <Link
-              href="/"
-              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/' ? 'text-[#713600]' : 'text-[#a08a6a] hover:text-[#38240d]'
-              }`}
-            >
-              <Home className="w-5 h-5 mb-0.5" />
-              <span>Today</span>
-            </Link>
-            <Link
-              href="/diary"
-              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/diary' ? 'text-[#713600]' : 'text-[#a08a6a] hover:text-[#38240d]'
-              }`}
-            >
-              <BookOpen className="w-5 h-5 mb-0.5" />
-              <span>Diary</span>
-            </Link>
-
-            {/* Centre Camera FAB — Prominently elevated above nav bar */}
-            <div className="flex flex-col items-center flex-1 -mt-9 relative z-50">
-              <Link
-                href="/scanner"
-                aria-label="Scan Meal"
-                className="w-[66px] h-[66px] rounded-full bg-[#713600] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(113,54,0,0.45)] border-[5px] border-white active:scale-95 transition-all"
-              >
-                <Camera className="w-7 h-7 text-white stroke-[2.2]" />
-              </Link>
-            </div>
-
-            <Link
-              href="/explore"
-              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/explore' ? 'text-[#713600]' : 'text-[#a08a6a] hover:text-[#38240d]'
-              }`}
-            >
-              <Compass className="w-5 h-5 mb-0.5" />
-              <span>Explore</span>
-            </Link>
-            <Link
-              href="/coach"
-              className={`flex flex-col items-center flex-1 py-1 rounded-2xl text-[11px] font-semibold transition-colors ${
-                pathname === '/coach' ? 'text-[#713600]' : 'text-[#a08a6a] hover:text-[#38240d]'
-              }`}
-            >
-              <Sparkles className="w-5 h-5 mb-0.5" />
-              <span>Coach</span>
-            </Link>
+      {/* Desktop Sidebar - Minimal, accessible via hover or keyboard */}
+      <aside className="hidden lg:flex lg:flex-col lg:w-16 lg:fixed lg:inset-y-0 bg-white/60 backdrop-blur-xl border-r border-[#e8e4d0]/40 px-2 py-5 z-30 overflow-y-auto no-scrollbar" role="navigation" aria-label="Main navigation">
+        <Link href="/" className="flex flex-col items-center gap-1 px-1 py-3 mb-6 group">
+          <div className="w-10 h-10 rounded-2xl bg-[#713600] text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+            <Leaf className="w-5 h-5" />
           </div>
+        </Link>
+        <nav className="space-y-2 flex-1" style={{ scrollbarGutter: 'stable' }}>
+          {BOTTOM_NAV_ITEMS.filter(i => !i.isCenter).map((item) => {
+            const active = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 px-1 py-3 rounded-2xl text-[10px] font-semibold transition-all ${
+                  active
+                    ? 'text-[#713600] bg-[#f5f2e0]/80'
+                    : 'text-[#a08a6a] hover:text-[#38240d] hover:bg-[#f0ece0]/60'
+                }`}
+                title={item.label}
+              >
+                <Icon className={`w-5 h-5 transition-transform ${active ? 'scale-110' : ''}`} />
+                <span className={active ? 'font-bold' : ''}>{item.label}</span>
+              </Link>
+            );
+          })}
+          <Link
+            href="/scanner"
+            className="flex flex-col items-center gap-1 px-1 py-3 rounded-2xl text-[10px] font-semibold text-[#713600] bg-[#f5f2e0]/80"
+            title="AI Meal Scanner"
+          >
+            <Camera className="w-5 h-5" />
+            <span className="font-bold">Scan</span>
+          </Link>
         </nav>
-      )}
+        <div className="space-y-2 pt-4 border-t border-[#e8e4d0]/40">
+          <Link
+            href="/settings"
+            className="flex flex-col items-center gap-1 px-1 py-2.5 rounded-2xl text-[10px] font-medium text-[#a08a6a] hover:text-[#713600] hover:bg-[#f0ece0]/60 transition-colors"
+            title="Settings & Privacy"
+          >
+            <Settings className="w-5 h-5" />
+            <span>Settings</span>
+          </Link>
+          <Link
+            href="/profile"
+            className="flex flex-col items-center gap-1 px-1 py-2.5 rounded-2xl text-[10px] font-medium text-[#a08a6a] hover:text-[#713600] hover:bg-[#f0ece0]/60 transition-colors"
+            title="Body Profile"
+          >
+            <User className="w-5 h-5" />
+            <span>Profile</span>
+          </Link>
+        </div>
+      </aside>
     </div>
   );
 }

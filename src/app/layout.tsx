@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Epilogue, Manrope } from 'next/font/google';
 import './globals.css';
 import { AppShell } from '@/components/AppShell';
+import { ToastProvider } from '@/components/ui/Toast';
 
 const epilogue = Epilogue({
   variable: '--font-epilogue',
@@ -34,6 +35,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: '#713600',
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -56,7 +58,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="min-h-full bg-[#fdfbd4] text-[#38240d]">
         <Suspense fallback={<div className="min-h-screen bg-[#F7F4EF]" />}>
-          <AppShell>{children}</AppShell>
+          <ToastProvider>
+            <AppShell>{children}</AppShell>
+          </ToastProvider>
         </Suspense>
       </body>
     </html>
