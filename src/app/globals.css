@@ -55,6 +55,31 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* Prevent accidental text selection on interactive mobile elements */
+button, 
+nav, 
+a,
+[role="button"],
+.select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Smooth iOS momentum scrolling */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scroll snap utility for mobile date strips and cards */
+.snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+}
+.snap-item {
+  scroll-snap-align: center;
 }
 
 h1, h2, h3, .font-display {

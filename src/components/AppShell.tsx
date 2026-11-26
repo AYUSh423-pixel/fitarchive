@@ -24,6 +24,7 @@ import {
   Lock,
   Leaf,
 } from 'lucide-react';
+import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 
 interface AuthState {
   checked: boolean;
@@ -368,16 +369,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               : 'flex-1 w-full max-w-2xl mx-auto px-4 sm:px-5 pt-3 pb-28 lg:pb-12 animate-fade-in'
           }
         >
+          {!isScannerPage && <PwaInstallPrompt />}
           {children}
         </main>
 
-        {/* Single Minimalist Floating Pill Bottom Navigation (Mobile) */}
+        {/* Single Minimalist Floating Pill Bottom Navigation (Mobile PWA) */}
         {!isScannerPage && (
           <nav
             aria-label="Primary Mobile Navigation"
-            className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none pb-safe"
+            className="lg:hidden fixed inset-x-3 z-40 flex justify-center pointer-events-none"
+            style={{ bottom: 'max(14px, env(safe-area-inset-bottom, 14px))' }}
           >
-            <div className="pointer-events-auto bg-white/95 backdrop-blur-xl rounded-[32px] px-3 py-2 shadow-[0_8px_30px_rgba(28,25,23,0.08)] border border-[#E7E3D8]/80 flex items-center justify-between w-full max-w-sm mx-auto">
+            <div className="pointer-events-auto bg-white/95 backdrop-blur-xl rounded-[32px] px-3 py-1.5 shadow-[0_8px_32px_rgba(28,25,23,0.12)] border border-[#E7E3D8]/80 flex items-center justify-between w-full max-w-sm mx-auto">
               {BOTTOM_NAV_ITEMS.map((item) => {
                 const active = pathname === item.href;
                 const Icon = item.icon;
@@ -389,7 +392,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       <Link
                         href={item.href}
                         aria-label="Scan Meal with AI"
-                        className="w-[62px] h-[62px] rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_10px_24px_rgba(180,83,9,0.45)] border-[4px] border-[#F6F4EE] active:scale-95 transition-all hover:scale-105 animate-pulse-glow cursor-pointer"
+                        className="w-[60px] h-[60px] rounded-full bg-[#B45309] text-white flex items-center justify-center shadow-[0_10px_24px_rgba(180,83,9,0.45)] border-[4px] border-[#F6F4EE] active:scale-90 transition-all hover:scale-105 animate-pulse-glow cursor-pointer"
                       >
                         <Camera className="w-6 h-6 text-white stroke-[2.3]" />
                       </Link>
@@ -401,9 +404,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex flex-col items-center flex-1 py-1.5 px-2 rounded-2xl text-[11px] font-semibold transition-all tactile-press ${
+                    className={`flex flex-col items-center flex-1 py-1 px-1.5 rounded-2xl text-[10.5px] font-semibold transition-all tactile-press ${
                       active
-                        ? 'text-[#B45309] bg-[#FEF3C7]/80 font-bold scale-105'
+                        ? 'text-[#B45309] bg-[#FEF3C7]/90 font-bold scale-105'
                         : 'text-[#A8A29E] hover:text-[#1C1917]'
                     }`}
                   >

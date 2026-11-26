@@ -332,17 +332,20 @@ export function FoodLogModal({
 
   return (
     <>
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-xs p-0 sm:p-4">
-      <div className="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl border border-[#e8e4d0]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-xs p-0 sm:p-4 animate-fade-in">
+      <div className="bg-white w-full sm:max-w-xl rounded-t-[28px] sm:rounded-3xl max-h-[92vh] flex flex-col shadow-2xl border border-[#E7E3D8] pb-safe animate-fade-in-up">
+        {/* Mobile Drag Indicator */}
+        <div className="w-10 h-1 bg-[#E7E3D8] rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e4d0]">
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#F1EFEA]">
           <div>
-            <h2 className="font-display text-lg font-bold text-[#38240d]">Log Pure-Veg Meal</h2>
-            <p className="text-xs text-[#a08a6a]">Search Indian foods or speak naturally</p>
+            <h2 className="font-display text-lg font-bold text-[#1C1917]">Log Pure-Veg Meal</h2>
+            <p className="text-xs text-[#8C827A]">Search Indian foods or speak naturally</p>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-[#f0ece0] flex items-center justify-center text-[#a08a6a]"
+            className="w-9 h-9 rounded-full bg-[#FAF8F5] border border-[#E7E3D8] flex items-center justify-center text-[#8C827A] hover:text-[#1C1917] tactile-press-sm cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -350,13 +353,13 @@ export function FoodLogModal({
 
         {/* Meal Slot + Mode Switch */}
         <div className="px-6 pt-3 pb-2 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex gap-1.5 bg-[#f0ece0] p-1 rounded-full">
+          <div className="flex gap-1.5 bg-[#FAF8F5] border border-[#E7E3D8]/60 p-1 rounded-full">
             {(['breakfast', 'lunch', 'snacks', 'dinner'] as MealSlot[]).map((slot) => (
               <button
                 key={slot}
                 onClick={() => setMealSlot(slot)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer ${
-                  mealSlot === slot ? 'bg-[#c05800] text-white shadow-xs' : 'text-[#713600]'
+                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer tactile-press-sm ${
+                  mealSlot === slot ? 'bg-[#B45309] text-white shadow-xs' : 'text-[#78716C] hover:text-[#1C1917]'
                 }`}
               >
                 {slot}
@@ -364,19 +367,19 @@ export function FoodLogModal({
             ))}
           </div>
 
-          <div className="flex gap-1.5 bg-[#f0ece0] p-1 rounded-full">
+          <div className="flex gap-1.5 bg-[#FAF8F5] border border-[#E7E3D8]/60 p-1 rounded-full">
             <button
               onClick={() => setMode('manual')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${
-                mode === 'manual' ? 'bg-[#38240d] text-white' : 'text-[#713600]'
+              className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer tactile-press-sm ${
+                mode === 'manual' ? 'bg-[#1C1917] text-white shadow-xs' : 'text-[#78716C]'
               }`}
             >
               Manual
             </button>
             <button
               onClick={() => setMode('voice')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer ${
-                mode === 'voice' ? 'bg-[#38240d] text-white' : 'text-[#713600]'
+              className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer tactile-press-sm ${
+                mode === 'voice' ? 'bg-[#1C1917] text-white shadow-xs' : 'text-[#78716C]'
               }`}
             >
               <Mic className="w-3 h-3" /> Voice

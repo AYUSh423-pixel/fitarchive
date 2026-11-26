@@ -33,8 +33,11 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'NutriFit AI',
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -43,7 +46,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#B45309',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F6F4EE' },
+    { media: '(prefers-color-scheme: dark)', color: '#B45309' },
+  ],
   viewportFit: 'cover',
 };
 
