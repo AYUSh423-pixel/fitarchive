@@ -328,8 +328,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className={`flex-1 lg:pl-64 flex flex-col min-h-screen w-full ${isScannerPage ? 'bg-[#0D1F18]' : ''}`}>
-        {/* Subtle Minimal Header on Non-Today Pages (mobile) */}
-        {!isScannerPage && !isRootToday && (
+        {/* Subtle Minimal Header on All Pages (mobile) - includes Today page */}
+        {!isScannerPage && (
           <header className="sticky top-0 z-30 h-14 bg-[#F6F4EE]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between lg:hidden border-b border-[#E7E3D8]/50">
             <div className="flex items-center gap-2">
               <button
