@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Check, HelpCircle, Mic, MicOff, Plus, Search, X } from 'lucide-react';
+import { Check, HelpCircle, Mic, MicOff, Plus, Search, X, PlusCircle, Calculator, Trash2 } from 'lucide-react';
 import type { FoodItem, FoodUnit, MealSlot } from '@/types/nutrifit';
+import { AddCustomFoodModal } from '@/components/AddCustomFoodModal';
 
 interface FoodLogModalProps {
   open: boolean;
@@ -44,6 +45,24 @@ export function FoodLogModal({
   const [showGuide, setShowGuide] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  // Custom food modal
+  const [showCustomFood, setShowCustomFood] = useState(false);
+  
+  // Track items added in this session for meal summary
+  const [mealItems, setMealItems] = useState<
+    Array<{
+      food: FoodItem;
+      quantity: number;
+      unit: FoodUnit;
+      weightGrams: number;
+      calories: number;
+      proteinG: number;
+      carbsG: number;
+      fatG: number;
+      oilGheeGrams: number;
+    }>
+  >([]);
 
   // Voice state
   const [transcript, setTranscript] = useState('');
@@ -105,6 +124,13 @@ export function FoodLogModal({
       const mult = computeMultiplier(selectedFood, quantity, unit);
       const gheeCalories = extraGheeTsp * 45;
       const gheeFat = extraGheeTsp * 5;
+      const weightGrams = Math.round(selectedFood.weightGrams * mult + extraGheeTsp * 5);
+      const calories = Math.round(selectedFood.calories * mult + gheeCalories);
+      const proteinG = Number((selectedFood.proteinG * mult).toFixed(1));
+      const carbsG = Number((selectedFood.carbsG * mult).toFixed(1));
+      const fatG = Number((selectedFood.fatG * mult + gheeFat).toFixed(1));
+      const oilGheeGrams = Number((selectedFood.oilOrGheeIncludedG * mult + extraGheeTsp * 5).toFixed(1));
+
       const res = await fetch('/api/food-logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,25 +144,61 @@ export function FoodLogModal({
               : selectedFood.name,
           quantity,
           unit,
-          weightGrams: Math.round(selectedFood.weightGrams * mult + extraGheeTsp * 5),
-          calories: Math.round(selectedFood.calories * mult + gheeCalories),
-          proteinG: Number((selectedFood.proteinG * mult).toFixed(1)),
-          carbsG: Number((selectedFood.carbsG * mult).toFixed(1)),
-          fatG: Number((selectedFood.fatG * mult + gheeFat).toFixed(1)),
+          weightGrams,
+          calories,
+          proteinG,
+          carbsG,
+          fatG,
           loggingMethod: 'manual',
           confidence: selectedFood.confidence === 'verified' ? 'verified' : 'ai_confirmed_estimate',
-          oilGheeGrams: Number((selectedFood.oilOrGheeIncludedG * mult + extraGheeTsp * 5).toFixed(1)),
+          oilGheeGrams,
         }),
       });
       if (!res.ok) throw new Error('Failed to save food log');
+
+      // Track for meal summary
+      setMealItems((prev) => [
+        ...prev,
+        {
+          food: selectedFood,
+          quantity,
+          unit,
+          weightGrams,
+          calories,
+          proteinG,
+          carbsG,
+          fatG,
+          oilGheeGrams,
+        },
+      ]);
+
       setSelectedFood(null);
+      setQuantity(1);
+      setUnit('bowl');
+      setExtraGheeTsp(0);
       onSaved();
-      onClose();
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCustomFoodCreated = (food: FoodItem) => {
+    // Auto-select the newly created food
+    setSelectedFood(food);
+    setQuantity(food.servingSize);
+    setUnit(food.servingUnit);
+    setExtraGheeTsp(0);
+    setShowCustomFood(false);
+  };
+
+  const handleRemoveMealItem = (index: number) => {
+    setMealItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleClearMeal = () => {
+    setMealItems([]);
   };
 
   const handleStartVoice = () => {
@@ -228,10 +290,37 @@ export function FoodLogModal({
         }),
       });
       if (!res.ok) throw new Error('Failed to save voice entries');
+
+      // Track for meal summary
+      setMealItems((prev) => [
+        ...prev,
+        ...voiceItems.map((it) => ({
+          food: {
+            id: it.foodId || `voice-${Date.now()}`,
+            name: it.name,
+            calories: it.calories,
+            proteinG: it.proteinG,
+            carbsG: it.carbsG,
+            fatG: it.fatG,
+            weightGrams: it.weightGrams,
+            servingSize: it.quantity,
+            servingUnit: it.unit,
+            oilOrGheeIncludedG: it.oilGheeGrams,
+          } as FoodItem,
+          quantity: it.quantity,
+          unit: it.unit,
+          weightGrams: it.weightGrams,
+          calories: it.calories,
+          proteinG: it.proteinG,
+          carbsG: it.carbsG,
+          fatG: it.fatG,
+          oilGheeGrams: it.oilGheeGrams,
+        })),
+      ]);
+
       setVoiceItems([]);
       setTranscript('');
       onSaved();
-      onClose();
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -242,6 +331,7 @@ export function FoodLogModal({
   const previewMult = selectedFood ? computeMultiplier(selectedFood, quantity, unit) : 1;
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-xs p-0 sm:p-4">
       <div className="bg-[#FAF8F5] w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl border border-[#E4E0D8]">
         {/* Header */}
@@ -460,6 +550,14 @@ export function FoodLogModal({
                       </div>
                     </button>
                   ))}
+                  {/* Add Custom Food Button */}
+                  <button
+                    onClick={() => setShowCustomFood(true)}
+                    className="w-full text-left p-3.5 rounded-2xl bg-[#F0FDF4] border-2 border-dashed border-[#86EFAC] flex items-center justify-center gap-2 transition-all cursor-pointer hover:border-[#16A34A]"
+                  >
+                    <PlusCircle className="w-4 h-4 text-[#16A34A]" />
+                    <span className="font-semibold text-sm text-[#16A34A]">Add Custom Food</span>
+                  </button>
                 </div>
               )}
             </>
@@ -544,10 +642,94 @@ export function FoodLogModal({
                   </button>
                 </div>
               )}
+
+              {/* Meal Summary */}
+              {mealItems.length > 0 && (
+                <div className="pt-4 border-t border-[#E4E0D8]">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-sm text-[#1B1B1E] flex items-center gap-2">
+                      <Calculator className="w-4 h-4 text-[#FB923C]" />
+                      Meal Summary ({mealItems.length} items)
+                    </h3>
+                    <button
+                      onClick={handleClearMeal}
+                      className="text-xs text-[#BA1A1A] font-semibold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Clear All
+                    </button>
+                  </div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {mealItems.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-2xl bg-white border border-[#E4E0D8] flex items-center justify-between gap-2"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm truncate">{item.food.name}</p>
+                          <p className="text-xs text-[#554337]">
+                            {item.quantity} {item.unit} ({item.weightGrams}g) • P: {item.proteinG}g • C: {item.carbsG}g • F: {item.fatG}g
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-xs font-bold text-[#944A00] bg-[#FFEDD5] px-2.5 py-1 rounded-full">
+                            {item.calories} kcal
+                          </span>
+                          <button
+                            onClick={() => handleRemoveMealItem(idx)}
+                            className="text-xs text-[#BA1A1A] font-semibold cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-3 rounded-2xl bg-[#F5F3F6] border border-[#E4E0D8]">
+                    <div className="grid grid-cols-4 gap-2 text-center mb-2">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-[#944A00]">Total Calories</p>
+                        <p className="font-display font-bold text-lg text-[#944A00]">
+                          {mealItems.reduce((s, i) => s + i.calories, 0)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-[#006C4B]">Total Protein</p>
+                        <p className="font-display font-bold text-lg text-[#006C4B]">
+                          {mealItems.reduce((s, i) => s + i.proteinG, 0).toFixed(1)}g
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-[#674BB5]">Total Carbs</p>
+                        <p className="font-display font-bold text-lg text-[#674BB5]">
+                          {mealItems.reduce((s, i) => s + i.carbsG, 0).toFixed(1)}g
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-[#944A00]">Total Fat</p>
+                        <p className="font-display font-bold text-lg text-[#944A00]">
+                          {mealItems.reduce((s, i) => s + i.fatG, 0).toFixed(1)}g
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-center text-xs text-[#554337]">
+                      Total weight: {mealItems.reduce((s, i) => s + i.weightGrams, 0)}g • Oil/Ghee: {mealItems.reduce((s, i) => s + i.oilGheeGrams, 0).toFixed(1)}g
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
     </div>
+
+    <AddCustomFoodModal
+      open={showCustomFood}
+      onClose={() => setShowCustomFood(false)}
+      onFoodCreated={handleCustomFoodCreated}
+      mealItems={mealItems}
+    />
+  </>
   );
 }
