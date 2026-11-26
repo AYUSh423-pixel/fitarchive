@@ -78,7 +78,7 @@ export function createRateLimiter(config: RateLimitConfig) {
 // Pre-configured limiters for common use cases
 export const authRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 10,          // 10 attempts per 15 min
+  maxRequests: 30,          // 30 attempts per 15 min (allows testing + real use)
   keyPrefix: 'auth',
 });
 
@@ -96,7 +96,7 @@ export const aiRateLimiter = createRateLimiter({
 
 export const strictRateLimiter = createRateLimiter({
   windowMs: 60 * 1000,      // 1 minute
-  maxRequests: 5,           // 5 requests per minute
+  maxRequests: 30,          // 30 requests per minute (allows normal browsing)
   keyPrefix: 'strict',
 });
 

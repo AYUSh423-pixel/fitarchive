@@ -170,41 +170,53 @@ export async function POST(req: Request) {
         if (authUser?.user) {
           const newUserId = authUser.user.id;
 
-          // Create base isolated user profile
-          await supabaseAdmin.from('user_profiles').insert({
-            id: newUserId,
-            name,
-            email,
-            age: 25,
-            gender: 'male',
-            height_cm: 170,
-            weight_kg: 70,
-            bmi: 24.2,
-            diet_type: 'pure_veg_no_egg',
-            activity_level: 'gym_4_5_days',
-            food_preference: 'Homemade Indian food',
-            goal: 'lean_athletic',
-            onboarding_completed: false,
-          });
+          // Create base isolated user profile (non-blocking)
+          try {
+            await supabaseAdmin.from('user_profiles').insert({
+              id: newUserId,
+              name,
+              email,
+              age: 25,
+              gender: 'male',
+              height_cm: 170,
+              weight_kg: 70,
+              bmi: 24.2,
+              diet_type: 'pure_veg_no_egg',
+              activity_level: 'gym_4_5_days',
+              food_preference: 'Homemade Indian food',
+              goal: 'lean_athletic',
+              onboarding_completed: false,
+            });
+          } catch (profileErr) {
+            logger.warn('Failed to create user_profiles row (non-blocking)', { error: profileErr, userId: newUserId }, newUserId, requestId);
+          }
 
           // Create initial baseline nutrition targets for this user
-          await supabaseAdmin.from('nutrition_targets').insert({
-            user_id: newUserId,
-            calories_kcal: 1800,
-            protein_g: 130,
-            carbs_g: 155,
-            fat_g: 65,
-            water_ml: 3000,
-          });
+          try {
+            await supabaseAdmin.from('nutrition_targets').insert({
+              user_id: newUserId,
+              calories_kcal: 1800,
+              protein_g: 130,
+              carbs_g: 155,
+              fat_g: 65,
+              water_ml: 3000,
+            });
+          } catch (targetsErr) {
+            logger.warn('Failed to create nutrition_targets (non-blocking)', { error: targetsErr, userId: newUserId }, newUserId, requestId);
+          }
 
           // Create initial habit log
-          await supabaseAdmin.from('habit_logs').insert({
-            user_id: newUserId,
-            log_date: new Date().toISOString().slice(0, 10),
-            water_target_completed: false,
-            workout_completed: false,
-            consistency_score: 50,
-          });
+          try {
+            await supabaseAdmin.from('habit_logs').insert({
+              user_id: newUserId,
+              log_date: new Date().toISOString().slice(0, 10),
+              water_target_completed: false,
+              workout_completed: false,
+              consistency_score: 50,
+            });
+          } catch (habitErr) {
+            logger.warn('Failed to create habit_logs (non-blocking)', { error: habitErr, userId: newUserId }, newUserId, requestId);
+          }
 
           await setServerSessionCookie({
             userId: newUserId,
@@ -213,7 +225,7 @@ export async function POST(req: Request) {
           });
 
           logger.audit('User signup', { email, supabase: true }, newUserId, requestId);
-          return NextResponse.json({ ok: true, authenticated: true, email, onboardingCompleted: false }, { headers });
+          return NextResponse.json({ ok: true, authenticated: true, email, name, onboardingCompleted: false }, { headers });
         }
       }
 
