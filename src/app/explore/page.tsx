@@ -5,15 +5,6 @@ import { Search, CalendarDays, Dumbbell, TrendingUp, Droplets, ShoppingCart, Bar
 import Link from 'next/link';
 import type { FoodItem, Recipe, MealSlot } from '@/types/nutrifit';
 
-const FOOD_CATEGORIES = [
-  { label: 'Dal', color: '#FAF8F5', textColor: '#B45309' },
-  { label: 'Sabzi', color: '#FAF8F5', textColor: '#D97706' },
-  { label: 'Roti & rice', color: '#FAF8F5', textColor: '#B45309' },
-  { label: 'Paneer', color: '#FAF8F5', textColor: '#78716C' },
-  { label: 'Snacks', color: '#FAF8F5', textColor: '#B45309' },
-  { label: 'Sweets', color: '#FAF8F5', textColor: '#D97706' },
-];
-
 const TOOLS = [
   { label: 'Meal planner', icon: <CalendarDays className="w-5 h-5 text-[#B45309]" />, href: '/planner' },
   { label: 'Gym & workouts', icon: <Dumbbell className="w-5 h-5 text-[#B45309]" />, href: '/workouts' },
@@ -23,12 +14,11 @@ const TOOLS = [
   { label: 'Analytics', icon: <BarChart3 className="w-5 h-5 text-[#B45309]" />, href: '/analytics' },
 ];
 
-const FILTER_CHIPS = ['All', 'Dal', 'Sabzi', 'Roti & rice', 'Paneer'];
-
 export default function IndianFoodExplorePage() {
   const [query, setQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState<string>('All');
   const [foods, setFoods] = useState<FoodItem[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
   const [loading, setLoading] = useState(true);
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -43,13 +33,37 @@ export default function IndianFoodExplorePage() {
       if (activeFilter !== 'All') params.set('category', activeFilter);
       const res = await fetch(`/api/foods?${params.toString()}`, { cache: 'no-store' });
       if (res.ok) {
-        const d = await res.json();
+        const d = (await res.json()) as { foods: FoodItem[]; recipes: Recipe[] };
         setFoods(d.foods || []);
+        // Extract unique categories from foods if we don't have them yet
+        if (categories.length <= 1 && d.foods && d.foods.length > 0) {
+          const uniqueCats = [...new Set(d.foods.map((f) => f.category))].sort();
+          setCategories(['All', ...uniqueCats]);
+        }
       }
     } finally {
       setLoading(false);
     }
-  }, [query, activeFilter]);
+  }, [query, activeFilter, categories.length]);
+
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await fetch('/api/foods?limit=0', { cache: 'no-store' });
+        if (res.ok) {
+          const d = (await res.json()) as { foods: FoodItem[]; recipes: Recipe[] };
+          if (d.foods && d.foods.length > 0) {
+            const uniqueCats = [...new Set(d.foods.map((f) => f.category))].sort();
+            setCategories(['All', ...uniqueCats]);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load categories:', e);
+      }
+    };
+    loadCategories();
+  }, []);
 
   useEffect(() => { loadFoods(); }, [loadFoods]);
 
@@ -100,17 +114,17 @@ export default function IndianFoodExplorePage() {
 
       {/* Filter chips */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar animate-fade-in">
-        {FILTER_CHIPS.map((chip) => (
+        {categories.map((cat) => (
           <button
-            key={chip}
-            onClick={() => setActiveFilter(chip)}
+            key={cat}
+            onClick={() => setActiveFilter(cat)}
             className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer tactile-press-sm ${
-              activeFilter === chip
+              activeFilter === cat
                 ? 'bg-[#1C1917] text-white shadow-xs'
                 : 'bg-white text-[#1C1917] border border-[#E7E3D8] hover:border-[#B45309]/40'
             }`}
           >
-            {chip}
+            {cat}
           </button>
         ))}
       </div>
@@ -143,13 +157,13 @@ export default function IndianFoodExplorePage() {
           <div className="animate-fade-in-up">
             <h3 className="font-bold text-[#1C1917] text-base mb-3">Indian food database</h3>
             <div className="grid grid-cols-2 gap-2.5">
-              {FOOD_CATEGORIES.map((cat) => (
+              {categories.filter(c => c !== 'All').map((cat) => (
                 <button
-                  key={cat.label}
-                  onClick={() => setActiveFilter(cat.label)}
+                  key={cat}
+                  onClick={() => setActiveFilter(cat)}
                   className="card-minimal p-3.5 text-left w-full cursor-pointer tactile-press flex items-center justify-between hover:border-[#B45309]/30 transition-all"
                 >
-                  <p className="font-bold text-sm text-[#1C1917]">{cat.label}</p>
+                  <p className="font-bold text-sm text-[#1C1917]">{cat}</p>
                   <div className="w-7 h-7 rounded-full bg-[#FFF7ED] flex items-center justify-center">
                     <ChevronRight className="w-4 h-4 text-[#B45309]" />
                   </div>

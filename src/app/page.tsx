@@ -2,9 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ChevronRight, Moon, Coffee, Sun, Utensils } from 'lucide-react';
+import { ArrowRight, ChevronRight, Moon, Coffee, Sun, Utensils, MoreHorizontal, Settings, RefreshCw, CalendarDays, Sparkles } from 'lucide-react';
 import { CalorieArcGauge } from '@/components/CalorieArcGauge';
 import { FoodLogModal } from '@/components/FoodLogModal';
+import { Dropdown, type DropdownItem } from '@/components/ui/Dropdown';
 import type { FoodLog, MealSlot, NutritionTarget, UserProfile } from '@/types/nutrifit';
 
 interface DashboardData {
@@ -72,7 +73,7 @@ export default function HomeDashboardPage() {
 
   return (
     <div className="space-y-4 max-w-2xl mx-auto pb-6">
-      {/* Header Greeting */}
+      {/* Header with 3-dot menu */}
       <div className="flex items-center justify-between pb-1 animate-fade-in">
         <div>
           <p className="text-[11px] font-bold tracking-widest uppercase text-[#B45309]">
@@ -82,13 +83,34 @@ export default function HomeDashboardPage() {
             {greeting}, {profile?.name ? profile.name.split(' ')[0] : 'Friend'}
           </h1>
         </div>
-        <Link
-          href="/profile"
-          className="w-10 h-10 rounded-full bg-white border border-[#E7E3D8] shadow-sm flex items-center justify-center text-[#B45309] font-bold text-sm tactile-press overflow-hidden"
-          title="Profile"
-        >
-          {profile?.name ? profile.name.charAt(0).toUpperCase() : 'N'}
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/profile"
+            className="w-10 h-10 rounded-full bg-white border border-[#E7E3D8] shadow-sm flex items-center justify-center text-[#B45309] font-bold text-sm tactile-press overflow-hidden"
+            title="Profile"
+          >
+            {profile?.name ? profile.name.charAt(0).toUpperCase() : 'N'}
+          </Link>
+          <Dropdown
+            trigger={<button className="w-10 h-10 rounded-full bg-white border border-[#E7E3D8] shadow-sm flex items-center justify-center text-[#B45309] tactile-press" title="More options" aria-label="More options"><MoreHorizontal className="w-5 h-5" /></button>}
+            items={[
+              { value: 'refresh', label: 'Refresh Data', icon: <RefreshCw className="w-4 h-4" /> },
+              { value: 'planner', label: 'Meal Planner', icon: <CalendarDays className="w-4 h-4" /> },
+              { value: 'coach', label: 'AI Coach', icon: <Sparkles className="w-4 h-4" /> },
+              { value: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" />, divider: true },
+              { value: 'logout', label: 'Log Out', icon: <ChevronRight className="w-4 h-4" />, danger: true },
+            ]}
+            onSelect={(value) => {
+              if (value === 'refresh') fetchState();
+              else if (value === 'planner') window.location.href = '/planner';
+              else if (value === 'coach') window.location.href = '/coach';
+              else if (value === 'settings') window.location.href = '/settings';
+              else if (value === 'logout') window.location.href = '/api/auth?action=logout';
+            }}
+            align="end"
+            placement="bottom"
+          />
+        </div>
       </div>
 
       {/* Calorie Arc Card */}
