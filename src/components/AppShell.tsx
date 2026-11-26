@@ -345,107 +345,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className={`flex-1 lg:pl-64 flex flex-col min-h-screen w-full ${isScannerPage ? 'bg-[#0D1F18]' : ''}`}>
-        {/* Subtle Minimal Header on All Pages (mobile) - includes Today page */}
+        {/* Subtle Minimal Transparent Header on Mobile */}
         {!isScannerPage && (
-          <header className="sticky top-0 z-30 h-14 bg-[#F6F4EE]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between lg:hidden border-b border-[#E7E3D8]/50">
-            <div className="flex items-center gap-2">
+          <header
+            className={`sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between lg:hidden transition-all bg-transparent border-none ${
+              pathname === '/' ? 'h-12' : 'h-16 pt-2 pb-1'
+            }`}
+          >
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open menu"
-                className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#78716C] shadow-xs tactile-press"
+                className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-[#78716C] shadow-xs tactile-press hover:bg-white"
               >
                 <Menu className="w-4 h-4" />
               </button>
-              <h1 className="font-display text-base font-bold text-[#1C1917]">
-                {pageTitle}
-              </h1>
+              {pathname !== '/' && (
+                <h1 className="font-display text-2xl font-bold text-[#1C1917] tracking-tight">
+                  {pageTitle}
+                </h1>
+              )}
             </div>
-            <div className="flex items-center gap-1.5 relative">
-              <Link
-                href="/explore"
-                aria-label="Explore foods"
-                className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#78716C] shadow-xs tactile-press hover:text-[#B45309] transition-colors"
-              >
-                <Search className="w-4 h-4" />
-              </Link>
-              <button
-                onClick={() => setMoreMenuOpen((v) => !v)}
-                aria-label="More options"
-                className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#1C1917] shadow-xs tactile-press hover:bg-[#FAF8F5] transition-colors cursor-pointer"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
 
-              {/* Functional 3-Dots Quick Actions Popover Menu */}
-              {moreMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setMoreMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 top-11 z-50 w-56 card-minimal p-1.5 bg-white shadow-xl border border-[#E7E3D8] animate-scale-in space-y-0.5">
-                    <Link
-                      href="/profile"
-                      onClick={() => setMoreMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1C1917] hover:bg-[#FAF8F5] transition-colors"
-                    >
-                      <User className="w-4 h-4 text-[#B45309]" />
-                      <span>My Profile & Goals</span>
-                    </Link>
-                    <button
-                      onClick={async () => {
-                        setMoreMenuOpen(false);
-                        try {
-                          await fetch('/api/water', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ amountMl: 250 }),
-                          });
-                          window.location.reload();
-                        } catch {}
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1C1917] hover:bg-[#FAF8F5] transition-colors text-left cursor-pointer"
-                    >
-                      <Droplets className="w-4 h-4 text-blue-500" />
-                      <span>Quick Log +250ml Water</span>
-                    </button>
-                    <Link
-                      href="/coach"
-                      onClick={() => setMoreMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1C1917] hover:bg-[#FAF8F5] transition-colors"
-                    >
-                      <Sparkles className="w-4 h-4 text-[#B45309]" />
-                      <span>Ask AI Dietitian</span>
-                    </Link>
-                    <Link
-                      href="/diary"
-                      onClick={() => setMoreMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1C1917] hover:bg-[#FAF8F5] transition-colors"
-                    >
-                      <CalendarDays className="w-4 h-4 text-[#78716C]" />
-                      <span>Food Diary</span>
-                    </Link>
-                    <Link
-                      href="/settings"
-                      onClick={() => setMoreMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1C1917] hover:bg-[#FAF8F5] transition-colors"
-                    >
-                      <Settings className="w-4 h-4 text-[#78716C]" />
-                      <span>Settings</span>
-                    </Link>
-                    <div className="border-t border-[#F1EFEA] my-1" />
-                    <button
-                      onClick={() => {
-                        setMoreMenuOpen(false);
-                        handleLogout();
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                </>
+            {/* Right side: NO 3-dots on home page. Only clean search shortcut on non-home pages */}
+            <div className="flex items-center gap-2">
+              {pathname !== '/' && pathname !== '/explore' && (
+                <Link
+                  href="/explore"
+                  aria-label="Search foods"
+                  className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-[#78716C] shadow-xs tactile-press hover:text-[#B45309] transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                </Link>
               )}
             </div>
           </header>

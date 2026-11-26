@@ -316,25 +316,22 @@ export default function IndianFoodExplorePage() {
         </>
       )}
 
-      {/* Add to Meal Bottom-Sheet Modal (Elevation z-[70] so it NEVER collides with bottom nav bar FAB) */}
+      {/* Add to Meal Centered Blur Popup Box (z-[100] with backdrop-blur-md overlayering app bar) */}
       {selectedFood && (
-        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
-          {/* Full Dark Overlay */}
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          {/* Dismiss overlay */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            className="absolute inset-0"
             onClick={() => setSelectedFood(null)}
           />
 
-          {/* Modal Container */}
-          <div className="relative bg-white w-full sm:max-w-md rounded-t-[32px] sm:rounded-[32px] max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in-up z-10">
-            {/* Mobile Drag Indicator */}
-            <div className="w-10 h-1 bg-[#E7E3D8] rounded-full mx-auto mt-2.5 sm:hidden" />
-
+          {/* Centered Popup Box */}
+          <div className="relative bg-white w-full max-w-sm rounded-[28px] p-5 shadow-2xl border border-[#E7E3D8] animate-scale-in flex flex-col space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar z-10">
             {/* Header */}
-            <div className="px-5 py-3.5 border-b border-[#F1EFEA] flex items-center justify-between">
+            <div className="flex items-center justify-between pb-3 border-b border-[#F1EFEA]">
               <div>
-                <h3 className="font-bold text-base text-[#1C1917]">Log to Today&apos;s Diet</h3>
-                <p className="text-xs text-[#8C827A]">Customize portion & slot</p>
+                <h3 className="font-bold text-base text-[#1C1917]">Add to Meal</h3>
+                <p className="text-xs text-[#8C827A]">Choose portion & meal slot</p>
               </div>
               <button
                 onClick={() => setSelectedFood(null)}
@@ -344,85 +341,82 @@ export default function IndianFoodExplorePage() {
               </button>
             </div>
 
-            {/* Scrollable Body */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 no-scrollbar">
-              {/* Food preview chip */}
-              <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-[#FAF8F5] border border-[#E7E3D8]/60">
-                <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getFoodVisual(selectedFood).image}
-                    alt={selectedFood.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-sm text-[#1C1917] truncate">{selectedFood.name}</h4>
-                  <p className="text-xs text-[#8C827A] mt-0.5">
-                    {selectedFood.calories} kcal · {selectedFood.proteinG}g protein
-                  </p>
-                </div>
+            {/* Food Thumbnail + Name */}
+            <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-[#FAF8F5] border border-[#E7E3D8]/60">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shrink-0 shadow-xs">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={getFoodVisual(selectedFood).image}
+                  alt={selectedFood.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-
-              {/* Quantity Selector */}
-              <div>
-                <label className="text-xs font-bold text-[#1C1917] block mb-2">Quantity / Portions</label>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setQuantity(Math.max(0.5, +(quantity - 0.5).toFixed(1)))}
-                    className="w-10 h-10 rounded-2xl bg-[#FAF8F5] border border-[#E7E3D8] flex items-center justify-center text-[#1C1917] tactile-press-sm cursor-pointer hover:border-[#B45309]"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="text-2xl font-bold text-[#1C1917] w-14 text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(+(quantity + 0.5).toFixed(1))}
-                    className="w-10 h-10 rounded-2xl bg-[#FAF8F5] border border-[#E7E3D8] flex items-center justify-center text-[#1C1917] tactile-press-sm cursor-pointer hover:border-[#B45309]"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                  <span className="text-sm font-semibold text-[#8C827A]">
-                    {selectedFood.servingUnit}(s)
-                  </span>
-                </div>
-                <div className="mt-2 text-xs font-semibold text-[#B45309] bg-[#FFF7ED] border border-[#FED7AA]/50 p-2 rounded-xl flex items-center justify-between">
-                  <span>
-                    Total: {Math.round(selectedFood.calories * quantity)} kcal ·{' '}
-                    {(selectedFood.proteinG * quantity).toFixed(1)}g Protein
-                  </span>
-                  <span>{Math.round(selectedFood.weightGrams * quantity)}g</span>
-                </div>
-              </div>
-
-              {/* Meal Slot Selector */}
-              <div>
-                <label className="text-xs font-bold text-[#1C1917] block mb-2">Meal Slot</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['breakfast', 'lunch', 'snacks', 'dinner'] as MealSlot[]).map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setMealSlot(s)}
-                      className={`py-2 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer tactile-press-sm ${
-                        mealSlot === s
-                          ? 'bg-[#B45309] text-white shadow-xs ring-2 ring-[#B45309]/20'
-                          : 'bg-[#FAF8F5] text-[#78716C] border border-[#E7E3D8]/60 hover:bg-white'
-                      }`}
-                    >
-                      {s === 'snacks' ? 'Snack' : s.charAt(0).toUpperCase() + s.slice(1)}
-                    </button>
-                  ))}
-                </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-bold text-sm text-[#1C1917] truncate">{selectedFood.name}</h4>
+                <p className="text-xs text-[#8C827A] mt-0.5">
+                  {selectedFood.calories} kcal · {selectedFood.proteinG}g protein
+                </p>
               </div>
             </div>
 
-            {/* Sticky Action Footer (elevated with pb-safe so it NEVER collides with bottom navbar) */}
-            <div className="sticky bottom-0 bg-white/95 backdrop-blur-md px-5 py-4 border-t border-[#F1EFEA] pb-safe">
+            {/* Quantity Selector */}
+            <div>
+              <label className="text-xs font-bold text-[#1C1917] block mb-2">Quantity / Portions</label>
+              <div className="flex items-center justify-between bg-[#FAF8F5] p-2 rounded-2xl border border-[#E7E3D8]/60">
+                <button
+                  onClick={() => setQuantity(Math.max(0.5, +(quantity - 0.5).toFixed(1)))}
+                  className="w-9 h-9 rounded-xl bg-white border border-[#E7E3D8] flex items-center justify-center text-[#1C1917] tactile-press-sm cursor-pointer hover:border-[#B45309]"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <div className="text-center">
+                  <span className="text-xl font-bold text-[#1C1917]">{quantity}</span>
+                  <span className="text-xs font-semibold text-[#8C827A] ml-1.5">
+                    {selectedFood.servingUnit}(s)
+                  </span>
+                </div>
+                <button
+                  onClick={() => setQuantity(+(quantity + 0.5).toFixed(1))}
+                  className="w-9 h-9 rounded-xl bg-white border border-[#E7E3D8] flex items-center justify-center text-[#1C1917] tactile-press-sm cursor-pointer hover:border-[#B45309]"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="mt-2 text-xs font-semibold text-[#B45309] bg-[#FFF7ED] border border-[#FED7AA]/50 p-2 rounded-xl flex items-center justify-between">
+                <span>
+                  Total: {Math.round(selectedFood.calories * quantity)} kcal ·{' '}
+                  {(selectedFood.proteinG * quantity).toFixed(1)}g Protein
+                </span>
+                <span>{Math.round(selectedFood.weightGrams * quantity)}g</span>
+              </div>
+            </div>
+
+            {/* Meal Slot Selector */}
+            <div>
+              <label className="text-xs font-bold text-[#1C1917] block mb-2">Meal Slot</label>
+              <div className="grid grid-cols-4 gap-1.5">
+                {(['breakfast', 'lunch', 'snacks', 'dinner'] as MealSlot[]).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setMealSlot(s)}
+                    className={`py-2 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer tactile-press-sm ${
+                      mealSlot === s
+                        ? 'bg-[#B45309] text-white shadow-xs'
+                        : 'bg-[#FAF8F5] text-[#78716C] border border-[#E7E3D8]/60 hover:bg-white'
+                    }`}
+                  >
+                    {s === 'snacks' ? 'Snack' : s.charAt(0).toUpperCase() + s.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Action Button */}
+            <div className="pt-2">
               <button
                 onClick={handleAddToMeal}
                 disabled={addingToMeal}
-                className="w-full py-3.5 rounded-2xl bg-[#B45309] text-white font-bold text-base shadow-[0_4px_16px_rgba(180,83,9,0.3)] disabled:opacity-50 tactile-press transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-2xl bg-[#B45309] hover:bg-[#9a3412] text-white font-bold text-sm shadow-[0_4px_16px_rgba(180,83,9,0.3)] disabled:opacity-50 tactile-press transition-all cursor-pointer"
               >
                 {addingToMeal
                   ? 'Saving to Log…'
