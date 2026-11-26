@@ -57,8 +57,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${epilogue.variable} ${manrope.variable} h-full antialiased`}>
       <head>
-        <script src="/button.js" />
-        <script src="/tabs.js" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -25,7 +25,12 @@ export async function GET(req: Request) {
     );
   }
   if (category && category !== 'All') {
-    foods = foods.filter((f) => f.category === category);
+    const catLower = category.toLowerCase();
+    foods = foods.filter(
+      (f) =>
+        f.category.toLowerCase().includes(catLower) ||
+        catLower.includes(f.category.toLowerCase())
+    );
   }
   if (tag) {
     foods = foods.filter((f) => f.tags.some((t) => t.toLowerCase().includes(tag)));
