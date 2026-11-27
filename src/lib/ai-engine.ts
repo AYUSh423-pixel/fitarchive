@@ -119,14 +119,16 @@ export async function callVidhyantraChat(
   console.log('[Vidhyantra] Model:', vidhyantraModel);
 
   try {
+    const sanitizedKey = (apiKey || DEFAULT_VIDHYANTRA_KEY).trim().replace(/^["']|["']$/g, '');
+
     const res = await fetch(chatUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey || DEFAULT_VIDHYANTRA_KEY}`,
+        'Authorization': `Bearer ${sanitizedKey}`,
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(28000),
+      signal: AbortSignal.timeout(15000),
     });
 
     console.log('[Vidhyantra] Response status:', res.status);
@@ -134,7 +136,13 @@ export async function callVidhyantraChat(
     if (!res.ok) {
       const errorText = await res.text();
       console.error('[Vidhyantra] API error:', res.status, errorText);
-      return null;
+      try {
+        const parsed = JSON.parse(errorText);
+        if (parsed.error) {
+          return `⚠️ Vidhyantra AI Error (${res.status}): ${parsed.error}`;
+        }
+      } catch {}
+      return `⚠️ Vidhyantra AI Error (${res.status}): ${errorText.slice(0, 120)}`;
     }
     const data = await res.json();
     console.log('[Vidhyantra] Response data keys:', Object.keys(data));
@@ -311,7 +319,7 @@ Respond ONLY in this exact JSON shape:
           const data = await res.json();
           jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         }
-      } else if (isVidhyantraUrl(baseUrl)) {
+      } else if (isVidhyantra(baseUrl, provider, apiKey)) {
         // Vidhyantra sol (GPT-6 flagship) — supports image analysis via image field
         console.log('[Vidhyantra] Provider detected, preparing request...', {
           hasImage: !!base64Image,
@@ -775,7 +783,7 @@ ${todayLogs.length
           const data = await res.json();
           replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         }
-      } else if (isVidhyantraUrl(baseUrl)) {
+      } else if (isVidhyantra(baseUrl, provider, apiKey)) {
         // Vidhyantra custom API — passes multi-turn history + user question
         replyText = await callVidhyantraChat(
           [

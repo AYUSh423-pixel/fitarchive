@@ -9,6 +9,8 @@ import { validateRequest, aiChatSchema } from '@/lib/validation';
 import { logger, generateRequestId } from '@/lib/logger';
 import { aiRateLimiter, applyRateLimit, getClientKey } from '@/lib/rate-limit';
 
+export const maxDuration = 30;
+
 export async function GET(req: Request) {
   const requestId = generateRequestId();
   const clientKey = getClientKey(req);
