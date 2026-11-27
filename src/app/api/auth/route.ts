@@ -43,7 +43,7 @@ export async function GET() {
         authenticated: true,
         email: session.email,
         onboardingCompleted: false,
-        name: 'Member',
+        name: session.name || 'Member',
       });
     }
 
@@ -52,7 +52,7 @@ export async function GET() {
       authenticated: Boolean(session.userId === db.auth.userId || session.userId),
       email: session.email ?? db.auth.email,
       onboardingCompleted: db.profile.onboardingCompleted,
-      name: db.profile.name,
+      name: session.name || db.profile.name,
     });
   } catch (err) {
     logger.error('Auth GET error', { error: err }, undefined, requestId);
@@ -96,6 +96,7 @@ export async function POST(req: Request) {
       await setServerSessionCookie({
         userId: db.auth.userId,
         email: db.auth.email,
+        name: db.profile.name,
         iat: Date.now(),
       });
       return NextResponse.json({
@@ -134,14 +135,15 @@ export async function POST(req: Request) {
             }
           }
 
-          await setServerSessionCookie({
-            userId: authData.user.id,
-            email: authData.user.email || email,
-            iat: Date.now(),
-          });
-
           const userName = profileName || (authData.user.user_metadata?.name as string) || 'User';
           const userEmail = authData.user.email || email;
+
+          await setServerSessionCookie({
+            userId: authData.user.id,
+            email: userEmail,
+            name: userName,
+            iat: Date.now(),
+          });
 
           logger.audit('User login', { email, supabase: true }, authData.user.id, requestId);
           return NextResponse.json({
@@ -164,6 +166,7 @@ export async function POST(req: Request) {
         await setServerSessionCookie({
           userId: db.auth.userId,
           email: db.auth.email,
+          name: db.profile.name,
           iat: Date.now(),
         });
         logger.audit('User login', { email, supabase: false }, db.auth.userId, requestId);
@@ -268,7 +271,7 @@ export async function POST(req: Request) {
             }
           }
 
-          await setServerSessionCookie({ userId: newUserId, email, iat: Date.now() });
+          await setServerSessionCookie({ userId: newUserId, email, name, iat: Date.now() });
           logger.audit('User signup', { email, supabase: true }, newUserId, requestId);
           return NextResponse.json({
             ok: true,
@@ -294,6 +297,7 @@ export async function POST(req: Request) {
       await setServerSessionCookie({
         userId: db.auth.userId,
         email,
+        name: name || db.profile.name,
         iat: Date.now(),
       });
       logger.audit('User signup', { email, supabase: false }, db.auth.userId, requestId);

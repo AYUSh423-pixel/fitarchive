@@ -17,6 +17,7 @@ if (!AUTH_SECRET && process.env.NODE_ENV === 'production') {
 export interface SessionPayload {
   userId: string;
   email: string;
+  name?: string;
   iat: number;
 }
 

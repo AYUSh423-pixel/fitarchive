@@ -41,8 +41,32 @@ const VIDHYANTRA_HOST = 'vidhyantra.online';
 const DEFAULT_VIDHYANTRA_KEY = 'vdk_eyAml9DSFSVzTIUOH5Pi47p_W7AShio5t1S5ZpbpKqA';
 const DEFAULT_VIDHYANTRA_BASE_URL = 'https://www.vidhyantra.online/api/v1';
 
+export function normalizeVidhyantraUrl(baseUrl?: string): string {
+  let url = (baseUrl || DEFAULT_VIDHYANTRA_BASE_URL).trim();
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  url = url.replace(/\/+$/, '');
+  if (!url.includes('/api/v1')) {
+    url = `${url}/api/v1`;
+  }
+  if (!url.endsWith('/chat')) {
+    url = `${url}/chat/`;
+  } else if (!url.endsWith('/chat/')) {
+    url = `${url}/`;
+  }
+  return url;
+}
+
+export function isVidhyantra(baseUrl?: string, provider?: string, apiKey?: string): boolean {
+  if (provider === 'custom' && (!baseUrl || baseUrl.includes('vidhyantra'))) return true;
+  if (baseUrl && (baseUrl.toLowerCase().includes('vidhyantra.online') || baseUrl.toLowerCase().includes('vidhyantra'))) return true;
+  if (apiKey && apiKey.startsWith('vdk_')) return true;
+  return false;
+}
+
 function isVidhyantraUrl(baseUrl: string) {
-  try { return new URL(baseUrl).hostname.includes(VIDHYANTRA_HOST); } catch { return false; }
+  return isVidhyantra(baseUrl);
 }
 
 export async function callVidhyantraChat(
@@ -53,7 +77,7 @@ export async function callVidhyantraChat(
   imageBase64?: string,
   mimeType?: string
 ): Promise<string | null> {
-  const chatUrl = (baseUrl || DEFAULT_VIDHYANTRA_BASE_URL).replace(/\/+$/, '') + '/chat/';
+  const chatUrl = normalizeVidhyantraUrl(baseUrl);
 
   // Valid Vidhyantra models — default to 'sol' (GPT-6 flagship, most capable)
   const VALID_MODELS = ['sol', 'terra', 'chatgpt56', 'ultra', 'quick', 'code'];
@@ -154,13 +178,14 @@ export function resolveAiCredentials(config?: AiConfig) {
     }
   }
 
-  if (apiKey.startsWith('vdk_')) {
+  let baseUrl = config?.baseUrl || process.env.AI_BASE_URL || '';
+  if (isVidhyantra(baseUrl, provider, apiKey)) {
     provider = 'custom';
+    if (!baseUrl) baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
   }
 
-  let baseUrl = config?.baseUrl || process.env.AI_BASE_URL || '';
   if (!baseUrl) {
-    if (provider === 'custom' || apiKey.startsWith('vdk_')) baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
+    if (provider === 'custom') baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
     else if (provider === 'openai') baseUrl = 'https://api.openai.com/v1';
     else if (provider === 'groq') baseUrl = 'https://api.groq.com/openai/v1';
     else if (provider === 'openrouter') baseUrl = 'https://openrouter.ai/api/v1';
@@ -168,7 +193,7 @@ export function resolveAiCredentials(config?: AiConfig) {
 
   let model = config?.model || process.env.AI_MODEL || '';
   if (!model) {
-    if (provider === 'custom' || apiKey.startsWith('vdk_')) model = 'sol';
+    if (provider === 'custom' || isVidhyantra(baseUrl, provider, apiKey)) model = 'sol';
     else if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
     else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';

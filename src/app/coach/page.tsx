@@ -43,6 +43,16 @@ export default function AiDietitianPage() {
       if (res.ok) {
         const d = await res.json();
         setMessages((prev) => [...prev, d.userMsg, d.assistantMsg]);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        const errMsg: AiMessage = {
+          id: `err-${Date.now()}`,
+          userId: 'system',
+          role: 'assistant',
+          content: errData.error || 'Sorry, unable to get response from AI coach. Please check your AI configuration in Settings.',
+          createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, errMsg]);
       }
     } finally {
       setSending(false);

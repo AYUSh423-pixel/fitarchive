@@ -53,7 +53,7 @@ export async function requireAuth(): Promise<
 
         const userProfile: DatabaseState['profile'] = {
           id: p.id,
-          name: p.name || 'Member',
+          name: p.name || session.name || 'Member',
           email: p.email || session.email,
           age: Number(p.age || 25),
           gender: p.gender || 'male',
@@ -209,6 +209,11 @@ export async function requireAuth(): Promise<
   const db = readDatabase();
   const userFilteredDb: DatabaseState = {
     ...db,
+    profile: {
+      ...db.profile,
+      name: session.name || db.profile.name,
+      email: session.email || db.profile.email,
+    },
     aiConversations: (db.aiConversations || []).filter(
       (c) => !c.userId || c.userId === session.userId || session.userId === DEFAULT_USER_ID
     ),
