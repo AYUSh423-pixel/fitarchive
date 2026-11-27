@@ -159,41 +159,57 @@ export async function callVidhyantraChat(
 }
 
 export function resolveAiCredentials(config?: AiConfig) {
-  let apiKey = config?.apiKey || process.env.AI_API_KEY || '';
+  let baseUrl = config?.baseUrl || process.env.AI_BASE_URL || '';
+  let model = config?.model || process.env.AI_MODEL || '';
   let provider = config?.provider || (process.env.AI_PROVIDER as any);
+  let apiKey = config?.apiKey || process.env.AI_API_KEY || '';
 
-  console.log('[resolveAiCredentials] Input config:', { 
-    configApiKey: config?.apiKey ? '***' : 'none',
-    configProvider: config?.provider,
-    configBaseUrl: config?.baseUrl,
-    configModel: config?.model,
-    envAI_API_KEY: process.env.AI_API_KEY ? '***' : 'none',
-    envAI_PROVIDER: process.env.AI_PROVIDER,
-    envAI_BASE_URL: process.env.AI_BASE_URL,
-    envAI_MODEL: process.env.AI_MODEL,
-  });
+  const isGeminiKey = (k?: string) => Boolean(k && (k.startsWith('AIza') || k.startsWith('AQ.')));
 
-  // If no API key set in env or config, fallback to available keys or default Vidhyantra key
+  // 1. If baseUrl points to Vidhyantra or provider is explicitly custom/Vidhyantra
+  if (isVidhyantra(baseUrl, provider, apiKey)) {
+    provider = 'custom';
+    if (!baseUrl) baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
+    if (!model) model = 'sol';
+
+    // If apiKey is empty or was populated with a Gemini key, pick the Vidhyantra/OpenAI key!
+    if (!apiKey || isGeminiKey(apiKey)) {
+      if (process.env.OPENAI_API_KEY && !isGeminiKey(process.env.OPENAI_API_KEY)) {
+        apiKey = process.env.OPENAI_API_KEY;
+      } else if (process.env.AI_API_KEY && !isGeminiKey(process.env.AI_API_KEY)) {
+        apiKey = process.env.AI_API_KEY;
+      } else {
+        apiKey = DEFAULT_VIDHYANTRA_KEY;
+      }
+    }
+    return { provider, apiKey, model, baseUrl };
+  }
+
+  // 2. If provider is gemini or apiKey is explicitly a Gemini key
+  if (provider === 'gemini' || isGeminiKey(apiKey) || (!apiKey && process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY)) {
+    provider = 'gemini';
+    apiKey = apiKey || process.env.GEMINI_API_KEY || '';
+    if (!model) model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    return { provider, apiKey, model, baseUrl: '' };
+  }
+
+  // 3. Fallback for other providers
   if (!apiKey) {
-    if (process.env.GEMINI_API_KEY) {
-      apiKey = process.env.GEMINI_API_KEY;
-      provider = 'gemini';
-    } else if (process.env.OPENAI_API_KEY) {
+    if (process.env.OPENAI_API_KEY) {
       apiKey = process.env.OPENAI_API_KEY;
       provider = 'openai';
     } else if (process.env.GROQ_API_KEY) {
       apiKey = process.env.GROQ_API_KEY;
       provider = 'groq';
+    } else if (process.env.GEMINI_API_KEY) {
+      apiKey = process.env.GEMINI_API_KEY;
+      provider = 'gemini';
     } else {
       apiKey = DEFAULT_VIDHYANTRA_KEY;
       provider = 'custom';
+      baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
+      model = 'sol';
     }
-  }
-
-  let baseUrl = config?.baseUrl || process.env.AI_BASE_URL || '';
-  if (isVidhyantra(baseUrl, provider, apiKey)) {
-    provider = 'custom';
-    if (!baseUrl) baseUrl = DEFAULT_VIDHYANTRA_BASE_URL;
   }
 
   if (!baseUrl) {
@@ -203,9 +219,8 @@ export function resolveAiCredentials(config?: AiConfig) {
     else if (provider === 'openrouter') baseUrl = 'https://openrouter.ai/api/v1';
   }
 
-  let model = config?.model || process.env.AI_MODEL || '';
   if (!model) {
-    if (provider === 'custom' || isVidhyantra(baseUrl, provider, apiKey)) model = 'sol';
+    if (provider === 'custom') model = 'sol';
     else if (provider === 'gemini') model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     else if (provider === 'groq') model = 'llama-3.3-70b-versatile';
     else if (provider === 'openrouter') model = 'google/gemini-2.0-flash-001';
