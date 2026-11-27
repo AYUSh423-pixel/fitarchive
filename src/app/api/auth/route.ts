@@ -83,13 +83,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, authenticated: false }, { headers });
     }
 
-    if (action === 'quick_personal') {
+    if (action === 'quick_personal' || action === 'quick_enter') {
       await setServerSessionCookie({
         userId: db.auth.userId,
         email: db.auth.email,
         iat: Date.now(),
       });
-      return NextResponse.json({ ok: true, authenticated: true, email: db.auth.email }, { headers });
+      return NextResponse.json({
+        ok: true,
+        authenticated: true,
+        email: db.auth.email,
+        name: db.profile.name,
+        user: { name: db.profile.name, email: db.auth.email },
+      }, { headers });
     }
 
     if (action === 'login') {
@@ -115,13 +121,17 @@ export async function POST(req: Request) {
             iat: Date.now(),
           });
 
+          const userName = profile?.name || 'User';
+          const userEmail = authData.user.email || email;
+
           logger.audit('User login', { email, supabase: true }, authData.user.id, requestId);
           return NextResponse.json({
             ok: true,
             authenticated: true,
-            email: authData.user.email,
-            name: profile?.name || 'User',
+            email: userEmail,
+            name: userName,
             onboardingCompleted: Boolean(profile?.onboarding_completed),
+            user: { name: userName, email: userEmail },
           }, { headers });
         }
 
@@ -138,7 +148,13 @@ export async function POST(req: Request) {
           iat: Date.now(),
         });
         logger.audit('User login', { email, supabase: false }, db.auth.userId, requestId);
-        return NextResponse.json({ ok: true, authenticated: true, email: db.auth.email }, { headers });
+        return NextResponse.json({
+          ok: true,
+          authenticated: true,
+          email: db.auth.email,
+          name: db.profile.name,
+          user: { name: db.profile.name, email: db.auth.email },
+        }, { headers });
       }
 
       logger.security('Failed login attempt', { email }, undefined, requestId);
@@ -231,7 +247,14 @@ export async function POST(req: Request) {
           });
 
           logger.audit('User signup', { email, supabase: true }, newUserId, requestId);
-          return NextResponse.json({ ok: true, authenticated: true, email, name, onboardingCompleted: false }, { headers });
+          return NextResponse.json({
+            ok: true,
+            authenticated: true,
+            email,
+            name,
+            onboardingCompleted: false,
+            user: { name, email },
+          }, { headers });
         }
       }
 
@@ -251,7 +274,14 @@ export async function POST(req: Request) {
         iat: Date.now(),
       });
       logger.audit('User signup', { email, supabase: false }, db.auth.userId, requestId);
-      return NextResponse.json({ ok: true, authenticated: true, email, onboardingCompleted: false }, { headers });
+      return NextResponse.json({
+        ok: true,
+        authenticated: true,
+        email,
+        name: name || db.profile.name,
+        onboardingCompleted: false,
+        user: { name: name || db.profile.name, email },
+      }, { headers });
     }
 
     if (action === 'change_password') {

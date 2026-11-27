@@ -147,12 +147,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Quick access failed');
+      const userName = data.name || data.user?.name || 'Ayush';
+      const userEmail = data.email || data.user?.email || 'personal@nutrifit.local';
       setAuth({
         checked: true,
         authenticated: true,
-        name: data.user.name,
-        email: data.user.email,
+        name: userName,
+        email: userEmail,
       });
+      window.location.reload();
     } catch (err: unknown) {
       setAuthError((err as Error).message);
     } finally {
@@ -177,12 +180,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Authentication failed');
+      const userName = data.name || data.user?.name || (authMode === 'signup' ? signupName : 'Member');
+      const userEmail = data.email || data.user?.email || email;
       setAuth({
         checked: true,
         authenticated: true,
-        name: data.user.name,
-        email: data.user.email,
+        name: userName,
+        email: userEmail,
       });
+      window.location.reload();
     } catch (err: unknown) {
       setAuthError((err as Error).message);
     } finally {

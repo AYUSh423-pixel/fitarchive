@@ -58,7 +58,7 @@ export const logoutSchema = z.object({
 });
 
 export const quickPersonalSchema = z.object({
-  action: z.literal('quick_personal'),
+  action: z.enum(['quick_personal', 'quick_enter']),
 });
 
 export const authActionSchema = z.discriminatedUnion('action', [
