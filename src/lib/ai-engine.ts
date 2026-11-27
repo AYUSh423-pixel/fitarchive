@@ -136,13 +136,17 @@ export async function callVidhyantraChat(
     if (!res.ok) {
       const errorText = await res.text();
       console.error('[Vidhyantra] API error:', res.status, errorText);
+      const isDefault = !apiKey || apiKey === DEFAULT_VIDHYANTRA_KEY;
+      const keyHint = isDefault 
+        ? 'No AI_API_KEY received from Vercel environment (fell back to default key)'
+        : `Key sent: ${sanitizedKey.slice(0, 6)}...${sanitizedKey.slice(-4)}`;
       try {
         const parsed = JSON.parse(errorText);
         if (parsed.error) {
-          return `⚠️ Vidhyantra AI Error (${res.status}): ${parsed.error}`;
+          return `⚠️ Vidhyantra AI (${res.status}): ${parsed.error} [${keyHint}]`;
         }
       } catch {}
-      return `⚠️ Vidhyantra AI Error (${res.status}): ${errorText.slice(0, 120)}`;
+      return `⚠️ Vidhyantra AI (${res.status}): ${errorText.slice(0, 120)} [${keyHint}]`;
     }
     const data = await res.json();
     console.log('[Vidhyantra] Response data keys:', Object.keys(data));

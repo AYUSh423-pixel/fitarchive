@@ -12,10 +12,10 @@ export async function GET() {
   if (guard.error) return guard.error;
 
   const dbConfig = guard.db.aiConfig;
-  const currentKey = dbConfig?.apiKey || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || '';
-  const provider = dbConfig?.provider || (process.env.OPENAI_API_KEY ? 'openai' : 'gemini');
-  const model = dbConfig?.model || (provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini');
-  const baseUrl = dbConfig?.baseUrl || '';
+  const currentKey = dbConfig?.apiKey || process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || '';
+  const provider = dbConfig?.provider || (process.env.AI_API_KEY ? 'custom' : process.env.OPENAI_API_KEY ? 'openai' : 'gemini');
+  const model = dbConfig?.model || process.env.AI_MODEL || (provider === 'gemini' ? 'gemini-2.5-flash' : provider === 'custom' ? 'sol' : 'gpt-4o-mini');
+  const baseUrl = dbConfig?.baseUrl || process.env.AI_BASE_URL || '';
 
   return NextResponse.json({
     provider,
@@ -34,8 +34,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const provider = (body.provider || 'gemini') as AiProvider;
     const apiKey = String(body.apiKey || '').trim();
-    const model = String(body.model || '').trim() || (provider === 'gemini' ? 'gemini-2.5-flash' : provider === 'groq' ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini');
-    const baseUrl = String(body.baseUrl || '').trim();
+    const model = String(body.model || '').trim() || (provider === 'gemini' ? 'gemini-2.5-flash' : provider === 'groq' ? 'llama-3.3-70b-versatile' : provider === 'custom' ? 'sol' : 'gpt-4o-mini');
+    const baseUrl = String(body.baseUrl || '').trim() || (provider === 'custom' ? 'https://www.vidhyantra.online/api/v1' : '');
 
     // Update in-memory runtime
     if (provider === 'gemini') {
@@ -43,6 +43,11 @@ export async function POST(req: Request) {
       process.env.GEMINI_MODEL = model;
     } else if (provider === 'openai') {
       process.env.OPENAI_API_KEY = apiKey;
+    } else if (provider === 'custom') {
+      process.env.AI_API_KEY = apiKey;
+      process.env.AI_BASE_URL = baseUrl;
+      process.env.AI_MODEL = model;
+      process.env.AI_PROVIDER = 'custom';
     }
 
     const newConfig: AiConfig = {
