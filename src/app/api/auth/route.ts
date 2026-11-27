@@ -21,21 +21,30 @@ export async function GET() {
     }
 
     // If Supabase is connected and it's not the default local mock user
-    if (isSupabaseEnabled() && supabaseAdmin && session.userId !== DEFAULT_USER_ID) {
-      const { data: profile } = await supabaseAdmin
-        .from('user_profiles')
-        .select('name, email, onboarding_completed')
-        .eq('id', session.userId)
-        .single();
+    if (isSupabaseEnabled() && session.userId !== DEFAULT_USER_ID) {
+      if (supabaseAdmin) {
+        const { data: profile } = await supabaseAdmin
+          .from('user_profiles')
+          .select('name, email, onboarding_completed')
+          .eq('id', session.userId)
+          .single();
 
-      if (profile) {
-        return NextResponse.json({
-          authenticated: true,
-          email: session.email,
-          onboardingCompleted: Boolean(profile.onboarding_completed),
-          name: profile.name,
-        });
+        if (profile) {
+          return NextResponse.json({
+            authenticated: true,
+            email: session.email,
+            onboardingCompleted: Boolean(profile.onboarding_completed),
+            name: profile.name,
+          });
+        }
       }
+
+      return NextResponse.json({
+        authenticated: true,
+        email: session.email,
+        onboardingCompleted: false,
+        name: 'Member',
+      });
     }
 
     const db = readDatabase();
@@ -101,19 +110,29 @@ export async function POST(req: Request) {
     if (action === 'login') {
       const { email, password } = body;
 
-      // Check Supabase if enabled
-      if (isSupabaseEnabled() && supabaseAdmin) {
-        const { data: authData, error: authErr } = await supabaseAdmin.auth.signInWithPassword({
+      // Check Supabase if enabled — works with anon client or admin client
+      const authClient = supabaseClient || supabaseAdmin;
+      if (isSupabaseEnabled() && authClient) {
+        const { data: authData, error: authErr } = await authClient.auth.signInWithPassword({
           email,
           password,
         });
 
         if (authData?.user) {
-          const { data: profile } = await supabaseAdmin
-            .from('user_profiles')
-            .select('name, onboarding_completed')
-            .eq('id', authData.user.id)
-            .single();
+          let profileName: string | null = null;
+          let onboardingCompleted = false;
+
+          if (supabaseAdmin) {
+            const { data: profile } = await supabaseAdmin
+              .from('user_profiles')
+              .select('name, onboarding_completed')
+              .eq('id', authData.user.id)
+              .single();
+            if (profile) {
+              profileName = profile.name;
+              onboardingCompleted = Boolean(profile.onboarding_completed);
+            }
+          }
 
           await setServerSessionCookie({
             userId: authData.user.id,
@@ -121,7 +140,7 @@ export async function POST(req: Request) {
             iat: Date.now(),
           });
 
-          const userName = profile?.name || 'User';
+          const userName = profileName || (authData.user.user_metadata?.name as string) || 'User';
           const userEmail = authData.user.email || email;
 
           logger.audit('User login', { email, supabase: true }, authData.user.id, requestId);
@@ -130,7 +149,7 @@ export async function POST(req: Request) {
             authenticated: true,
             email: userEmail,
             name: userName,
-            onboardingCompleted: Boolean(profile?.onboarding_completed),
+            onboardingCompleted,
             user: { name: userName, email: userEmail },
           }, { headers });
         }
@@ -182,9 +201,12 @@ export async function POST(req: Request) {
             logger.security('Signup attempted with existing email', { email }, undefined, requestId);
             return NextResponse.json({ error: 'An account with this email already exists. Please sign in.' }, { status: 400, headers });
           }
+
+          // For Supabase database errors (e.g. broken triggers on auth.users) or upstream issues,
+          // fall back to local database so user signup is never blocked.
           const errInfo: Record<string, unknown> = { email, error: authErr.message };
-          logger.error('Supabase signup error', errInfo, undefined, requestId);
-          return NextResponse.json({ error: 'Unable to create account. Please try again.' }, { status: 400, headers });
+          logger.warn('Supabase signup error — falling back to local account', errInfo, undefined, requestId);
+          // fall through to local fallback below
         }
 
         // signUp returns a user even when email confirmation is pending.
