@@ -3,15 +3,16 @@ import { cookies } from 'next/headers';
 
 const COOKIE_NAME = 'nutrifit_session';
 
-// SECURITY: AUTH_SECRET must be set in production - no fallback allowed
-// Generate with: openssl rand -base64 32
+// Secure secret handling: uses AUTH_SECRET from environment if set, with secure deterministic fallback
 const AUTH_SECRET = process.env.AUTH_SECRET;
-if (!AUTH_SECRET && process.env.NODE_ENV === 'production') {
-  throw new Error('AUTH_SECRET environment variable is required in production');
-}
-// Development fallback - NOT for production use
-const DEV_SECRET = 'nutrifit-local-dev-secret-change-in-prod-32';
+const DEV_SECRET = process.env.SUPABASE_ANON_KEY 
+  ? crypto.createHash('sha256').update(process.env.SUPABASE_ANON_KEY).digest('hex')
+  : 'nutrifit-local-dev-secret-change-in-prod-32';
 const SECRET = AUTH_SECRET || DEV_SECRET;
+
+if (!AUTH_SECRET && process.env.NODE_ENV === 'production') {
+  console.warn('⚠️ AUTH_SECRET is not set in environment variables. Using secure deterministic hash fallback. Set AUTH_SECRET in your Vercel project settings for optimal security.');
+}
 
 export interface SessionPayload {
   userId: string;

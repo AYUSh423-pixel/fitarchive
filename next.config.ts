@@ -51,10 +51,10 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
-          // Permissions policy (feature policy)
+          // Permissions policy (camera and microphone allowed for meal scanner & voice log)
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), payment=()',
+            value: 'camera=(self), microphone=(self), geolocation=(), payment=()',
           },
           // HSTS - only in production
           ...(isProd ? [{

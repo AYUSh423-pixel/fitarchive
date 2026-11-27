@@ -7,7 +7,7 @@ import {
   verifyPassword,
 } from '@/lib/auth';
 import { DEFAULT_USER_ID, readDatabase, updateDatabase } from '@/lib/db/local-store';
-import { supabaseAdmin, isSupabaseEnabled } from '@/lib/db/supabase-client';
+import { supabaseAdmin, supabaseClient, isSupabaseEnabled } from '@/lib/db/supabase-client';
 import { authRateLimiter, applyRateLimit, getClientKey } from '@/lib/rate-limit';
 import { validateRequest, authActionSchema } from '@/lib/validation';
 import { logger, generateRequestId } from '@/lib/logger';
@@ -164,88 +164,89 @@ export async function POST(req: Request) {
     if (action === 'signup') {
       const { email, password, name } = body;
 
-      // 1. Create in Supabase if configured
-      if (isSupabaseEnabled() && supabaseAdmin) {
-        const { data: authUser, error: authErr } = await supabaseAdmin.auth.admin.createUser({
+      // 1. Create in Supabase if configured — uses client-side signUp (works with anon key, no service role required)
+      if (isSupabaseEnabled() && supabaseClient) {
+        const { data: authData, error: authErr } = await supabaseClient.auth.signUp({
           email,
           password,
-          email_confirm: true,
-          user_metadata: { name },
+          options: { data: { name } },
         });
 
         if (authErr) {
-          // If already exists, notify cleanly
-          if (authErr.message.includes('already registered')) {
+          // Already-registered check
+          if (
+            authErr.message.toLowerCase().includes('already registered') ||
+            authErr.message.toLowerCase().includes('user already registered') ||
+            authErr.message.toLowerCase().includes('email already')
+          ) {
             logger.security('Signup attempted with existing email', { email }, undefined, requestId);
             return NextResponse.json({ error: 'An account with this email already exists. Please sign in.' }, { status: 400, headers });
           }
-          // Log full error for debugging (safe access via type casting)
-          const err = authErr as unknown as Record<string, unknown>;
           const errInfo: Record<string, unknown> = { email, error: authErr.message };
-          if ('code' in err) errInfo.code = err.code;
-          if ('details' in err) errInfo.details = err.details;
-          if ('hint' in err) errInfo.hint = err.hint;
           logger.error('Supabase signup error', errInfo, undefined, requestId);
           return NextResponse.json({ error: 'Unable to create account. Please try again.' }, { status: 400, headers });
         }
 
-        if (authUser?.user) {
-          const newUserId = authUser.user.id;
+        // signUp returns a user even when email confirmation is pending.
+        // identities?.length === 0 means the email already exists but is unconfirmed.
+        const signedUpUser = authData?.user;
+        if (signedUpUser && signedUpUser.identities && signedUpUser.identities.length === 0) {
+          logger.security('Signup with existing (unconfirmed) email', { email }, undefined, requestId);
+          return NextResponse.json({ error: 'An account with this email already exists. Please sign in.' }, { status: 400, headers });
+        }
 
-          // Create base isolated user profile (non-blocking)
-          try {
-            await supabaseAdmin.from('user_profiles').insert({
-              id: newUserId,
-              name,
-              email,
-              age: 25,
-              gender: 'male',
-              height_cm: 170,
-              weight_kg: 70,
-              bmi: 24.2,
-              diet_type: 'pure_veg_no_egg',
-              activity_level: 'gym_4_5_days',
-              food_preference: 'Homemade Indian food',
-              goal: 'lean_athletic',
-              onboarding_completed: false,
-            });
-          } catch (profileErr) {
-            logger.warn('Failed to create user_profiles row (non-blocking)', { error: profileErr, userId: newUserId }, newUserId, requestId);
+        if (signedUpUser) {
+          const newUserId = signedUpUser.id;
+
+          // Create base isolated user profile (non-blocking) — use supabaseAdmin if available, else skip
+          if (supabaseAdmin) {
+            try {
+              await supabaseAdmin.from('user_profiles').insert({
+                id: newUserId,
+                name,
+                email,
+                age: 25,
+                gender: 'male',
+                height_cm: 170,
+                weight_kg: 70,
+                bmi: 24.2,
+                diet_type: 'pure_veg_no_egg',
+                activity_level: 'gym_4_5_days',
+                food_preference: 'Homemade Indian food',
+                goal: 'lean_athletic',
+                onboarding_completed: false,
+              });
+            } catch (profileErr) {
+              logger.warn('Failed to create user_profiles row (non-blocking)', { error: profileErr, userId: newUserId }, newUserId, requestId);
+            }
+
+            try {
+              await supabaseAdmin.from('nutrition_targets').insert({
+                user_id: newUserId,
+                calories_kcal: 1800,
+                protein_g: 130,
+                carbs_g: 155,
+                fat_g: 65,
+                water_ml: 3000,
+              });
+            } catch (targetsErr) {
+              logger.warn('Failed to create nutrition_targets (non-blocking)', { error: targetsErr, userId: newUserId }, newUserId, requestId);
+            }
+
+            try {
+              await supabaseAdmin.from('habit_logs').insert({
+                user_id: newUserId,
+                log_date: new Date().toISOString().slice(0, 10),
+                water_target_completed: false,
+                workout_completed: false,
+                consistency_score: 50,
+              });
+            } catch (habitErr) {
+              logger.warn('Failed to create habit_logs (non-blocking)', { error: habitErr, userId: newUserId }, newUserId, requestId);
+            }
           }
 
-          // Create initial baseline nutrition targets for this user
-          try {
-            await supabaseAdmin.from('nutrition_targets').insert({
-              user_id: newUserId,
-              calories_kcal: 1800,
-              protein_g: 130,
-              carbs_g: 155,
-              fat_g: 65,
-              water_ml: 3000,
-            });
-          } catch (targetsErr) {
-            logger.warn('Failed to create nutrition_targets (non-blocking)', { error: targetsErr, userId: newUserId }, newUserId, requestId);
-          }
-
-          // Create initial habit log
-          try {
-            await supabaseAdmin.from('habit_logs').insert({
-              user_id: newUserId,
-              log_date: new Date().toISOString().slice(0, 10),
-              water_target_completed: false,
-              workout_completed: false,
-              consistency_score: 50,
-            });
-          } catch (habitErr) {
-            logger.warn('Failed to create habit_logs (non-blocking)', { error: habitErr, userId: newUserId }, newUserId, requestId);
-          }
-
-          await setServerSessionCookie({
-            userId: newUserId,
-            email,
-            iat: Date.now(),
-          });
-
+          await setServerSessionCookie({ userId: newUserId, email, iat: Date.now() });
           logger.audit('User signup', { email, supabase: true }, newUserId, requestId);
           return NextResponse.json({
             ok: true,
